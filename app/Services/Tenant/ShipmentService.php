@@ -9,7 +9,7 @@ use Throwable;
 
 /**
  * Class ShipmentService
- * * Handles business logic related to tenant order shipments.
+ * Handles business logic related to tenant order shipments.
  */
 class ShipmentService
 {
