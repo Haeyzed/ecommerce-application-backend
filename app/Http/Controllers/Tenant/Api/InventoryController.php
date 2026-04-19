@@ -8,6 +8,7 @@ use App\Http\Requests\Tenant\Inventory\AdjustInventoryRequest;
 use App\Models\Tenant\Product;
 use App\Services\Tenant\ProductService;
 use Illuminate\Http\JsonResponse;
+use Throwable;
 
 /**
  * Inventory Endpoints
@@ -30,6 +31,7 @@ class InventoryController extends Controller
      * @param AdjustInventoryRequest $request
      * @param Product $product
      * @return JsonResponse
+     * @throws Throwable
      */
     public function adjust(AdjustInventoryRequest $request, Product $product): JsonResponse
     {

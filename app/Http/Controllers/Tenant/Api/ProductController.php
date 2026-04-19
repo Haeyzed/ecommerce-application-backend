@@ -34,14 +34,33 @@ class ProductController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $products = $this->productService->getPaginatedProducts(
-            $request->query('category'),
-            $request->query('q')
-        );
+        $filters = [
+            'is_active'     => true,
+            'category_slug' => $request->query('category'),
+            'search'        => $request->query('q'),
+        ];
+
+        $products = $this->productService->getPaginatedProducts($filters);
 
         return ApiResponse::success(
             ['products' => $products],
             'Products retrieved successfully'
+        );
+    }
+
+    /**
+     * Get product details.
+     *
+     * @param string $slug
+     * @return JsonResponse
+     */
+    public function show(string $slug): JsonResponse
+    {
+        $product = $this->productService->getProductBySlug($slug);
+
+        return ApiResponse::success(
+            ['product' => $product],
+            'Product retrieved successfully'
         );
     }
 
@@ -64,30 +83,15 @@ class ProductController extends Controller
     }
 
     /**
-     * Get product details.
-     *
-     * @param string $slug
-     * @return JsonResponse
-     */
-    public function show(string $slug): JsonResponse
-    {
-        $product = $this->productService->getProductBySlug($slug);
-
-        return ApiResponse::success(
-            ['product' => $product],
-            'Product retrieved successfully'
-        );
-    }
-
-    /**
      * Update a product.
      *
      * @param UpdateProductRequest $request
-     * @param Product $product
+     * @param int $id
      * @return JsonResponse
      */
-    public function update(UpdateProductRequest $request, Product $product): JsonResponse
+    public function update(UpdateProductRequest $request, int $id): JsonResponse
     {
+        $product = Product::query()->findOrFail($id);
         $updatedProduct = $this->productService->updateProduct($product, $request->validated());
 
         return ApiResponse::success(
@@ -99,11 +103,12 @@ class ProductController extends Controller
     /**
      * Delete a product.
      *
-     * @param Product $product
+     * @param int $id
      * @return JsonResponse
      */
-    public function destroy(Product $product): JsonResponse
+    public function destroy(int $id): JsonResponse
     {
+        $product = Product::query()->findOrFail($id);
         $this->productService->deleteProduct($product);
 
         return ApiResponse::success(null, 'Product deleted successfully');

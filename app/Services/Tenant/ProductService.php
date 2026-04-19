@@ -7,6 +7,7 @@ use App\Models\Tenant\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Throwable;
 
 /**
  * Class ProductService
@@ -92,12 +93,13 @@ class ProductService
      * @param string $reason The reason for adjustment.
      * @param string|null $note Optional context note.
      * @return Product
+     * @throws Throwable
      */
     public function adjustStock(Product $product, int $delta, string $reason, ?string $note = null): Product
     {
         return DB::transaction(function () use ($product, $delta, $reason, $note) {
             $product->lockForUpdate()->refresh();
-            $product->stock = max(0, ((int) $product->stock) + $delta);
+            $product->stock = max(0, ($product->stock) + $delta);
             $product->save();
 
             InventoryMovement::query()->create([
