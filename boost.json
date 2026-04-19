@@ -1,0 +1,17 @@
+{
+    "agents": [
+        "cursor",
+        "gemini",
+        "copilot"
+    ],
+    "guidelines": true,
+    "mcp": true,
+    "nightwatch_mcp": false,
+    "sail": false,
+    "skills": [
+        "laravel-best-practices",
+        "socialite-development",
+        "pest-testing",
+        "tailwindcss-development"
+    ]
+}
