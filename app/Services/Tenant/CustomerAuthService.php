@@ -204,7 +204,6 @@ class CustomerAuthService
             ]
         );
 
-        // Update provider details if they logged in with a different method previously
         if ($user->provider !== $provider) {
             $user->update([
                 'provider' => $provider,
@@ -212,12 +211,10 @@ class CustomerAuthService
             ]);
         }
 
-        // Ensure the customer profile exists
         $customer = Customer::query()->firstOrCreate([
             'user_id' => $user->id,
         ]);
 
-        // Authenticate the user
         Auth::login($user);
         request()->session()->regenerate();
 
