@@ -2,6 +2,7 @@
 
 namespace App\Models\Tenant;
 
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
@@ -64,10 +65,10 @@ class Coupon extends Model
      * Check if the coupon is redeemable based on subtotal and current time.
      *
      * @param float $subtotal The subtotal of the cart or order.
-     * @param \DateTimeInterface|null $now The current time (defaults to now).
+     * @param DateTimeInterface|null $now The current time (defaults to now).
      * @return bool
      */
-    public function isRedeemable(float $subtotal, \DateTimeInterface $now = null): bool
+    public function isRedeemable(float $subtotal, DateTimeInterface $now = null): bool
     {
         $now ??= now();
         if (!$this->is_active) return false;

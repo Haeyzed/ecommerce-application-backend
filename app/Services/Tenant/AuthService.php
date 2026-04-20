@@ -2,8 +2,7 @@
 
 namespace App\Services\Tenant;
 
-use App\Models\Tenant\Customer;
-use App\Models\Tenant\User;
+use App\Models\Central\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Registered;
@@ -16,72 +15,54 @@ use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 
 /**
- * Class CustomerService
- * * Handles storefront authentication, profile management, password resets, and social logins via the base User model.
+ * Class AuthService
+ * * Handles all core business logic related to user authentication.
  */
-class CustomerAuthService
+class AuthService
 {
     /**
-     * Register a new storefront customer.
-     * * Creates the underlying User, attaches a Customer profile, and logs them in via session.
+     * Handle user registration.
      *
      * @param array $data Validated registration data.
-     * @return array Contains 'user' and 'profile'.
+     * @return User
      */
-    public function register(array $data): array
+    public function register(array $data): User
     {
         $user = User::query()->create([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
+            'name' => $data['name'],
+            'email' => $data['email'],
             'password' => Hash::make($data['password']),
-        ]);
-
-        $customer = Customer::query()->create([
-            'user_id' => $user->id,
         ]);
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return [
-            'user'    => $user,
-            'profile' => $customer,
-        ];
+        return $user;
     }
 
     /**
-     * Authenticate an existing storefront customer via session.
-     * * Attempts login, regenerates the session, and ensures they have a Customer profile.
+     * Handle user login via session.
      *
      * @param array $credentials Validated login credentials.
-     * @return array Contains 'user' and 'profile'.
+     * @return User
      * @throws ValidationException
      */
-    public function login(array $credentials): array
+    public function login(array $credentials): User
     {
         if (! Auth::attempt($credentials)) {
             throw ValidationException::withMessages([
-                'email' => [__('auth.failed')],
+                'email' => __('auth.failed'),
             ]);
         }
 
         request()->session()->regenerate();
 
-        $user = Auth::user();
-
-        $customer = Customer::query()->firstOrCreate([
-            'user_id' => $user->id,
-        ]);
-
-        return [
-            'user'    => $user,
-            'profile' => $customer,
-        ];
+        return Auth::user();
     }
 
     /**
-     * Logout a customer by invalidating their session.
+     * Handle user logout.
      *
      * @return void
      */
@@ -94,7 +75,7 @@ class CustomerAuthService
     }
 
     /**
-     * Send a password reset link to the given customer.
+     * Send a password reset link to the given user.
      *
      * @param array $data Array containing the user's email.
      * @return string The status translation string.
@@ -114,7 +95,7 @@ class CustomerAuthService
     }
 
     /**
-     * Reset the customer's password.
+     * Reset the user's password.
      *
      * @param array $data Validated reset token, email, and new password.
      * @return string The status translation string.
@@ -140,7 +121,7 @@ class CustomerAuthService
     }
 
     /**
-     * Verify the customer's email address using the signed URL parameters.
+     * Verify the user's email address using the signed URL parameters.
      *
      * @param string $id The user ID.
      * @param string $hash The verification hash.
@@ -184,19 +165,18 @@ class CustomerAuthService
     }
 
     /**
-     * Handle socialite user login or registration for a storefront customer.
-     * * Creates the User if missing, attaches the Customer profile, and logs them in.
+     * Handle socialite user login or registration.
      *
      * @param string $provider
      * @param SocialiteUser $socialUser
-     * @return array Contains 'user' and 'profile'.
+     * @return User
      */
-    public function handleSocialLogin(string $provider, SocialiteUser $socialUser): array
+    public function handleSocialLogin(string $provider, SocialiteUser $socialUser): User
     {
         $user = User::query()->firstOrCreate(
             ['email' => $socialUser->getEmail()],
             [
-                'name' => $socialUser->getName() ?? $socialUser->getNickname() ?? 'Customer',
+                'name' => $socialUser->getName() ?? $socialUser->getNickname() ?? 'User',
                 'provider' => $provider,
                 'provider_id' => $socialUser->getId(),
                 'password' => null,
@@ -212,18 +192,10 @@ class CustomerAuthService
             ]);
         }
 
-        // Ensure the customer profile exists
-        $customer = Customer::query()->firstOrCreate([
-            'user_id' => $user->id,
-        ]);
-
         // Authenticate the user
         Auth::login($user);
         request()->session()->regenerate();
 
-        return [
-            'user'    => $user,
-            'profile' => $customer,
-        ];
+        return $user;
     }
 }

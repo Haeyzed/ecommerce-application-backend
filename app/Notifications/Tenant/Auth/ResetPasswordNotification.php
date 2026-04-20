@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Notifications\Central\Auth;
+namespace App\Notifications\Tenant\Auth;
 
 use Illuminate\Auth\Notifications\ResetPassword;
 
