@@ -3,6 +3,7 @@
 namespace App\Services\Tenant;
 
 use App\Models\Tenant\Coupon;
+use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Str;
 
@@ -76,13 +77,22 @@ class CouponService
 
     /**
      * Redeem a coupon.
-     * * Increments the used count for the coupon.
+     * Increments the used count for the coupon.
      *
      * @param Coupon $coupon
      * @return Coupon
+     * @throws Exception
      */
     public function redeemCoupon(Coupon $coupon): Coupon
     {
+        if ($coupon->max_uses && $coupon->used_count >= $coupon->max_uses) {
+            throw new Exception('Coupon usage limit reached');
+        }
+
+        if ($coupon->ends_at && now()->gt($coupon->ends_at)) {
+            throw new Exception('Coupon expired');
+        }
+
         $coupon->increment('used_count');
 
         return $coupon->fresh();

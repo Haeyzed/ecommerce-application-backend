@@ -6,9 +6,9 @@ use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\CustomerAuth\LoginRequest;
 use App\Http\Requests\Tenant\CustomerAuth\RegisterRequest;
-use App\Http\Requests\Tenant\Auth\ForgotPasswordRequest; // Re-using standard auth requests for matching logic
-use App\Http\Requests\Tenant\Auth\ResetPasswordRequest;
-use App\Services\Tenant\CustomerService;
+use App\Http\Requests\Tenant\CustomerAuth\ForgotPasswordRequest;
+use App\Http\Requests\Tenant\CustomerAuth\ResetPasswordRequest;
+use App\Services\Tenant\CustomerAuthService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -24,10 +24,10 @@ class CustomerAuthController extends Controller
     /**
      * Create a new CustomerController instance.
      *
-     * @param CustomerService $customerService
+     * @param CustomerAuthService $customerAuthService
      */
     public function __construct(
-        private readonly CustomerService $customerService
+        private readonly CustomerAuthService $customerAuthService
     ) {}
 
     /**
@@ -38,7 +38,7 @@ class CustomerAuthController extends Controller
      */
     public function register(RegisterRequest $request): JsonResponse
     {
-        $result = $this->customerService->register($request->validated());
+        $result = $this->customerAuthService->register($request->validated());
 
         return ApiResponse::success(
             $result,
@@ -56,7 +56,7 @@ class CustomerAuthController extends Controller
      */
     public function login(LoginRequest $request): JsonResponse
     {
-        $result = $this->customerService->login($request->validated());
+        $result = $this->customerAuthService->login($request->validated());
 
         return ApiResponse::success(
             $result,
@@ -88,7 +88,7 @@ class CustomerAuthController extends Controller
      */
     public function logout(Request $request): JsonResponse
     {
-        $this->customerService->logout();
+        $this->customerAuthService->logout();
 
         return ApiResponse::success(
             null,
@@ -104,7 +104,7 @@ class CustomerAuthController extends Controller
      */
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
-        $status = $this->customerService->sendPasswordResetLink($request->validated());
+        $status = $this->customerAuthService->sendPasswordResetLink($request->validated());
 
         return ApiResponse::success(
             ['status' => $status],
@@ -120,7 +120,7 @@ class CustomerAuthController extends Controller
      */
     public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {
-        $status = $this->customerService->resetPassword($request->validated());
+        $status = $this->customerAuthService->resetPassword($request->validated());
 
         return ApiResponse::success(
             ['status' => $status],
@@ -139,7 +139,7 @@ class CustomerAuthController extends Controller
     public function verify(Request $request, string $id, string $hash): JsonResponse
     {
         try {
-            $status = $this->customerService->verifyEmail($id, $hash);
+            $status = $this->customerAuthService->verifyEmail($id, $hash);
 
             return ApiResponse::success(
                 ['status' => $status],
@@ -159,7 +159,7 @@ class CustomerAuthController extends Controller
      */
     public function resendVerification(Request $request): JsonResponse
     {
-        $this->customerService->resendVerificationEmail($request->user());
+        $this->customerAuthService->resendVerificationEmail($request->user());
 
         return ApiResponse::success(
             ['status' => 'verification-link-sent'],
@@ -202,7 +202,7 @@ class CustomerAuthController extends Controller
         try {
             $socialUser = Socialite::driver($provider)->stateless()->user();
 
-            $this->customerService->handleSocialLogin($provider, $socialUser);
+            $this->customerAuthService->handleSocialLogin($provider, $socialUser);
 
             // Redirect back to the storefront frontend upon successful login
             return redirect()->away(config('app.storefront_url') . '/dashboard');

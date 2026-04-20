@@ -23,6 +23,8 @@ use Illuminate\Support\Carbon;
  * @property bool $is_active Indicates if the coupon is active.
  * @property Carbon|null $created_at Timestamp of when the coupon was created.
  * @property Carbon|null $updated_at Timestamp of when the coupon was last updated.
+ * @method int increment(string $column, float|int $amount = 1, array $extra = [])
+ * @method int decrement(string $column, float|int $amount = 1, array $extra = [])
  *
  * @package App\Models\Tenant
  */

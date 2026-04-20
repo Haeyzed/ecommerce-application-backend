@@ -151,17 +151,14 @@ class CustomerAuthService
     {
         $user = User::query()->findOrFail($id);
 
-        // Validate the hash against the user's email
         if (! hash_equals($hash, sha1($user->getEmailForVerification()))) {
             throw new AuthorizationException('Invalid verification link.');
         }
 
-        // If already verified, quietly return
         if ($user->hasVerifiedEmail()) {
             return 'already-verified';
         }
 
-        // Mark as verified and dispatch the event
         $user->markEmailAsVerified();
         event(new Verified($user));
 

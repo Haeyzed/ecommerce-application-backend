@@ -2,6 +2,7 @@
 
 namespace App\Models\Tenant;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,7 +21,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at Timestamp of when the cart was created.
  * @property Carbon|null $updated_at Timestamp of when the cart was last updated.
  *
- * @property-read \Illuminate\Database\Eloquent\Collection|CartItem[] $items The items within the cart.
+ * @property-read Collection|CartItem[] $items The items within the cart.
  * @property-read Customer|null $customer The customer who owns the cart.
  * @property-read Coupon|null $coupon The coupon applied to the cart.
  *
