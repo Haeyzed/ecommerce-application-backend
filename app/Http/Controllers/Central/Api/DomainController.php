@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Central\Api;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Central\Domain\StoreDomainRequest;
+use App\Http\Resources\Central\DomainResource;
 use App\Models\Central\Tenant;
 use App\Services\Central\DomainService;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -37,8 +38,8 @@ class DomainController extends Controller
         $domains = $this->domainService->getDomainsForTenant($tenant);
 
         return ApiResponse::success(
-            ['domains' => $domains],
-            'Domains retrieved successfully'
+            data: new DomainResource($domains),
+            message: 'Domains retrieved successfully'
         );
     }
 
@@ -56,7 +57,7 @@ class DomainController extends Controller
             $domain = $this->domainService->storeDomain($tenant, $request->validated());
 
             return ApiResponse::success(
-                ['domain' => $domain],
+                new DomainResource($domain),
                 'Domain attached successfully',
                 null,
                 201

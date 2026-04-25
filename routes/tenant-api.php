@@ -18,6 +18,8 @@ use App\Http\Controllers\Tenant\Api\HR\PayrollController;
 use App\Http\Controllers\Tenant\Api\HR\PerformanceController;
 use App\Http\Controllers\Tenant\Api\HR\PositionController;
 use App\Http\Controllers\Tenant\Api\HR\TrainingController;
+use App\Http\Controllers\Tenant\Api\Notification\NotificationPreferenceController;
+use App\Http\Controllers\Tenant\Api\Notification\NotificationTemplateController;
 use App\Http\Controllers\Tenant\Api\SettingController;
 use App\Http\Controllers\Tenant\Api\StaffAuthController;
 use Illuminate\Support\Facades\Route;
@@ -28,10 +30,6 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 |--------------------------------------------------------------------------
 | Tenant API (database-per-tenant)
 |--------------------------------------------------------------------------
-|
-| Loaded only on tenant domains. Uses the `tenant` session guard for
-| customer and staff authentication.
-|
 */
 
 Route::middleware([
@@ -95,10 +93,18 @@ Route::middleware([
         });
     });
 
-    // --- HR Module (Protected) ---
+    // --- Authenticated Features (Shared Staff & Customer) ---
+    Route::middleware('auth:sanctum')->group(function () {
+        // Notification Preferences
+        Route::prefix('notifications/preferences')->name('notifications.preferences.')->group(function () {
+            Route::get('/', [NotificationPreferenceController::class, 'index'])->name('index');
+            Route::put('/', [NotificationPreferenceController::class, 'update'])->name('update');
+        });
+    });
+
+    // --- HR Module (Protected Staff) ---
     Route::middleware('auth:sanctum')->prefix('hr')->name('hr.')->group(function () {
 
-        // Departments
         Route::prefix('departments')->name('departments.')->group(function () {
             Route::get('/', [DepartmentController::class, 'index'])->name('index');
             Route::get('/{id}', [DepartmentController::class, 'show'])->name('show');
@@ -107,31 +113,27 @@ Route::middleware([
             Route::delete('/{id}', [DepartmentController::class, 'destroy'])->name('destroy');
         });
 
-        // Employees
         Route::prefix('employees')->name('employees.')->group(function () {
             Route::get('/', [EmployeeController::class, 'index'])->name('index');
             Route::get('/{id}', [EmployeeController::class, 'show'])->name('show');
             Route::post('/', [EmployeeController::class, 'store'])->name('store');
-            Route::post('/{id}', [EmployeeController::class, 'update'])->name('update'); // POST for multipart form-data (avatar)
+            Route::post('/{id}', [EmployeeController::class, 'update'])->name('update'); // POST for multipart form-data
             Route::delete('/{id}', [EmployeeController::class, 'destroy'])->name('destroy');
             Route::post('/{id}/terminate', [EmployeeController::class, 'terminate'])->name('terminate');
         });
 
-        // Employee Documents
         Route::prefix('employee-documents')->name('employee-documents.')->group(function () {
             Route::get('/', [EmployeeDocumentController::class, 'index'])->name('index');
             Route::post('/', [EmployeeDocumentController::class, 'store'])->name('store');
             Route::delete('/{id}', [EmployeeDocumentController::class, 'destroy'])->name('destroy');
         });
 
-        // Attendance
         Route::prefix('attendance')->name('attendance.')->group(function () {
             Route::get('/', [AttendanceController::class, 'index'])->name('index');
             Route::post('/check-in', [AttendanceController::class, 'checkIn'])->name('check-in');
             Route::post('/check-out', [AttendanceController::class, 'checkOut'])->name('check-out');
         });
 
-        // Positions
         Route::prefix('positions')->name('positions.')->group(function () {
             Route::get('/', [PositionController::class, 'index'])->name('index');
             Route::get('/{id}', [PositionController::class, 'show'])->name('show');
@@ -140,7 +142,6 @@ Route::middleware([
             Route::delete('/{id}', [PositionController::class, 'destroy'])->name('destroy');
         });
 
-        // Trainings
         Route::prefix('trainings')->name('trainings.')->group(function () {
             Route::get('/', [TrainingController::class, 'index'])->name('index');
             Route::get('/{id}', [TrainingController::class, 'show'])->name('show');
@@ -151,7 +152,6 @@ Route::middleware([
             Route::post('/{id}/complete', [TrainingController::class, 'complete'])->name('complete');
         });
 
-        // Performance (Reviews & Goals)
         Route::prefix('performance')->name('performance.')->group(function () {
             Route::get('/reviews', [PerformanceController::class, 'reviews'])->name('reviews.index');
             Route::post('/reviews', [PerformanceController::class, 'storeReview'])->name('reviews.store');
@@ -159,14 +159,12 @@ Route::middleware([
             Route::post('/goals', [PerformanceController::class, 'storeGoal'])->name('goals.store');
         });
 
-        // Payroll
         Route::prefix('payroll')->name('payroll.')->group(function () {
             Route::get('/', [PayrollController::class, 'index'])->name('index');
             Route::post('/generate', [PayrollController::class, 'generate'])->name('generate');
             Route::post('/{id}/mark-paid', [PayrollController::class, 'markPaid'])->name('mark-paid');
         });
 
-        // Leave
         Route::prefix('leave')->name('leave.')->group(function () {
             Route::get('/', [LeaveController::class, 'index'])->name('index');
             Route::post('/', [LeaveController::class, 'store'])->name('store');
@@ -174,7 +172,6 @@ Route::middleware([
             Route::post('/{id}/reject', [LeaveController::class, 'reject'])->name('reject');
         });
 
-        // Recruitment (Job Postings, Applicants, Interviews)
         Route::prefix('job-postings')->name('job-postings.')->group(function () {
             Route::get('/', [JobPostingController::class, 'index'])->name('index');
             Route::get('/{id}', [JobPostingController::class, 'show'])->name('show');
@@ -192,15 +189,21 @@ Route::middleware([
         Route::prefix('interviews')->name('interviews.')->group(function () {
             Route::post('/schedule', [InterviewController::class, 'schedule'])->name('schedule');
         });
+
+        // Notification Templates (Admin/HR Only)
+        Route::prefix('notifications/templates')->name('notifications.templates.')->group(function () {
+            Route::get('/', [NotificationTemplateController::class, 'index'])->name('index');
+            Route::get('/{id}', [NotificationTemplateController::class, 'show'])->name('show');
+            Route::post('/', [NotificationTemplateController::class, 'store'])->name('store');
+            Route::put('/{id}', [NotificationTemplateController::class, 'update'])->name('update');
+            Route::delete('/{id}', [NotificationTemplateController::class, 'destroy'])->name('destroy');
+        });
     });
 
     // --- CMS Page Module ---
     Route::prefix('pages')->name('pages.')->group(function () {
-
-        // Public Page Route (Frontend)
         Route::get('/public/{slug}', [PageController::class, 'showPublic'])->name('show.public');
 
-        // Staff-Only Page Management (Protected)
         Route::middleware('auth:sanctum')->group(function () {
             Route::get('/', [PageController::class, 'index'])->name('index');
             Route::get('/{id}', [PageController::class, 'show'])->name('show');
@@ -213,28 +216,21 @@ Route::middleware([
 
     // --- Blog Module ---
     Route::prefix('blog')->name('blog.')->group(function () {
-
-        // Public Blog Routes
         Route::get('/posts', [BlogController::class, 'index'])->name('posts.index');
         Route::get('/posts/{slug}', [BlogController::class, 'show'])->name('posts.show');
         Route::get('/posts/{slug}/comments', [BlogController::class, 'getComments'])->name('posts.comments.index');
         Route::post('/posts/{slug}/comments', [BlogController::class, 'publicComment'])->name('posts.comments.public');
         Route::get('/categories', [BlogController::class, 'categoriesIndex'])->name('categories.index');
 
-        // Staff-Only Blog Management (Protected)
         Route::middleware('auth:sanctum')->group(function () {
-
-            // Post CRUD
             Route::post('/posts', [BlogController::class, 'store'])->name('posts.store');
             Route::put('/posts/{id}', [BlogController::class, 'update'])->name('posts.update');
             Route::delete('/posts/{id}', [BlogController::class, 'destroy'])->name('posts.destroy');
 
-            // Category CRUD
             Route::post('/categories', [BlogController::class, 'categoriesStore'])->name('categories.store');
             Route::put('/categories/{id}', [BlogController::class, 'categoriesUpdate'])->name('categories.update');
             Route::delete('/categories/{id}', [BlogController::class, 'categoriesDestroy'])->name('categories.destroy');
 
-            // Comment Moderation
             Route::put('/comments/{id}', [BlogController::class, 'updateComment'])->name('comments.update');
             Route::delete('/comments/{id}', [BlogController::class, 'destroyComment'])->name('comments.destroy');
         });

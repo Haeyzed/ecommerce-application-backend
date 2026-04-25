@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Tenant\HR;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\UploadedFile;
 
 class StoreEmployeeRequest extends FormRequest
 {
@@ -26,11 +25,18 @@ class StoreEmployeeRequest extends FormRequest
     {
         return [
             /**
-             * The ID of the linked staff user account.
+             * The ID of the linked staff user account. If omitted, a new Staff & User will be generated.
              * @var int|null $staff_id
              * @example 5
              */
             'staff_id' => ['nullable', 'integer', 'exists:staffs,id'],
+
+            /**
+             * The optional password to set for the newly auto-generated staff account.
+             * @var string|null $password
+             * @example "SecretP@ssw0rd!"
+             */
+            'password' => ['nullable', 'string', 'min:8'],
 
             /**
              * The ID of the department the employee belongs to.
@@ -56,14 +62,14 @@ class StoreEmployeeRequest extends FormRequest
             /**
              * The employee's last name.
              * @var string $last_name
-             * @example "Smith"
+             * @example "Doe"
              */
             'last_name' => ['required', 'string', 'max:128'],
 
             /**
              * The employee's email address.
              * @var string $email
-             * @example "john.smith@company.com"
+             * @example "john.doe@company.com"
              */
             'email' => ['required', 'email', 'max:255', 'unique:employees,email'],
 
@@ -75,7 +81,7 @@ class StoreEmployeeRequest extends FormRequest
             'phone' => ['nullable', 'string', 'max:32'],
 
             /**
-             * The type of employment (e.g., full_time, part_time).
+             * The type of employment.
              * @var string|null $employment_type
              * @example "full_time"
              */
@@ -111,8 +117,7 @@ class StoreEmployeeRequest extends FormRequest
 
             /**
              * The employee's avatar image file.
-             * @var UploadedFile|null $avatar
-             * @example "avatar.jpg"
+             * @var \Illuminate\Http\UploadedFile|null $avatar
              */
             'avatar' => ['nullable', 'file', 'image', 'max:2048'],
         ];

@@ -21,6 +21,7 @@ class TenantBootstrapSeeder extends Seeder
         $this->seedPages();
         $this->seedBlogCategories();
         $this->seedDepartmentsAndPositions();
+        $this->seedNotifications();
     }
 
     private function seedRolesAndPermissions(): void
@@ -352,6 +353,119 @@ class TenantBootstrapSeeder extends Seeder
                     ]
                 );
             }
+        }
+    }
+
+    /**
+     * Seed default notification channels and templates.
+     */
+    private function seedNotifications(): void
+    {
+        // 1. Seed Notification Channels
+        $channels = [
+            ['key' => 'email', 'label' => 'Email Notifications', 'is_active' => true],
+            ['key' => 'in_app', 'label' => 'In-App Notifications', 'is_active' => true],
+            ['key' => 'sms', 'label' => 'SMS Notifications', 'is_active' => false],
+        ];
+
+        foreach ($channels as $channel) {
+            DB::table('notification_channels')->updateOrInsert(
+                ['key' => $channel['key']],
+                [
+                    'label'      => $channel['label'],
+                    'is_active'  => $channel['is_active'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+        }
+
+        // 2. Seed Default Notification Templates
+        $templates = [
+            // --- Authentication & Account ---
+            [
+                'event'     => 'customer_registered',
+                'channel'   => 'email',
+                'subject'   => 'Welcome to {store_name}!',
+                'body'      => "Hello {name},\n\nWelcome to {store_name}! Your customer account has been created successfully. You can now log in and start exploring.\n\nBest regards,\nThe {store_name} Team",
+                'is_active' => true,
+            ],
+            [
+                'event'     => 'staff_registered',
+                'channel'   => 'email',
+                'subject'   => 'Welcome to the Team!',
+                'body'      => "Hello {name},\n\nYour staff account at {store_name} has been set up by the administrator. Please log in using your email to access the staff portal.\n\nWelcome aboard!",
+                'is_active' => true,
+            ],
+            [
+                'event'     => 'password_reset',
+                'channel'   => 'email',
+                'subject'   => 'Password Reset Request',
+                'body'      => "Hello {name},\n\nWe received a request to reset your password. Please use the following security token to reset it: \n\n**{token}**\n\nIf you did not request this, please ignore this email.",
+                'is_active' => true,
+            ],
+
+            // --- Billing & Invoices ---
+            [
+                'event'     => 'invoice_created',
+                'channel'   => 'email',
+                'subject'   => 'New Invoice Available: {invoice_id}',
+                'body'      => "Hello {name},\n\nA new invoice ({invoice_id}) has been generated for your account. The total amount due is {amount} {currency}. Please ensure payment is made by {due_date}.\n\nThank you!",
+                'is_active' => true,
+            ],
+            [
+                'event'     => 'invoice_paid',
+                'channel'   => 'email',
+                'subject'   => 'Payment Confirmation: Invoice {invoice_id}',
+                'body'      => "Hello {name},\n\nThank you! We have successfully received your payment of {amount} {currency} for invoice {invoice_id}.",
+                'is_active' => true,
+            ],
+
+            // --- HR & Employee Management ---
+            [
+                'event'     => 'leave_approved',
+                'channel'   => 'email',
+                'subject'   => 'Leave Request Approved',
+                'body'      => "Hello {name},\n\nYour leave request from {start_date} to {end_date} has been officially approved by {approver_name}.",
+                'is_active' => true,
+            ],
+            [
+                'event'     => 'leave_rejected',
+                'channel'   => 'email',
+                'subject'   => 'Leave Request Update',
+                'body'      => "Hello {name},\n\nYour recent leave request has been reviewed but unfortunately could not be approved at this time.\nReason: {reason}",
+                'is_active' => true,
+            ],
+            [
+                'event'     => 'payslip_generated',
+                'channel'   => 'email',
+                'subject'   => 'Your New Payslip is Available',
+                'body'      => "Hello {name},\n\nYour payslip for the period {period_start} to {period_end} has been generated. Your net pay is {net_amount} {currency}. You can view the full breakdown in your employee portal.",
+                'is_active' => true,
+            ],
+            [
+                'event'     => 'interview_scheduled',
+                'channel'   => 'email',
+                'subject'   => 'Interview Scheduled: {job_title}',
+                'body'      => "Hello {name},\n\nWe would like to invite you for an interview for the {job_title} position on {scheduled_at}. The interview will be conducted via {mode}.\n\nLooking forward to speaking with you!",
+                'is_active' => true,
+            ]
+        ];
+
+        foreach ($templates as $template) {
+            DB::table('notification_templates')->updateOrInsert(
+                [
+                    'event'   => $template['event'],
+                    'channel' => $template['channel'],
+                ],
+                [
+                    'subject'    => $template['subject'],
+                    'body'       => $template['body'],
+                    'is_active'  => $template['is_active'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
         }
     }
 }

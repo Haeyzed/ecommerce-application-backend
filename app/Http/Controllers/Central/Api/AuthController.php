@@ -89,7 +89,7 @@ class AuthController extends Controller
     public function me(Request $request): JsonResponse
     {
         return ApiResponse::success(
-            ['user' => new UserResource($request->user())],
+            new UserResource($request->user()),
             'Authenticated user fetched successfully'
         );
     }

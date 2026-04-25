@@ -49,7 +49,7 @@ class StaffAuthService
 
         return [
             'user' => $user,
-            'staff' => $staff,
+            'profile' => $staff,
             'token' => $token,
         ];
     }
@@ -82,11 +82,11 @@ class StaffAuthService
             ]);
         }
 
-        $token = $user->createToken('staff-token')->plainTextToken;
+        $token = $user->createToken('staff')->plainTextToken;
 
         return [
             'user' => $user->load('staff'),
-            'staff' => $user->staff,
+            'profile' => $user->staff,
             'token' => $token,
         ];
     }

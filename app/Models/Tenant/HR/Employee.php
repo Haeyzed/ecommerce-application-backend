@@ -20,7 +20,7 @@ use Spatie\MediaLibrary\HasMedia;
  * Represents a staff member inside the tenant's HR system.
  *
  * @property int $id The unique identifier of the employee.
- * @property int|null $staff_user_id The linked StaffUser account ID (if they have login access).
+ * @property int|null $staff_id The linked Staff account ID (if they have login access).
  * @property int|null $department_id The ID of the department the employee belongs to.
  * @property int|null $position_id The ID of the employee's job position.
  * @property string $employee_code A unique internal tracking code for the employee.

@@ -15,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileDoesNotExist;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
+use Throwable;
 
 /**
  * Employee Endpoints
@@ -50,7 +51,7 @@ class EmployeeController extends Controller
      * @param StoreEmployeeRequest $request
      * @return JsonResponse
      * @throws FileDoesNotExist
-     * @throws FileIsTooBig
+     * @throws FileIsTooBig|Throwable
      */
     public function store(StoreEmployeeRequest $request): JsonResponse
     {

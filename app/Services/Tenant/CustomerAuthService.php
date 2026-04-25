@@ -10,29 +10,28 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 
 /**
- * Class CustomerService
- * * Handles storefront authentication, profile management, password resets, and social logins via the base User model.
+ * Class CustomerAuthService
+ * * Handles storefront authentication, profile management, password resets, and social logins.
  */
 class CustomerAuthService
 {
     /**
      * Register a new storefront customer.
-     * * Creates the underlying User, attaches a Customer profile, and issues a Sanctum token.
      *
-     * @param  array  $data  Validated registration data.
+     * @param array $data Validated registration data.
      * @return array{user: User, profile: Customer, token: string}
      */
     public function register(array $data): array
     {
         $user = User::query()->create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+            'name'      => $data['name'],
+            'email'     => $data['email'],
+            'password'  => Hash::make($data['password']),
+            'is_active' => true,
         ]);
 
         $customer = Customer::query()->create([
@@ -44,24 +43,22 @@ class CustomerAuthService
         $token = $user->createToken('customer')->plainTextToken;
 
         return [
-            'user' => $user,
+            'user'    => $user,
             'profile' => $customer,
-            'token' => $token,
+            'token'   => $token,
         ];
     }
 
     /**
-     * Authenticate an existing storefront customer via Sanctum token.
-     * * Ensures they have a Customer profile.
+     * Authenticate an existing customer.
      *
-     * @param  array  $credentials  Validated login credentials.
+     * @param array $credentials
      * @return array{user: User, profile: Customer, token: string}
-     *
      * @throws ValidationException
      */
     public function login(array $credentials): array
     {
-        $user = User::query()->where('email', $credentials['email'])->whereHas('customer')->first();
+        $user = User::query()->where('email', $credentials['email'])->first();
 
         if (! $user || ! Hash::check($credentials['password'], $user->password)) {
             throw ValidationException::withMessages([
@@ -69,38 +66,31 @@ class CustomerAuthService
             ]);
         }
 
-        $customer = Customer::query()->firstOrCreate([
-            'user_id' => $user->id,
-        ]);
+        if (! $user->is_active || ! optional($user->customer)->is_active) {
+            throw ValidationException::withMessages([
+                'email' => ['Your account has been deactivated.'],
+            ]);
+        }
 
         $token = $user->createToken('customer')->plainTextToken;
 
         return [
-            'user' => $user,
-            'customer' => $customer,
-            'token' => $token,
+            'user'    => $user,
+            'profile' => $user->customer,
+            'token'   => $token,
         ];
     }
 
     /**
-     * Revoke the current Sanctum access token.
-     */
-    public function logout(User $user): void
-    {
-        $user->currentAccessToken()?->delete();
-    }
-
-    /**
-     * Send a password reset link to the given customer.
+     * Send a password reset link to the customer.
      *
-     * @param  array  $data  Array containing the user's email.
-     * @return string The status translation string.
-     *
+     * @param array $data
+     * @return string
      * @throws ValidationException
      */
     public function sendPasswordResetLink(array $data): string
     {
-        $status = Password::broker('tenant_users')->sendResetLink($data);
+        $status = Password::broker()->sendResetLink($data);
 
         if ($status !== Password::RESET_LINK_SENT) {
             throw ValidationException::withMessages([
@@ -114,18 +104,15 @@ class CustomerAuthService
     /**
      * Reset the customer's password.
      *
-     * @param  array  $data  Validated reset token, email, and new password.
-     * @return string The status translation string.
-     *
+     * @param array $data
+     * @return string
      * @throws ValidationException
      */
     public function resetPassword(array $data): string
     {
-        $status = Password::broker('tenant_users')->reset($data, function (User $user, string $password) {
+        $status = Password::broker()->reset($data, function (User $user, string $password) {
             $user->password = Hash::make($password);
-            $user->setRememberToken(Str::random(60));
             $user->save();
-
             event(new PasswordReset($user));
         });
 
@@ -141,9 +128,9 @@ class CustomerAuthService
     /**
      * Verify the customer's email address using the signed URL parameters.
      *
-     * @param  string  $id  The user ID.
-     * @param  string  $hash  The verification hash.
-     *
+     * @param string $id
+     * @param string $hash
+     * @return string
      * @throws AuthorizationException
      */
     public function verifyEmail(string $id, string $hash): string
@@ -167,7 +154,8 @@ class CustomerAuthService
     /**
      * Resend the email verification notification.
      *
-     * @param  User  $user  The authenticated user model.
+     * @param User $user
+     * @return void
      */
     public function resendVerificationEmail(User $user): void
     {
@@ -181,6 +169,8 @@ class CustomerAuthService
     /**
      * Handle socialite user login or registration for a storefront customer.
      *
+     * @param string $provider
+     * @param SocialiteUser $socialUser
      * @return array{user: User, profile: Customer, token: string}
      */
     public function handleSocialLogin(string $provider, SocialiteUser $socialUser): array
@@ -188,17 +178,18 @@ class CustomerAuthService
         $user = User::query()->firstOrCreate(
             ['email' => $socialUser->getEmail()],
             [
-                'name' => $socialUser->getName() ?? $socialUser->getNickname() ?? 'Customer',
-                'provider' => $provider,
-                'provider_id' => $socialUser->getId(),
-                'password' => null,
+                'name'              => $socialUser->getName() ?? $socialUser->getNickname() ?? 'Customer',
+                'provider'          => $provider,
+                'provider_id'       => $socialUser->getId(),
+                'password'          => null,
                 'email_verified_at' => now(),
+                'is_active'         => true,
             ]
         );
 
         if ($user->provider !== $provider) {
             $user->update([
-                'provider' => $provider,
+                'provider'    => $provider,
                 'provider_id' => $socialUser->getId(),
             ]);
         }
@@ -210,9 +201,9 @@ class CustomerAuthService
         $token = $user->createToken('customer')->plainTextToken;
 
         return [
-            'user' => $user,
+            'user'    => $user,
             'profile' => $customer,
-            'token' => $token,
+            'token'   => $token,
         ];
     }
 }
