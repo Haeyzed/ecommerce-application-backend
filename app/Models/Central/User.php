@@ -4,6 +4,7 @@ namespace App\Models\Central;
 
 use App\Notifications\Central\Auth\ResetPasswordNotification;
 use App\Notifications\Central\Auth\VerifyEmailNotification;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -28,12 +29,23 @@ use Laravel\Sanctum\HasApiTokens;
  * @property Carbon|null $created_at Timestamp of when the account was created.
  * @property Carbon|null $updated_at Timestamp of when the account was last updated.
  * @property Carbon|null $deleted_at Timestamp of when the account was soft deleted.
- *
- * @package App\Models\Central
  */
 class User extends Authenticatable implements MustVerifyEmail
 {
+    /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
+
+    protected static function newFactory(): UserFactory
+    {
+        return UserFactory::new();
+    }
+
+    /**
+     * The database connection that should be used by the model.
+     *
+     * @var string
+     */
+    protected $connection = 'central';
 
     /**
      * The attributes that are mass assignable.
@@ -45,7 +57,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'provider',
-        'provider_id'
+        'provider_id',
     ];
 
     /**
@@ -75,7 +87,6 @@ class User extends Authenticatable implements MustVerifyEmail
      * Send the password reset notification.
      *
      * @param  string  $token
-     * @return void
      */
     public function sendPasswordResetNotification($token): void
     {
@@ -84,11 +95,9 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Send the email verification notification.
-     *
-     * @return void
      */
     public function sendEmailVerificationNotification(): void
     {
-        $this->notify(new VerifyEmailNotification());
+        $this->notify(new VerifyEmailNotification);
     }
 }

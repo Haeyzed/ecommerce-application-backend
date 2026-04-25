@@ -7,7 +7,6 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Verified;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -23,10 +22,10 @@ class AuthService
     /**
      * Handle user registration.
      *
-     * @param array $data Validated registration data.
-     * @return User
+     * @param  array  $data  Validated registration data.
+     * @return array{user: User, token: string}
      */
-    public function register(array $data): User
+    public function register(array $data): array
     {
         $user = User::query()->create([
             'name' => $data['name'],
@@ -36,54 +35,59 @@ class AuthService
 
         event(new Registered($user));
 
-        Auth::login($user);
+        $token = $user->createToken('auth')->plainTextToken;
 
-        return $user;
+        return [
+            'user' => $user,
+            'token' => $token,
+        ];
     }
 
     /**
-     * Handle user login via session.
+     * Handle user login via Sanctum personal access token.
      *
-     * @param array $credentials Validated login credentials.
-     * @return User
+     * @param  array  $credentials  Validated login credentials.
+     * @return array{user: User, token: string}
+     *
      * @throws ValidationException
      */
-    public function login(array $credentials): User
+    public function login(array $credentials): array
     {
-        if (! Auth::attempt($credentials)) {
+        $user = User::query()->where('email', $credentials['email'])->first();
+
+        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
             throw ValidationException::withMessages([
                 'email' => __('auth.failed'),
             ]);
         }
 
-        request()->session()->regenerate();
+        $token = $user->createToken('auth')->plainTextToken;
 
-        return Auth::user();
+        return [
+            'user' => $user,
+            'token' => $token,
+        ];
     }
 
     /**
-     * Handle user logout.
-     *
-     * @return void
+     * Revoke the current Sanctum access token.
      */
-    public function logout(): void
+    public function logout(User $user): void
     {
-        Auth::guard('web')->logout();
-
-        request()->session()->invalidate();
-        request()->session()->regenerateToken();
+        $user->currentAccessToken()?->delete();
     }
 
     /**
      * Send a password reset link to the given user.
      *
-     * @param array $data Array containing the user's email.
+     * @param  array  $data  Array containing the user's email.
      * @return string The status translation string.
+     *
      * @throws ValidationException
      */
     public function sendPasswordResetLink(array $data): string
     {
-        $status = Password::sendResetLink($data);
+        $status = Password::broker('users')->sendResetLink($data);
 
         if ($status !== Password::RESET_LINK_SENT) {
             throw ValidationException::withMessages([
@@ -97,13 +101,14 @@ class AuthService
     /**
      * Reset the user's password.
      *
-     * @param array $data Validated reset token, email, and new password.
+     * @param  array  $data  Validated reset token, email, and new password.
      * @return string The status translation string.
+     *
      * @throws ValidationException
      */
     public function resetPassword(array $data): string
     {
-        $status = Password::reset($data, function (User $user, string $password) {
+        $status = Password::broker('users')->reset($data, function (User $user, string $password) {
             $user->password = Hash::make($password);
             $user->setRememberToken(Str::random(60));
             $user->save();
@@ -123,9 +128,9 @@ class AuthService
     /**
      * Verify the user's email address using the signed URL parameters.
      *
-     * @param string $id The user ID.
-     * @param string $hash The verification hash.
-     * @return string
+     * @param  string  $id  The user ID.
+     * @param  string  $hash  The verification hash.
+     *
      * @throws AuthorizationException
      */
     public function verifyEmail(string $id, string $hash): string
@@ -152,8 +157,7 @@ class AuthService
     /**
      * Resend the email verification notification.
      *
-     * @param User $user The authenticated user model.
-     * @return void
+     * @param  User  $user  The authenticated user model.
      */
     public function resendVerificationEmail(User $user): void
     {
@@ -167,11 +171,9 @@ class AuthService
     /**
      * Handle socialite user login or registration.
      *
-     * @param string $provider
-     * @param SocialiteUser $socialUser
-     * @return User
+     * @return array{user: User, token: string}
      */
-    public function handleSocialLogin(string $provider, SocialiteUser $socialUser): User
+    public function handleSocialLogin(string $provider, SocialiteUser $socialUser): array
     {
         $user = User::query()->firstOrCreate(
             ['email' => $socialUser->getEmail()],
@@ -192,10 +194,11 @@ class AuthService
             ]);
         }
 
-        // Authenticate the user
-        Auth::login($user);
-        request()->session()->regenerate();
+        $token = $user->createToken('auth')->plainTextToken;
 
-        return $user;
+        return [
+            'user' => $user,
+            'token' => $token,
+        ];
     }
 }

@@ -1,6 +1,8 @@
 <?php
 
-use Laravel\Sanctum\Sanctum;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
+use Laravel\Sanctum\Http\Middleware\AuthenticateSession;
 
 return [
 
@@ -15,12 +17,33 @@ return [
     |
     */
 
-    'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
-        '%s%s',
-        'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
-        Sanctum::currentApplicationUrlWithPort(),
-        // Sanctum::currentRequestHost(),
-    ))),
+    /*
+     * When SANCTUM_STATEFUL_DOMAINS is set in .env it replaces the default — which often
+     * drops the API host (e.g. ecommerce-app.test) and breaks session auth for Scramble
+     * "Try it" and same-origin tools. We always merge APP_URL host + port with your list.
+     */
+    'stateful' => array_values(array_unique(array_filter(array_merge(
+        [
+            'localhost',
+            'localhost:3000',
+            '127.0.0.1',
+            '127.0.0.1:3000',
+            '127.0.0.1:8000',
+            '::1',
+        ],
+        array_filter(array_map('trim', explode(',', (string) env('SANCTUM_STATEFUL_DOMAINS', '')))),
+        (static function (): array {
+            $host = parse_url((string) config('app.url'), PHP_URL_HOST);
+            if (! is_string($host) || $host === '') {
+                return [];
+            }
+
+            $port = parse_url((string) config('app.url'), PHP_URL_PORT);
+            $withPort = $port ? "{$host}:{$port}" : null;
+
+            return array_filter([$host, $withPort]);
+        })(),
+    )))),
 
     /*
     |--------------------------------------------------------------------------
@@ -34,7 +57,7 @@ return [
     |
     */
 
-    'guard' => ['web'],
+    'guard' => ['web', 'tenant'],
 
     /*
     |--------------------------------------------------------------------------
@@ -76,9 +99,9 @@ return [
     */
 
     'middleware' => [
-        'authenticate_session' => Laravel\Sanctum\Http\Middleware\AuthenticateSession::class,
-        'encrypt_cookies' => Illuminate\Cookie\Middleware\EncryptCookies::class,
-        'validate_csrf_token' => Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+        'authenticate_session' => AuthenticateSession::class,
+        'encrypt_cookies' => EncryptCookies::class,
+        'validate_csrf_token' => ValidateCsrfToken::class,
     ],
 
 ];

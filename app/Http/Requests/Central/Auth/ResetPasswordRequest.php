@@ -6,15 +6,17 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
 
 /**
- * @property string $token The reset token received via email. @example 9b7...f3a
- * @property string $email The user's email address. @example victor@example.com
- * @property string $password The new password. @example NewSecretP@ssw0rd!
- * @property string $password_confirmation The new password confirmation. @example NewSecretP@ssw0rd!
+ * @property string $token The reset token received via email.
+ * @property string $email The user's email address.
+ * @property string $password The new password.
+ * @property string $password_confirmation The new password confirmation.
  */
 class ResetPasswordRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
+     *
+     * @return bool
      */
     public function authorize(): bool
     {
@@ -29,8 +31,25 @@ class ResetPasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
+            /**
+             * The reset token received via email.
+             * @var string $token
+             * @example "9b7a4f3a..."
+             */
             'token' => ['required'],
+
+            /**
+             * The user's email address.
+             * @var string $email
+             * @example "victor@example.com"
+             */
             'email' => ['required', 'string', 'email'],
+
+            /**
+             * The new password.
+             * @var string $password
+             * @example "NewSecretP@ssw0rd!"
+             */
             'password' => ['required', 'confirmed', Password::min(8)],
         ];
     }

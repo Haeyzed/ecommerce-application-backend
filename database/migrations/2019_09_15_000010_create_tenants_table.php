@@ -10,14 +10,13 @@ class CreateTenantsTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
-        Schema::create('tenants', function (Blueprint $table) {
+        Schema::connection('central')->create('tenants', function (Blueprint $table) {
             $table->string('id')->primary();
             $table->string('name');
+            $table->string('status')->default('active');
             $table->string('owner_email')->nullable();
             $table->foreignId('plan_id')->nullable()->constrained('plans')->nullOnDelete();
             $table->timestamps();
@@ -27,11 +26,9 @@ class CreateTenantsTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {
-        Schema::dropIfExists('tenants');
+        Schema::connection('central')->dropIfExists('tenants');
     }
 }

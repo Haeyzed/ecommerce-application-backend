@@ -18,15 +18,13 @@ use Laravel\Socialite\Facades\Socialite;
 
 /**
  * Authentication Endpoints
- * * Handles user registration, authentication, and password management
- * for the Next.js SPA frontend using Laravel Sanctum.
+ * Handles user registration, authentication, and password management
+ * using Laravel Sanctum personal access tokens (Bearer API).
  */
 class AuthController extends Controller
 {
     /**
      * Create a new AuthController instance.
-     *
-     * @param AuthService $authService
      */
     public function __construct(
         private readonly AuthService $authService
@@ -34,19 +32,20 @@ class AuthController extends Controller
 
     /**
      * Register a new user.
-     * * Creates a new user account, triggers the verification email,
-     * and initializes a logged-in session.
-     * * @unauthenticated
+     * Creates a new user account, triggers the verification email,
+     * and returns a Sanctum access token.
      *
-     * @param RegisterRequest $request
-     * @return JsonResponse
+     * * @unauthenticated
      */
     public function register(RegisterRequest $request): JsonResponse
     {
-        $user = $this->authService->register($request->validated());
+        $result = $this->authService->register($request->validated());
 
         return ApiResponse::success(
-            ['user' => new UserResource($user)],
+            [
+                'user' => new UserResource($result['user']),
+                'token' => $result['token'],
+            ],
             'User registered successfully',
             null,
             201
@@ -55,42 +54,37 @@ class AuthController extends Controller
 
     /**
      * Login user.
-     * * Authenticates the user and initializes a secure session via cookies.
-     * * @unauthenticated
+     * Authenticates the user and returns a Sanctum access token.
      *
-     * @param LoginRequest $request
-     * @return JsonResponse
+     * * @unauthenticated
      */
     public function login(LoginRequest $request): JsonResponse
     {
-        $user = $this->authService->login($request->validated());
+        $result = $this->authService->login($request->validated());
 
         return ApiResponse::success(
-            ['user' => new UserResource($user)],
+            [
+                'user' => new UserResource($result['user']),
+                'token' => $result['token'],
+            ],
             'Login successful'
         );
     }
 
     /**
      * Logout user.
-     * * Invalidates the current session and clears the authentication cookies.
-     *
-     * @param Request $request
-     * @return JsonResponse
+     * Revokes the current Sanctum access token.
      */
     public function logout(Request $request): JsonResponse
     {
-        $this->authService->logout();
+        $this->authService->logout($request->user());
 
         return ApiResponse::success(null, 'Logout successful');
     }
 
     /**
      * Get current user.
-     * * Retrieves the profile information for the currently authenticated user.
-     *
-     * @param Request $request
-     * @return JsonResponse
+     * Retrieves the profile information for the currently authenticated user.
      */
     public function me(Request $request): JsonResponse
     {
@@ -102,11 +96,9 @@ class AuthController extends Controller
 
     /**
      * Request password reset link.
-     * * Sends an email containing a secure link to reset the user's password.
-     * * @unauthenticated
+     * Sends an email containing a secure link to reset the user's password.
      *
-     * @param ForgotPasswordRequest $request
-     * @return JsonResponse
+     * * @unauthenticated
      */
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
@@ -120,11 +112,9 @@ class AuthController extends Controller
 
     /**
      * Reset password.
-     * * Updates the user's password using the token provided via email.
-     * * @unauthenticated
+     * Updates the user's password using the token provided via email.
      *
-     * @param ResetPasswordRequest $request
-     * @return JsonResponse
+     * * @unauthenticated
      */
     public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {
@@ -138,13 +128,9 @@ class AuthController extends Controller
 
     /**
      * Verify email address.
-     * * Validates the signed URL and marks the user's email as verified.
-     * * @unauthenticated
+     * Validates the signed URL and marks the user's email as verified.
      *
-     * @param Request $request
-     * @param string $id
-     * @param string $hash
-     * @return JsonResponse
+     * * @unauthenticated
      */
     public function verify(Request $request, string $id, string $hash): JsonResponse
     {
@@ -163,10 +149,7 @@ class AuthController extends Controller
 
     /**
      * Resend verification email.
-     * * Triggers a new email verification link to be sent to the authenticated user.
-     *
-     * @param Request $request
-     * @return JsonResponse
+     * Triggers a new email verification link to be sent to the authenticated user.
      */
     public function resendVerification(Request $request): JsonResponse
     {
@@ -180,15 +163,12 @@ class AuthController extends Controller
 
     /**
      * Redirect the user to the provider's authentication page.
-     * * Returns the URL for the frontend to handle the redirect to avoid CORS issues.
-     *
-     * @param string $provider
-     * @return JsonResponse
+     * Returns the URL for the frontend to handle the redirect to avoid CORS issues.
      */
     public function redirectToProvider(string $provider): JsonResponse
     {
         $validated = validator(['provider' => $provider], [
-            'provider' => 'in:google,facebook,github'
+            'provider' => 'in:google,facebook,github',
         ])->validate();
 
         // Get the stateless redirect URL from Socialite
@@ -202,29 +182,27 @@ class AuthController extends Controller
 
     /**
      * Obtain the user information from the provider.
-     * * Handles the callback, logs the user in, and redirects to the Next.js frontend.
-     *
-     * @param string $provider
-     * @return RedirectResponse
+     * Handles the callback, issues a Sanctum token, and redirects to the SPA with `#access_token=...`.
      */
     public function handleProviderCallback(string $provider): RedirectResponse
     {
         $validated = validator(['provider' => $provider], [
-            'provider' => 'in:google,facebook,github'
+            'provider' => 'in:google,facebook,github',
         ])->validate();
 
         try {
             $socialUser = Socialite::driver($provider)->stateless()->user();
 
-            // Handle the login/registration via the service
-            $this->authService->handleSocialLogin($provider, $socialUser);
+            $result = $this->authService->handleSocialLogin($provider, $socialUser);
 
-            // Redirect back to the Next.js frontend upon successful login
-            return redirect()->away(config('app.frontend_url') . '/dashboard');
+            $base = rtrim((string) config('app.frontend_url'), '/');
+            $fragment = 'access_token='.rawurlencode($result['token']);
+
+            return redirect()->away($base.'/auth/callback#'.$fragment);
 
         } catch (\Exception $e) {
             // Redirect back to frontend login page with an error parameter
-            return redirect()->away(config('app.frontend_url') . '/login?error=social_auth_failed');
+            return redirect()->away(config('app.frontend_url').'/login?error=social_auth_failed');
         }
     }
 }

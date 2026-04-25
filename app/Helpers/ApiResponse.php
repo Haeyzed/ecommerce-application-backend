@@ -107,7 +107,7 @@ class ApiResponse
      *     has_more:bool
      * }
      */
-    public static function paginationMeta(LengthAwarePaginator $paginator): array
+    public static function meta(LengthAwarePaginator $paginator): array
     {
         return [
             'current_page' => $paginator->currentPage(),

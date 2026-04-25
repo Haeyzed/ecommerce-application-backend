@@ -10,6 +10,30 @@ return [
     'api_path' => 'api',
 
     /*
+    |--------------------------------------------------------------------------
+    | API Servers
+    |--------------------------------------------------------------------------
+    |
+    | These URLs are used in the generated OpenAPI documentation.
+    |
+    | For tenant API documentation, use "{tenant}" in the URL if your tenancy
+    | is initialized by tenant subdomain/domain.
+    |
+    */
+
+    'central_api_server' => env(
+        'SCRAMBLE_CENTRAL_API_SERVER',
+        rtrim((string) env('APP_URL', 'http://ecommerce-application-backend.test'), '/') . '/api'
+    ),
+
+    'tenant_api_server' => env(
+        'SCRAMBLE_TENANT_API_SERVER',
+        'http://{tenant}.ecommerce-application-backend.test/api'
+    ),
+
+    'default_tenant' => env('SCRAMBLE_DEFAULT_TENANT', 'demo'),
+
+    /*
      * Your API domain. By default, app domain is used. This is also a part of the default API routes
      * matcher, so when implementing your own, make sure you use this config if needed.
      */
@@ -79,51 +103,22 @@ return [
      * The list of servers of the API. By default, when `null`, server URL will be created from
      * `scramble.api_path` and `scramble.api_domain` config variables. When providing an array, you
      * will need to specify the local server URL manually (if needed).
-     *
-     * Example of non-default config (final URLs are generated using Laravel `url` helper):
-     *
-     * ```php
-     * 'servers' => [
-     *     'Live' => 'api',
-     *     'Prod' => 'https://scramble.dedoc.co/api',
-     * ],
-     * ```
      */
     'servers' => null,
 
     /**
      * Determines how Scramble stores the descriptions of enum cases.
-     * Available options:
-     * - 'description' – Case descriptions are stored as the enum schema's description using table formatting.
-     * - 'extension' – Case descriptions are stored in the `x-enumDescriptions` enum schema extension.
-     *
-     *    @see https://redocly.com/docs-legacy/api-reference-docs/specification-extensions/x-enum-descriptions
-     * - false - Case descriptions are ignored.
      */
     'enum_cases_description_strategy' => 'description',
 
     /**
      * Determines how Scramble stores the names of enum cases.
-     * Available options:
-     * - 'names' – Case names are stored in the `x-enumNames` enum schema extension.
-     * - 'varnames' - Case names are stored in the `x-enum-varnames` enum schema extension.
-     * - false - Case names are not stored.
      */
     'enum_cases_names_strategy' => false,
 
     /**
      * When Scramble encounters deep objects in query parameters, it flattens the parameters so the generated
-     * OpenAPI document correctly describes the API. Flattening deep query parameters is relevant until
-     * OpenAPI 3.2 is released and query string structure can be described properly.
-     *
-     * For example, this nested validation rule describes the object with `bar` property:
-     * `['foo.bar' => ['required', 'int']]`.
-     *
-     * When `flatten_deep_query_parameters` is `true`, Scramble will document the parameter like so:
-     * `{"name":"foo[bar]", "schema":{"type":"int"}, "required":true}`.
-     *
-     * When `flatten_deep_query_parameters` is `false`, Scramble will document the parameter like so:
-     *  `{"name":"foo", "schema": {"type":"object", "properties":{"bar":{"type": "int"}}, "required": ["bar"]}, "required":true}`.
+     * OpenAPI document correctly describes the API.
      */
     'flatten_deep_query_parameters' => true,
 

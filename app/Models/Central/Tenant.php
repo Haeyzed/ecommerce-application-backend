@@ -2,39 +2,44 @@
 
 namespace App\Models\Central;
 
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use Illuminate\Support\Carbon;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use Stancl\Tenancy\Contracts\TenantWithDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDomains;
 use Stancl\Tenancy\Database\Models\Domain;
 use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
-use Illuminate\Support\Carbon;
 
 /**
  * Class Tenant
  *
- * Represents a tenant (e.g., an e-commerce store) within the central database.
- * @property string $id The unique identifier for the tenant (often used as the default subdomain).
- * @property string $name The name of the tenant's store or business.
- * @property int|null $plan_id The foreign key referencing the subscription plan.
- * @property string $owner_email The email address of the store owner.
+ * Represents a tenant (store) in the central SaaS application.
+ *
+ * @property string $id The unique identifier/slug of the tenant.
+ * @property string $name The display name of the tenant store.
+ * @property string|null $owner_email The email address of the store owner.
+ * @property int|null $plan_id The current subscription plan ID.
+ * @property string|null $status The current status of the tenant (e.g., active, suspended).
+ * @property array|null $data Additional JSON data stored by the tenancy package.
  * @property Carbon|null $created_at Timestamp of when the tenant was created.
  * @property Carbon|null $updated_at Timestamp of when the tenant was last updated.
- * @property-read Plan|null $plan The subscription plan the tenant is subscribed to.
- * @property-read Collection|Domain[] $domains The custom and default domains associated with the tenant.
- *
- * @package App\Models\Central
+ * @property-read Plan|null $plan The subscription plan the tenant is on.
+ * @property-read Subscription|null $subscription The active subscription for the tenant.
+ * @property-read Collection|Invoice[] $invoices The invoices billed to the tenant.
+ * @property-read Collection|Domain[] $domains The domains associated with the tenant.
  */
-class Tenant extends BaseTenant implements TenantWithDatabase
+class Tenant extends BaseTenant implements AuditableContract, TenantWithDatabase
 {
-    use HasDatabase, HasDomains;
+    use Auditable, HasDatabase, HasDomains;
 
     /**
-     * Define the custom columns for the tenant model.
-     * * By default, stancl/tenancy stores extra data in a JSON column.
-     * Specifying columns here tells the package to map these attributes
-     * directly to physical database columns instead.
+     * Custom columns persisted directly on the tenants table (alongside `data`).
+     * Migration must add these columns.
      *
      * @return array<int, string>
      */
@@ -43,20 +48,40 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         return [
             'id',
             'name',
-            'plan_id',
             'owner_email',
-            'created_at',
-            'updated_at'
+            'plan_id',
+            'status',
         ];
     }
 
     /**
-     * Get the subscription plan associated with the tenant.
-     *
-     * @return BelongsTo
+     * Get the plan associated with the tenant through their subscription.
      */
-    public function plan(): BelongsTo
+    public function plan(): HasOneThrough
     {
-        return $this->belongsTo(Plan::class);
+        return $this->hasOneThrough(
+            Plan::class,
+            Subscription::class,
+            'tenant_id', // Foreign key on subscriptions table
+            'id',        // Foreign key on plans table
+            'id',        // Local key on tenants table
+            'plan_id'    // Local key on subscriptions table
+        );
+    }
+
+    /**
+     * Get the active subscription for the tenant.
+     */
+    public function subscription(): HasOne
+    {
+        return $this->hasOne(Subscription::class);
+    }
+
+    /**
+     * Get the invoices billed to the tenant.
+     */
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
     }
 }

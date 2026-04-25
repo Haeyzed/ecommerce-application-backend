@@ -9,17 +9,16 @@ use App\Http\Requests\Central\Tenant\UpdateTenantRequest;
 use App\Models\Central\Tenant;
 use App\Services\Central\TenantService;
 use Illuminate\Http\JsonResponse;
+use Throwable;
 
 /**
  * Tenant Endpoints
- * * Handles the provisioning, updating, and deletion of e-commerce stores (tenants).
+ * Handles the CRUD operations for central system tenants.
  */
 class TenantController extends Controller
 {
     /**
      * Create a new TenantController instance.
-     *
-     * @param TenantService $tenantService
      */
     public function __construct(
         private readonly TenantService $tenantService
@@ -27,9 +26,6 @@ class TenantController extends Controller
 
     /**
      * List all tenants.
-     * * Retrieves a paginated list of all provisioned stores.
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
@@ -42,11 +38,9 @@ class TenantController extends Controller
     }
 
     /**
-     * Provision a new tenant.
-     * * Creates a new isolated store database and assigns the default subdomain.
+     * Provision a new tenant manually.
      *
-     * @param StoreTenantRequest $request
-     * @return JsonResponse
+     * @throws Throwable
      */
     public function store(StoreTenantRequest $request): JsonResponse
     {
@@ -61,29 +55,20 @@ class TenantController extends Controller
     }
 
     /**
-     * Get tenant details.
-     * * Retrieves the details, domains, and plan of a specific tenant.
-     *
-     * @param Tenant $tenant
-     * @return JsonResponse
+     * Get specific tenant details.
      */
     public function show(Tenant $tenant): JsonResponse
     {
-        $tenantDetails = $this->tenantService->getTenantDetails($tenant);
+        $tenant = $this->tenantService->getTenantById($tenant->getKey());
 
         return ApiResponse::success(
-            ['tenant' => $tenantDetails],
+            ['tenant' => $tenant],
             'Tenant retrieved successfully'
         );
     }
 
     /**
-     * Update tenant details.
-     * * Modifies the tenant's basic information or subscription plan.
-     *
-     * @param UpdateTenantRequest $request
-     * @param Tenant $tenant
-     * @return JsonResponse
+     * Update an existing tenant.
      */
     public function update(UpdateTenantRequest $request, Tenant $tenant): JsonResponse
     {
@@ -98,9 +83,6 @@ class TenantController extends Controller
     /**
      * Delete tenant.
      * * Removes the tenant and their associated domains.
-     *
-     * @param Tenant $tenant
-     * @return JsonResponse
      */
     public function destroy(Tenant $tenant): JsonResponse
     {

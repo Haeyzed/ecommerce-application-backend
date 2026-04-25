@@ -5,13 +5,15 @@ namespace App\Http\Requests\Central\Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * @property string $email The user's registered email address. @example victor@example.com
- * @property string $password The user's password. @example SecretP@ssw0rd!
+ * @property string $email The user's registered email address.
+ * @property string $password The user's password.
  */
 class LoginRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
+     *
+     * @return bool
      */
     public function authorize(): bool
     {
@@ -26,7 +28,18 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
+            /**
+             * The user's registered email address.
+             * @var string $email
+             * @example "victor@example.com"
+             */
             'email' => ['required', 'string', 'email'],
+
+            /**
+             * The user's password.
+             * @var string $password
+             * @example "SecretP@ssw0rd!"
+             */
             'password' => ['required', 'string'],
         ];
     }

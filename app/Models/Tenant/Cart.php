@@ -4,8 +4,8 @@ namespace App\Models\Tenant;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -20,12 +20,9 @@ use Illuminate\Support\Carbon;
  * @property string $currency The ISO currency code for the cart.
  * @property Carbon|null $created_at Timestamp of when the cart was created.
  * @property Carbon|null $updated_at Timestamp of when the cart was last updated.
- *
  * @property-read Collection|CartItem[] $items The items within the cart.
  * @property-read Customer|null $customer The customer who owns the cart.
  * @property-read Coupon|null $coupon The coupon applied to the cart.
- *
- * @package App\Models\Tenant
  */
 class Cart extends Model
 {
@@ -43,8 +40,6 @@ class Cart extends Model
 
     /**
      * Get the items in the cart.
-     *
-     * @return HasMany
      */
     public function items(): HasMany
     {
@@ -53,8 +48,6 @@ class Cart extends Model
 
     /**
      * Get the customer that owns the cart.
-     *
-     * @return BelongsTo
      */
     public function customer(): BelongsTo
     {
@@ -63,8 +56,6 @@ class Cart extends Model
 
     /**
      * Get the coupon applied to the cart.
-     *
-     * @return BelongsTo
      */
     public function coupon(): BelongsTo
     {
@@ -73,11 +64,25 @@ class Cart extends Model
 
     /**
      * Calculate the subtotal of the cart.
-     *
-     * @return float
      */
     public function subtotal(): float
     {
         return (float) $this->items->sum(fn ($i) => $i->qty * $i->unit_price);
+    }
+
+    /**
+     * Total discount (in cents)
+     */
+    public function discountTotal(): int
+    {
+        return $this->items->sum(fn ($i) => $i->qty * $i->discount_amount);
+    }
+
+    /**
+     * Final total (in cents, before tax/shipping)
+     */
+    public function total(): int
+    {
+        return max(0, $this->subtotal() - $this->discountTotal());
     }
 }

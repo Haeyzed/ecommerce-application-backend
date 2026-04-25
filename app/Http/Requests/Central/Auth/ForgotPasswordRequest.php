@@ -5,12 +5,14 @@ namespace App\Http\Requests\Central\Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * @property string $email The email address to send the password reset link to. @example victor@example.com
+ * @property string $email The email address to send the password reset link to.
  */
 class ForgotPasswordRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
+     *
+     * @return bool
      */
     public function authorize(): bool
     {
@@ -25,6 +27,11 @@ class ForgotPasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
+            /**
+             * The email address to send the password reset link to.
+             * @var string $email
+             * @example "victor@example.com"
+             */
             'email' => ['required', 'string', 'email'],
         ];
     }

@@ -27,12 +27,9 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at Timestamp of when the profile was created.
  * @property Carbon|null $updated_at Timestamp of when the profile was last updated.
  * @property Carbon|null $deleted_at Timestamp of when the profile was soft deleted.
- *
  * @property-read User $user The base user account for this customer.
  * @property-read Collection|Order[] $orders The orders placed by this customer.
  * @property-read Collection|Address[] $addresses The addresses saved by this customer.
- *
- * @package App\Models\Tenant
  */
 class Customer extends Model
 {
@@ -46,6 +43,7 @@ class Customer extends Model
     protected $fillable = [
         'user_id',
         'phone',
+        'avatar_path',
         'avatar_url',
         'date_of_birth',
         'gender',
@@ -64,14 +62,12 @@ class Customer extends Model
     {
         return [
             'date_of_birth' => 'date',
-            'is_active'     => 'boolean',
+            'is_active' => 'boolean',
         ];
     }
 
     /**
      * Get the authenticatable user associated with this customer profile.
-     *
-     * @return BelongsTo
      */
     public function user(): BelongsTo
     {
@@ -80,8 +76,6 @@ class Customer extends Model
 
     /**
      * Get the orders placed by the customer.
-     *
-     * @return HasMany
      */
     public function orders(): HasMany
     {
@@ -90,7 +84,6 @@ class Customer extends Model
 
     /**
      * Get the addresses saved by the customer.
-     * * @return HasMany
      */
     public function addresses(): HasMany
     {

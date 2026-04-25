@@ -56,6 +56,11 @@ return [
 
     'frontend_url' => env('FRONTEND_URL', 'http://localhost:3000'),
 
+    /**
+     * Storefront SPA (per-tenant customer UI). Falls back to FRONTEND_URL if unset.
+     */
+    'storefront_url' => env('STOREFRONT_URL', env('FRONTEND_URL', 'http://localhost:3000')),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

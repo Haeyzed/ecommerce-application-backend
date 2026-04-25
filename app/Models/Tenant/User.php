@@ -2,20 +2,22 @@
 
 namespace App\Models\Tenant;
 
-use App\Notifications\Central\Auth\ResetPasswordNotification;
-use App\Notifications\Central\Auth\VerifyEmailNotification;
+use App\Notifications\Tenant\Auth\ResetPasswordNotification;
+use App\Notifications\Tenant\Auth\VerifyEmailNotification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * Class User
  *
- * Represents a registered user or store owner within the central application.
+ * Represents an authenticatable user in a tenant database (storefront customer or staff).
  *
  * @property int $id The unique identifier of the user.
  * @property string $name The full name of the user.
@@ -28,12 +30,17 @@ use Laravel\Sanctum\HasApiTokens;
  * @property Carbon|null $created_at Timestamp of when the account was created.
  * @property Carbon|null $updated_at Timestamp of when the account was last updated.
  * @property Carbon|null $deleted_at Timestamp of when the account was soft deleted.
- *
- * @package App\Models\Central
  */
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
+    use HasApiTokens, HasFactory, HasRoles, Notifiable, SoftDeletes;
+
+    /**
+     * The guard name used by Spatie permissions.
+     *
+     * @var string
+     */
+    protected string $guard_name = 'sanctum';
 
     /**
      * The attributes that are mass assignable.
@@ -44,8 +51,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'is_active',
         'provider',
-        'provider_id'
+        'provider_id',
     ];
 
     /**
@@ -68,6 +76,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
 
@@ -75,7 +84,6 @@ class User extends Authenticatable implements MustVerifyEmail
      * Send the password reset notification.
      *
      * @param  string  $token
-     * @return void
      */
     public function sendPasswordResetNotification($token): void
     {
@@ -84,11 +92,25 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Send the email verification notification.
-     *
-     * @return void
      */
     public function sendEmailVerificationNotification(): void
     {
-        $this->notify(new VerifyEmailNotification());
+        $this->notify(new VerifyEmailNotification);
+    }
+
+    /**
+     * @return HasOne<Customer, $this>
+     */
+    public function customer(): HasOne
+    {
+        return $this->hasOne(Customer::class);
+    }
+
+    /**
+     * @return HasOne<Staff, $this>
+     */
+    public function staff(): HasOne
+    {
+        return $this->hasOne(Staff::class);
     }
 }

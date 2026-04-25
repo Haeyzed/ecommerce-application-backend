@@ -12,7 +12,7 @@ use Illuminate\Http\JsonResponse;
 
 /**
  * Plan Endpoints
- * * Handles CRUD operations for subscription plans.
+ * Handles CRUD operations for subscription plans.
  */
 class PlanController extends Controller
 {
@@ -27,7 +27,7 @@ class PlanController extends Controller
 
     /**
      * List all plans.
-     * * Retrieves all available subscription plans ordered by price.
+     * Retrieves all available subscription plans ordered by price.
      *
      * @return JsonResponse
      */
@@ -43,7 +43,7 @@ class PlanController extends Controller
 
     /**
      * Create a new plan.
-     * * Adds a new subscription tier to the platform.
+     * Adds a new subscription tier to the platform.
      *
      * @param StorePlanRequest $request
      * @return JsonResponse
@@ -62,7 +62,7 @@ class PlanController extends Controller
 
     /**
      * Get plan details.
-     * * Retrieves a specific subscription plan.
+     * Retrieves a specific subscription plan.
      *
      * @param Plan $plan
      * @return JsonResponse
@@ -79,7 +79,7 @@ class PlanController extends Controller
 
     /**
      * Update a plan.
-     * * Modifies the features or pricing of an existing plan.
+     * Modifies the features or pricing of an existing plan.
      *
      * @param UpdatePlanRequest $request
      * @param Plan $plan
@@ -97,7 +97,7 @@ class PlanController extends Controller
 
     /**
      * Delete a plan.
-     * * Removes a subscription plan from the platform.
+     * Removes a subscription plan from the platform.
      *
      * @param Plan $plan
      * @return JsonResponse

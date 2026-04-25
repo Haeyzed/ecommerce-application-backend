@@ -18,7 +18,6 @@ class VerifyEmailNotification extends VerifyEmail
      * Build the verification URL.
      *
      * @param  mixed  $notifiable
-     * @return string
      */
     protected function verificationUrl($notifiable): string
     {
@@ -28,7 +27,7 @@ class VerifyEmailNotification extends VerifyEmail
 
         // 1. Generate the standard secure signed route for the Laravel API
         $apiUrl = URL::temporarySignedRoute(
-            'verification.verify',
+            'tenant.customer.verification.verify',
             Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
             [
                 'id' => $notifiable->getKey(),
@@ -39,6 +38,6 @@ class VerifyEmailNotification extends VerifyEmail
         // 2. Wrap it in your Next.js frontend URL
         $frontendUrl = rtrim(config('app.frontend_url'), '/');
 
-        return "{$frontendUrl}/verify-email?verify_url=" . urlencode($apiUrl);
+        return "{$frontendUrl}/verify-email?verify_url=".urlencode($apiUrl);
     }
 }

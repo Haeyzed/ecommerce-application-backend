@@ -12,7 +12,7 @@ use Illuminate\Http\JsonResponse;
 
 /**
  * Domain Endpoints
- * * Handles custom and default domain management for tenants.
+ * Handles custom and default domain management for tenants.
  */
 class DomainController extends Controller
 {
@@ -27,7 +27,7 @@ class DomainController extends Controller
 
     /**
      * List tenant domains.
-     * * Retrieves all domains attached to a specific tenant.
+     * Retrieves all domains attached to a specific tenant.
      *
      * @param Tenant $tenant
      * @return JsonResponse
@@ -44,7 +44,7 @@ class DomainController extends Controller
 
     /**
      * Add a custom domain.
-     * * Attaches a new custom domain to the tenant if their plan permits it.
+     * Attaches a new custom domain to the tenant if their plan permits it.
      *
      * @param StoreDomainRequest $request
      * @param Tenant $tenant
@@ -68,7 +68,7 @@ class DomainController extends Controller
 
     /**
      * Remove a domain.
-     * * Deletes a specific domain from the tenant.
+     * Deletes a specific domain from the tenant.
      *
      * @param Tenant $tenant
      * @param string $domain

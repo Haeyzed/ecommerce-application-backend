@@ -22,8 +22,6 @@ class CartController extends Controller
 {
     /**
      * Create a new CartController instance.
-     *
-     * @param CartService $cartService
      */
     public function __construct(
         private readonly CartService $cartService
@@ -31,25 +29,25 @@ class CartController extends Controller
 
     /**
      * Resolve the active cart using headers or auth.
-     *
-     * @param Request $request
-     * @return Cart
      */
     private function resolveCart(Request $request): Cart
     {
-        $customerId = $request->user()?->id;
+        $customerId = $request->user()?->customer?->id;
         $sessionToken = $request->header('X-Cart-Id') ?: Str::uuid()->toString();
 
         $request->headers->set('X-Cart-Id', $sessionToken);
 
-        return $this->cartService->resolveCart($customerId, $sessionToken);
+        $cart = $this->cartService->resolveCart($customerId, $sessionToken);
+
+        if ($customerId) {
+            $this->cartService->mergeGuestCartToCustomer($customerId, $sessionToken);
+        }
+
+        return $cart;
     }
 
     /**
      * Get cart details and totals.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function show(Request $request): JsonResponse
     {
@@ -59,7 +57,7 @@ class CartController extends Controller
         return ApiResponse::success(
             [
                 'cart' => $cart->load(['items.product', 'coupon']),
-                'totals' => $totals
+                'totals' => $totals,
             ],
             'Cart retrieved successfully'
         )->header('X-Cart-Id', $request->header('X-Cart-Id'));
@@ -68,8 +66,6 @@ class CartController extends Controller
     /**
      * Add a new item to the cart.
      *
-     * @param AddItemRequest $request
-     * @return JsonResponse
      * @throws Throwable
      */
     public function addItem(AddItemRequest $request): JsonResponse
@@ -85,10 +81,6 @@ class CartController extends Controller
 
     /**
      * Update the quantity of a specific cart item.
-     *
-     * @param UpdateItemRequest $request
-     * @param int $itemId
-     * @return JsonResponse
      */
     public function updateItem(UpdateItemRequest $request, int $itemId): JsonResponse
     {
@@ -105,10 +97,6 @@ class CartController extends Controller
 
     /**
      * Remove an item from the cart.
-     *
-     * @param Request $request
-     * @param int $itemId
-     * @return JsonResponse
      */
     public function removeItem(Request $request, int $itemId): JsonResponse
     {
@@ -125,9 +113,6 @@ class CartController extends Controller
 
     /**
      * Apply a discount coupon to the cart.
-     *
-     * @param ApplyCouponRequest $request
-     * @return JsonResponse
      */
     public function applyCoupon(ApplyCouponRequest $request): JsonResponse
     {
