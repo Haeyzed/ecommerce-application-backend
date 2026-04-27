@@ -3,8 +3,11 @@
 namespace App\Services\Central;
 
 use App\Models\Central\Tenant;
+use App\Models\Central\User;
+use App\Notifications\Central\DynamicTemplateNotification;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -35,18 +38,49 @@ class TenantService
     public function createTenant(array $data): Tenant
     {
         return DB::transaction(function () use ($data) {
+            $subdomain = Str::slug($data['subdomain']);
+            $centralDomain = config('tenancy.central_domains')[0] ?? 'localhost';
+            $tenantDomain = "{$subdomain}.{$centralDomain}";
+            $rawPassword = Str::password(8);
+
             $tenant = Tenant::query()->create([
-                'id' => Str::slug($data['subdomain']),
+                'id' => $subdomain,
                 'name' => $data['name'],
                 'owner_email' => $data['owner_email'],
                 'plan_id' => $data['plan_id'] ?? null,
             ]);
 
-            $centralDomain = config('tenancy.central_domains')[0] ?? 'localhost';
-
             $tenant->domains()->create([
-                'domain' => $data['subdomain'].'.'.$centralDomain,
+                'domain' => $tenantDomain,
             ]);
+
+            // Notify the owner user of the new tenant, if the user exists
+            if (!empty($data['owner_email'])) {
+                $user = User::query()->where('email', $data['owner_email'])->first();
+                if ($user) {
+                    $user->notify(new DynamicTemplateNotification(
+                        event: 'tenant_registered',
+                        templateData: [
+                            'tenant_name' => $tenant->name,
+                            'domain'      => $tenantDomain,
+                            'email'       => $data['owner_email'],
+                            'password'    => $rawPassword,
+                        ]
+                    ));
+                } else {
+                    // Send to an anonymous notifiable via the email address
+                    Notification::route('mail', $data['owner_email'])
+                        ->notify(new DynamicTemplateNotification(
+                            event: 'tenant_registered',
+                            templateData: [
+                                'tenant_name' => $tenant->name,
+                                'domain'      => $tenantDomain,
+                                'email'       => $data['owner_email'],
+                                'password'    => $rawPassword,
+                            ]
+                        ));
+                }
+            }
 
             return $tenant->load('domains');
         });

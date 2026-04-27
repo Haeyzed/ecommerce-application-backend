@@ -4,6 +4,7 @@ namespace App\Services\Tenant;
 
 use App\Models\Tenant\Customer;
 use App\Models\Tenant\User;
+use App\Notifications\Tenant\DynamicTemplateNotification;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Registered;
@@ -39,6 +40,14 @@ class CustomerAuthService
         ]);
 
         event(new Registered($user));
+
+        $user->notify(new DynamicTemplateNotification(
+            event: 'customer_registered',
+            templateData: [
+                'name'       => $user->name,
+                'store_name' => config('app.name', 'Our Store'), // Or get tenant name
+            ]
+        ));
 
         $token = $user->createToken('customer')->plainTextToken;
 

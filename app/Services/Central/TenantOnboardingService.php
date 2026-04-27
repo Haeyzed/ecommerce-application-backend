@@ -8,9 +8,11 @@ use App\Models\Central\Tenant;
 use App\Models\Tenant\Setting;
 use App\Models\Tenant\Staff;
 use App\Models\Tenant\User;
-use Database\Seeders\Tenant\TenantBootstrapSeeder;
+use App\Notifications\Central\DynamicTemplateNotification;
+use Database\Seeders\Tenant\TenantTableSeeder;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -46,6 +48,8 @@ class TenantOnboardingService
             $centralDomain = parse_url((string) config('app.url'), PHP_URL_HOST)
                 ?: 'ecommerce-application-backend.test';
 
+            $rawPassword = $payload['owner_password'] ?? Str::password(8);
+
             /** @var Tenant $tenant */
             $tenant = Tenant::query()->create([
                 'id' => $subdomain,
@@ -59,16 +63,18 @@ class TenantOnboardingService
                 ],
             ]);
 
+            $tenantDomain = "{$subdomain}.{$centralDomain}";
+
             $tenant->domains()->create([
-                'domain' => "{$subdomain}.{$centralDomain}",
+                'domain' => $tenantDomain,
             ]);
 
             /*
              * Boot tenant context and seed roles + owner inside the tenant DB.
              */
-            $tenant->run(function () use ($payload, $subdomain) {
+            $tenant->run(function () use ($payload, $subdomain, $rawPassword) {
                 Artisan::call('db:seed', [
-                    '--class' => TenantBootstrapSeeder::class,
+                    '--class' => TenantTableSeeder::class,
                     '--force' => true,
                 ]);
 
@@ -76,7 +82,7 @@ class TenantOnboardingService
                 $ownerUser = User::query()->create([
                     'name' => $payload['owner_name'] ?? 'Owner',
                     'email' => $payload['owner_email'] ?? "owner@{$subdomain}.local",
-                    'password' => $payload['owner_password'] ?? Str::random(32),
+                    'password' => $rawPassword,
                     'is_active' => true,
                 ]);
 
@@ -113,6 +119,20 @@ class TenantOnboardingService
                     $plan,
                     (int) ($payload['trial_days'] ?? 14)
                 );
+            }
+
+            // Notify the owner of the new tenant
+            if (!empty($payload['owner_email'])) {
+                Notification::route('mail', $payload['owner_email'])
+                    ->notify(new DynamicTemplateNotification(
+                        event: 'tenant_registered',
+                        templateData: [
+                            'tenant_name' => $tenant->name,
+                            'domain'      => $tenantDomain,
+                            'email'       => $payload['owner_email'],
+                            'password'    => $rawPassword,
+                        ]
+                    ));
             }
 
             return $tenant->fresh('domains');

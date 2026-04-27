@@ -3,8 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Central\User;
-use Database\Seeders\Central\CentralRolesSeeder;
-use Database\Seeders\Central\PlanTableSeed;
+use Database\Seeders\Central\CentralTableSeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -17,8 +16,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(PlanTableSeed::class);
-        $this->call(CentralRolesSeeder::class);
+        $this->call(CentralTableSeeder::class);
 
         User::factory()->create([
             'name' => 'Test User',

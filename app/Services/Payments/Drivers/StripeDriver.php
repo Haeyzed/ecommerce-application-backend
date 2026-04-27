@@ -3,6 +3,7 @@
 namespace App\Services\Payments\Drivers;
 
 use App\Contracts\Payments\PaymentGatewayInterface;
+use App\Traits\ResolvesTenantPaymentConfig;
 use Stripe\StripeClient;
 use Stripe\Webhook;
 
@@ -12,14 +13,20 @@ use Stripe\Webhook;
  */
 class StripeDriver implements PaymentGatewayInterface
 {
+    use ResolvesTenantPaymentConfig;
+
     protected StripeClient $stripe;
+
+    protected string $webhookSecret;
 
     /**
      * Create a new StripeDriver instance.
      */
     public function __construct()
     {
-        $this->stripe = new StripeClient(config('services.stripe.secret'));
+        $credentials = $this->putEnv('stripe');
+        $this->stripe = new StripeClient($credentials['secret_key'] ?? '');
+        $this->webhookSecret = $credentials['webhook_secret'] ?? '';
     }
 
     /**

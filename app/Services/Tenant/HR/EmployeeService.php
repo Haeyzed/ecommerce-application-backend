@@ -5,6 +5,8 @@ namespace App\Services\Tenant\HR;
 use App\Models\Tenant\HR\Employee;
 use App\Models\Tenant\Staff;
 use App\Models\Tenant\User;
+use App\Notifications\Tenant\DynamicTemplateNotification;
+use App\Services\Tenant\SettingService;
 use DateTimeInterface;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -19,11 +21,15 @@ use Throwable;
  */
 class EmployeeService
 {
+    public function __construct(
+        private readonly SettingService $settingService
+    ) {}
+
     /**
      * Retrieve a paginated, filtered list of employees.
      *
-     * @param array $filters
-     * @param int $perPage
+     * @param array $filters Query filters (e.g., search, department_id, is_active).
+     * @param int $perPage Items per page.
      * @return LengthAwarePaginator
      */
     public function getPaginatedEmployees(array $filters = [], int $perPage = 20): LengthAwarePaginator
@@ -54,12 +60,14 @@ class EmployeeService
         return DB::transaction(function () use ($data) {
             $data['employee_code'] = $data['employee_code'] ?? 'EMP-' . strtoupper(Str::random(6));
 
-            // Auto-provision User & Staff if no staff_id was provided
             if (empty($data['staff_id'])) {
+
+                $rawPassword = $data['password'] ?? Str::random(8);
+
                 $user = User::query()->create([
                     'name'      => trim(($data['first_name'] ?? '') . ' ' . ($data['last_name'] ?? '')),
                     'email'     => $data['email'],
-                    'password'  => Hash::make($data['password'] ?? Str::random(12)),
+                    'password'  => Hash::make($rawPassword),
                     'is_active' => $data['is_active'] ?? true,
                 ]);
 
@@ -73,11 +81,21 @@ class EmployeeService
 
                 $data['staff_id'] = $staff->id;
 
-                // Dispatch Registered event to send the Welcome / Verify Email notification template
+                $storeName = $this->settingService->getCurrentSettings()->name ?? config('app.name');
+
                 event(new Registered($user));
+
+                $user->notify(new DynamicTemplateNotification(
+                    event: 'staff_registered',
+                    templateData: [
+                        'name'       => $user->name,
+                        'store_name' => $storeName,
+                        'email'      => $user->email,
+                        'password'   => $rawPassword,
+                    ]
+                ));
             }
 
-            // Remove the raw password before creating the HR Employee record
             unset($data['password']);
 
             return Employee::query()->create($data);

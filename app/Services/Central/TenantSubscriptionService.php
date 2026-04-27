@@ -8,7 +8,10 @@ use App\Models\Central\Invoice;
 use App\Models\Central\Plan;
 use App\Models\Central\Subscription;
 use App\Models\Central\Tenant;
+use App\Models\Central\User;
+use App\Notifications\Central\DynamicTemplateNotification;
 use App\Services\Payments\SubscriptionGatewayManager;
+use Illuminate\Support\Facades\Notification;
 
 /**
  * Class TenantSubscriptionService
@@ -36,7 +39,7 @@ class TenantSubscriptionService
      */
     public function startTrial(Tenant $tenant, Plan $plan, int $days = 14): Subscription
     {
-        return Subscription::query()->updateOrCreate(
+        $subscription = Subscription::query()->updateOrCreate(
             ['tenant_id' => $tenant->id],
             [
                 'plan_id' => $plan->id,
@@ -45,6 +48,10 @@ class TenantSubscriptionService
                 'current_period_ends_at' => now()->addDays($days),
             ]
         );
+
+        $this->notifyTenantSubscribed($tenant, $plan);
+
+        return $subscription;
     }
 
     /**
@@ -59,6 +66,13 @@ class TenantSubscriptionService
             'status' => SubscriptionStatus::ACTIVE->value,
             'current_period_ends_at' => now()->addMonth(),
         ]);
+
+        $tenant = $sub->tenant;
+        $plan = $sub->plan;
+
+        if ($tenant && $plan) {
+            $this->notifyTenantSubscribed($tenant, $plan);
+        }
 
         return $sub->fresh();
     }
@@ -76,6 +90,13 @@ class TenantSubscriptionService
             'status' => SubscriptionStatus::CANCELED->value,
             'cancels_at' => $atPeriodEnd ? $sub->current_period_ends_at : now(),
         ]);
+
+        $tenant = $sub->tenant;
+        $plan = $sub->plan;
+
+        if ($tenant && $plan) {
+            $this->notifyTenantCanceled($tenant, $plan);
+        }
 
         return $sub->fresh();
     }
@@ -96,5 +117,61 @@ class TenantSubscriptionService
             'provider' => $sub->provider,
             'provider_invoice_id' => $raw['id'] ?? $raw['data']['id'] ?? $raw['data']['code'] ?? null,
         ]);
+    }
+
+    /**
+     * Notify the tenant owner of a subscription event.
+     */
+    protected function notifyTenantSubscribed(Tenant $tenant, Plan $plan): void
+    {
+        if (!empty($tenant->owner_email)) {
+            $user = User::query()->where('email', $tenant->owner_email)->first();
+            if ($user) {
+                $user->notify(new DynamicTemplateNotification(
+                    event: 'tenant_subscribed',
+                    templateData: [
+                        'tenant_name' => $tenant->name,
+                        'plan_name' => $plan->name,
+                    ]
+                ));
+            } else {
+                Notification::route('mail', $tenant->owner_email)
+                    ->notify(new DynamicTemplateNotification(
+                        event: 'tenant_subscribed',
+                        templateData: [
+                            'tenant_name' => $tenant->name,
+                            'plan_name' => $plan->name,
+                        ]
+                    ));
+            }
+        }
+    }
+
+    /**
+     * Notify the tenant owner of a cancellation event.
+     */
+    protected function notifyTenantCanceled(Tenant $tenant, Plan $plan): void
+    {
+        if (!empty($tenant->owner_email)) {
+            $user = User::query()->where('email', $tenant->owner_email)->first();
+            if ($user) {
+                $user->notify(new DynamicTemplateNotification(
+                    event: 'tenant_canceled',
+                    templateData: [
+                        'tenant_name' => $tenant->name,
+                        'plan_name' => $plan->name,
+                    ]
+                ));
+            } else {
+                Notification::route('mail', $tenant->owner_email)
+                    ->notify(new DynamicTemplateNotification(
+                        event: 'tenant_canceled',
+                        templateData: [
+                            'tenant_name' => $tenant->name,
+                            'plan_name' => $plan->name,
+                        ]
+                    ));
+            }
+        }
     }
 }

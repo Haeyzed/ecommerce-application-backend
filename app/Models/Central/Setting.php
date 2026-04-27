@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Tenant;
+namespace App\Models\Central;
 
 use App\Traits\Auditable;
 use App\Traits\HasTenantMedia;

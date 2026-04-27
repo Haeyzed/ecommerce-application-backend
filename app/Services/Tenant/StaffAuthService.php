@@ -4,6 +4,7 @@ namespace App\Services\Tenant;
 
 use App\Models\Tenant\Staff;
 use App\Models\Tenant\User;
+use App\Notifications\Tenant\DynamicTemplateNotification;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Registered;
@@ -28,6 +29,8 @@ class StaffAuthService
      */
     public function register(array $data): array
     {
+        $rawPassword = $data['password'] ?? Str::random(8);
+
         $user = User::query()->create([
             'name' => $data['name'],
             'email' => $data['email'],
@@ -44,6 +47,16 @@ class StaffAuthService
         ]);
 
         event(new Registered($user));
+
+        $user->notify(new DynamicTemplateNotification(
+            event: 'staff_registered',
+            templateData: [
+                'name'       => $user->name,
+                'store_name' => config('app.name', 'Our Store'), // Or get tenant name
+                'email'      => $user->email,
+                'password'   => $rawPassword,
+            ]
+        ));
 
         $token = $user->createToken('staff')->plainTextToken;
 

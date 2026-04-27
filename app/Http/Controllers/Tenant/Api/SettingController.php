@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Tenant\Api;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\Setting\UpdateSettingRequest;
+use App\Http\Resources\Tenant\SettingResource;
 use App\Services\Tenant\SettingService;
 use Illuminate\Http\JsonResponse;
 use Throwable;
@@ -23,21 +24,25 @@ class SettingController extends Controller
     ) {}
 
     /**
-     * Get current store settings.
+     * Retrieve the current store settings.
+     *
+     * @return JsonResponse
      */
     public function show(): JsonResponse
     {
         $setting = $this->settingService->getCurrentSettings();
 
         return ApiResponse::success(
-            ['setting' => $setting],
+            new SettingResource($setting),
             'Settings retrieved successfully'
         );
     }
 
     /**
-     * Update store settings.
+     * Update the store settings (supports multipart/form-data for image uploads).
      *
+     * @param UpdateSettingRequest $request
+     * @return JsonResponse
      * @throws Throwable
      */
     public function update(UpdateSettingRequest $request): JsonResponse
@@ -49,7 +54,7 @@ class SettingController extends Controller
         );
 
         return ApiResponse::success(
-            ['setting' => $setting],
+            new SettingResource($setting),
             'Settings updated successfully'
         );
     }
