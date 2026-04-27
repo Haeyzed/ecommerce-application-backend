@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Notifications\Tenant;
+namespace App\Notifications\Central;
 
-use App\Models\Tenant\NotificationPreference;
-use App\Models\Tenant\NotificationTemplate;
+use App\Models\Central\NotificationPreference;
+use App\Models\Central\NotificationTemplate;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
@@ -17,10 +17,10 @@ use Illuminate\Support\HtmlString;
  */
 class DynamicTemplateNotification extends Notification implements ShouldQueue
 {
-    use Queueable;
+//    use Queueable;
 
     /**
-     * @param string $event The event name (e.g., 'staff_registered', 'leave_approved')
+     * @param string $event The event name (e.g., 'tenant_registered', 'plan_expiring')
      * @param array $templateData The key-value pairs to swap into the template
      */
     public function __construct(
@@ -36,14 +36,18 @@ class DynamicTemplateNotification extends Notification implements ShouldQueue
      */
     public function via(mixed $notifiable): array
     {
-        $channels = [];
 
-        // Check if the user has opted out of email notifications for this event
-        if ($this->shouldSendViaChannel($notifiable, 'email')) {
-            $channels[] = 'mail';
-        }
+//        // You can later add logic here to check NotificationPreferences
+        // to see if the user opted out of emails.
+        return ['mail'];
+//        $channels = [];
 
-        return $channels;
+//        // Check if the user has opted out of email notifications for this event
+//        if ($this->shouldSendViaChannel($notifiable, 'email')) {
+//            $channels[] = 'mail';
+//        }
+//
+//        return $channels;
     }
 
     /**
@@ -112,6 +116,6 @@ class DynamicTemplateNotification extends Notification implements ShouldQueue
             ->where('channel', $channel)
             ->first();
 
-        return !$preference || (bool)$preference->enabled;
+        return !$preference || (bool) $preference->enabled;
     }
 }

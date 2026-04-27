@@ -3,12 +3,14 @@
 namespace App\Providers;
 
 use App\Models\PersonalAccessToken;
+use App\Models\Tenant\MailSetting;
 use Dedoc\Scramble\Scramble;
 use Dedoc\Scramble\Support\Generator\OpenApi;
 use Dedoc\Scramble\Support\Generator\SecurityScheme;
 use Dedoc\Scramble\Support\Generator\Server;
 use Dedoc\Scramble\Support\Generator\ServerVariable;
 use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
@@ -122,5 +124,23 @@ class AppServiceProvider extends ServiceProvider
                     SecurityScheme::http('bearer')
                 );
             });
+
+        // Only run this if the tenant database connection is active and the table exists
+        if (function_exists('tenant') && tenant() && Schema::hasTable('mail_settings')) {
+
+            $mailSettings = MailSetting::query()->first();
+
+            if ($mailSettings) {
+                Config::set('mail.default', $mailSettings->mailer ?? 'smtp');
+                Config::set('mail.mailers.smtp.host', $mailSettings->host);
+                Config::set('mail.mailers.smtp.port', $mailSettings->port);
+                Config::set('mail.mailers.smtp.encryption', $mailSettings->encryption);
+                Config::set('mail.mailers.smtp.username', $mailSettings->username);
+                Config::set('mail.mailers.smtp.password', $mailSettings->password);
+
+                Config::set('mail.from.address', $mailSettings->from_address);
+                Config::set('mail.from.name', $mailSettings->from_name);
+            }
+        }
     }
 }

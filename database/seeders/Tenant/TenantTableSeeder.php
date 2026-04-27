@@ -10,7 +10,7 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
-class TenantBootstrapSeeder extends Seeder
+class TenantTableSeeder extends Seeder
 {
     public function run(): void
     {
@@ -28,7 +28,7 @@ class TenantBootstrapSeeder extends Seeder
     private function seedRolesAndPermissions(): void
     {
         $matrix = config('roles.tenant');
-        $guards = config('roles.guards', ['web', 'sanctum']);
+        $guards = config('roles.guards', ['web']);
 
         if (!is_array($matrix)) {
             throw new InvalidArgumentException('The config value [roles.tenant] must be an array. Check config/roles.php.');

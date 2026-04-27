@@ -1,13 +1,22 @@
 @php
+$isTenant = app()->bound('tenant');
+
+if ($isTenant) {
 $settings = \App\Models\Tenant\Setting::query()->first();
+} else {
+$settings = \App\Models\Central\Setting::query()->first();
+}
+
 $storeName = $settings?->name ?? config('app.name');
 
-// Safely attempt to get the Spatie Media URL, falling back to the old logo_path if needed
 $logoUrl = null;
 if ($settings) {
-$logoUrl = method_exists($settings, 'getFirstMediaUrl')
-? $settings->getFirstMediaUrl('logo')
-: $settings->logo_path;
+// Check if hasMedia exists and the logo is actually present before fetching
+if (method_exists($settings, 'hasMedia') && $settings->hasMedia('logo')) {
+$logoUrl = $settings->getFirstMediaUrl('logo');
+} else {
+$logoUrl = $settings->logo_path ?? null;
+}
 }
 @endphp
 
