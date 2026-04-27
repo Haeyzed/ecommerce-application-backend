@@ -1,0 +1,6 @@
+127.0.0.1 ecommerce-application-backend.test
+127.0.0.1 globalhub.ecommerce-application-backend.test
+
+ipconfig /flushdns
+
+ping globalhub.ecommerce-application-backend.test
