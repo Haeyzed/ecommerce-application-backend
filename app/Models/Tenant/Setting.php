@@ -55,7 +55,6 @@ class Setting extends Model implements AuditableContract, HasMedia
         'contact_email',
         'contact_phone',
         'address',
-        'id',
     ];
 
     /**

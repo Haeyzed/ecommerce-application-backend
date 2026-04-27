@@ -18,6 +18,7 @@ class TenantBootstrapSeeder extends Seeder
 
         $this->seedRolesAndPermissions();
         $this->seedSettings();
+        $this->seedMailSettings();
         $this->seedPages();
         $this->seedBlogCategories();
         $this->seedDepartmentsAndPositions();
@@ -29,23 +30,23 @@ class TenantBootstrapSeeder extends Seeder
         $matrix = config('roles.tenant');
         $guards = config('roles.guards', ['web', 'sanctum']);
 
-        if (! is_array($matrix)) {
+        if (!is_array($matrix)) {
             throw new InvalidArgumentException('The config value [roles.tenant] must be an array. Check config/roles.php.');
         }
 
-        if (! is_array($guards) || $guards === []) {
+        if (!is_array($guards) || $guards === []) {
             throw new InvalidArgumentException('The config value [roles.guards] must be a non-empty array. Check config/roles.php.');
         }
 
         $allPerms = collect($matrix)
             ->flatten()
             ->unique()
-            ->reject(fn ($permission) => $permission === '*');
+            ->reject(fn($permission) => $permission === '*');
 
         $expanded = $allPerms
-            ->flatMap(fn ($permission) => str_ends_with($permission, '.*')
+            ->flatMap(fn($permission) => str_ends_with($permission, '.*')
                 ? collect(['view', 'create', 'update', 'delete'])
-                    ->map(fn ($action) => str_replace('*', $action, $permission))
+                    ->map(fn($action) => str_replace('*', $action, $permission))
                 : [$permission])
             ->unique()
             ->values();
@@ -59,7 +60,7 @@ class TenantBootstrapSeeder extends Seeder
             }
 
             foreach ($matrix as $roleName => $permissions) {
-                if (! is_array($permissions)) {
+                if (!is_array($permissions)) {
                     throw new InvalidArgumentException("Permissions for tenant role [{$roleName}] must be an array.");
                 }
 
@@ -79,9 +80,9 @@ class TenantBootstrapSeeder extends Seeder
                 }
 
                 $needed = collect($permissions)
-                    ->flatMap(fn ($permission) => str_ends_with($permission, '.*')
+                    ->flatMap(fn($permission) => str_ends_with($permission, '.*')
                         ? collect(['view', 'create', 'update', 'delete'])
-                            ->map(fn ($action) => str_replace('*', $action, $permission))
+                            ->map(fn($action) => str_replace('*', $action, $permission))
                         : [$permission])
                     ->unique()
                     ->values();
@@ -98,36 +99,129 @@ class TenantBootstrapSeeder extends Seeder
 
     private function seedSettings(): void
     {
-        if (DB::table('settings')->exists()) {
-            return;
-        }
+        DB::table('settings')->updateOrInsert(
+            ['id' => 1],
+            [
+                'name' => 'Default Store',
+                'tagline' => 'Your trusted online store',
+                'currency' => 'USD',
+                'timezone' => 'UTC',
+                'language' => 'en',
+                'logo_path' => null,
+                'favicon_path' => null,
+                'primary_color' => '#2563eb',
+                'social' => json_encode([
+                    'facebook' => null,
+                    'instagram' => null,
+                    'twitter' => null,
+                    'linkedin' => null,
+                ]),
+                'payment_providers' => json_encode([
+                    'stripe' => [
+                        'enabled'   => false,
+                        'test_mode' => true,
+                        'test'      => [
+                            'public_key'     => 'pk_test_stripe_...',
+                            'secret_key'     => 'sk_test_stripe_...',
+                            'webhook_secret' => 'whsec_test_stripe_...',
+                        ],
+                        'live'      => [
+                            'public_key'     => 'pk_live_stripe_...',
+                            'secret_key'     => 'sk_live_stripe_...',
+                            'webhook_secret' => 'whsec_live_stripe_...',
+                        ]
+                    ],
+                    'paypal' => [
+                        'enabled'   => false,
+                        'test_mode' => true,
+                        'test'      => [
+                            'client_id' => 'client_test_paypal_...',
+                            'secret'    => 'secret_test_paypal_...',
+                        ],
+                        'live'      => [
+                            'client_id' => 'client_live_paypal_...',
+                            'secret'    => 'secret_live_paypal_...',
+                        ]
+                    ],
+                    'paystack' => [
+                        'enabled'   => false,
+                        'test_mode' => true,
+                        'test'      => [
+                            'public_key' => 'pk_test_paystack_...',
+                            'secret_key' => 'sk_test_paystack_...',
+                        ],
+                        'live'      => [
+                            'public_key' => 'pk_live_paystack_...',
+                            'secret_key' => 'sk_live_paystack_...',
+                        ]
+                    ],
+                    'flutterwave' => [
+                        'enabled'   => false,
+                        'test_mode' => true,
+                        'test'      => [
+                            'public_key'     => 'flwpubk_test_...',
+                            'secret_key'     => 'flwsec_test_...',
+                            'encryption_key' => 'flw_enc_test_...',
+                        ],
+                        'live'      => [
+                            'public_key'     => 'flwpubk_live_...',
+                            'secret_key'     => 'flwsec_live_...',
+                            'encryption_key' => 'flw_enc_live_...',
+                        ]
+                    ],
+                    'razorpay' => [
+                        'enabled'   => false,
+                        'test_mode' => true,
+                        'test'      => [
+                            'key_id'     => 'rzp_test_...',
+                            'key_secret' => 'rzp_test_secret_...',
+                        ],
+                        'live'      => [
+                            'key_id'     => 'rzp_live_...',
+                            'key_secret' => 'rzp_live_secret_...',
+                        ]
+                    ],
+                    'square' => [
+                        'enabled'   => false,
+                        'test_mode' => true,
+                        'test'      => [
+                            'application_id' => 'sandbox-sq0idb_...',
+                            'access_token'   => 'sandbox-sq0atb_...',
+                            'location_id'    => 'sandbox_location_...',
+                        ],
+                        'live'      => [
+                            'application_id' => 'sq0idp_...',
+                            'access_token'   => 'sq0atp_...',
+                            'location_id'    => 'live_location_...',
+                        ]
+                    ],
+                ]),
+                'contact_email' => null,
+                'contact_phone' => null,
+                'address' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+    }
 
-        DB::table('settings')->insert([
-            'name' => 'Default Store',
-            'tagline' => 'Your trusted online store',
-            'currency' => 'USD',
-            'timezone' => 'UTC',
-            'language' => 'en',
-            'logo_path' => null,
-            'favicon_path' => null,
-            'primary_color' => '#2563eb',
-            'social' => json_encode([
-                'facebook' => null,
-                'instagram' => null,
-                'twitter' => null,
-                'linkedin' => null,
-            ]),
-            'payment_providers' => json_encode([
-                'stripe' => false,
-                'paypal' => false,
-                'paystack' => false,
-            ]),
-            'contact_email' => null,
-            'contact_phone' => null,
-            'address' => null,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+    private function seedMailSettings(): void
+    {
+        DB::table('mail_settings')->updateOrInsert(
+            ['id' => 1],
+            [
+                'mailer'       => 'smtp',
+                'host'         => '127.0.0.1',
+                'port'         => 1025,
+                'username'     => null,
+                'password'     => null,
+                'encryption'   => 'tls',
+                'from_address' => 'noreply@yourstore.com',
+                'from_name'    => 'Default Store',
+                'created_at'   => now(),
+                'updated_at'   => now(),
+            ]
+        );
     }
 
     private function seedPages(): void
@@ -319,7 +413,7 @@ class TenantBootstrapSeeder extends Seeder
         foreach ($departments as $departmentName => $departmentData) {
             $department = DB::table('departments')->where('name', $departmentName)->first();
 
-            if (! $department) {
+            if (!$department) {
                 $departmentId = DB::table('departments')->insertGetId([
                     'name' => $departmentName,
                     'code' => $departmentData['code'],
@@ -356,9 +450,6 @@ class TenantBootstrapSeeder extends Seeder
         }
     }
 
-    /**
-     * Seed default notification channels and templates.
-     */
     private function seedNotifications(): void
     {
         // 1. Seed Notification Channels
@@ -372,8 +463,8 @@ class TenantBootstrapSeeder extends Seeder
             DB::table('notification_channels')->updateOrInsert(
                 ['key' => $channel['key']],
                 [
-                    'label'      => $channel['label'],
-                    'is_active'  => $channel['is_active'],
+                    'label' => $channel['label'],
+                    'is_active' => $channel['is_active'],
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]
@@ -384,70 +475,70 @@ class TenantBootstrapSeeder extends Seeder
         $templates = [
             // --- Authentication & Account ---
             [
-                'event'     => 'customer_registered',
-                'channel'   => 'email',
-                'subject'   => 'Welcome to {store_name}!',
-                'body'      => "Hello {name},\n\nWelcome to {store_name}! Your customer account has been created successfully. You can now log in and start exploring.\n\nBest regards,\nThe {store_name} Team",
+                'event' => 'customer_registered',
+                'channel' => 'email',
+                'subject' => 'Welcome to {store_name}!',
+                'body' => "Hello {name},\n\nWelcome to {store_name}! Your customer account has been created successfully. You can now log in and start exploring.\n\nBest regards,\nThe {store_name} Team",
                 'is_active' => true,
             ],
             [
-                'event'     => 'staff_registered',
-                'channel'   => 'email',
-                'subject'   => 'Welcome to the Team!',
-                'body'      => "Hello {name},\n\nYour staff account at {store_name} has been set up by the administrator. Please log in using your email to access the staff portal.\n\nWelcome aboard!",
+                'event' => 'staff_registered',
+                'channel' => 'email',
+                'subject' => 'Welcome to the Team!',
+                'body' => "Hello {name},\n\nYour staff account at {store_name} has been set up by the administrator.\n\nPlease log in to the staff portal using the following credentials:\nEmail: {email}\nPassword: {password}\n\nFor security reasons, we recommend changing your password after your first login.\n\nWelcome aboard!",
                 'is_active' => true,
             ],
             [
-                'event'     => 'password_reset',
-                'channel'   => 'email',
-                'subject'   => 'Password Reset Request',
-                'body'      => "Hello {name},\n\nWe received a request to reset your password. Please use the following security token to reset it: \n\n**{token}**\n\nIf you did not request this, please ignore this email.",
+                'event' => 'password_reset',
+                'channel' => 'email',
+                'subject' => 'Password Reset Request',
+                'body' => "Hello {name},\n\nWe received a request to reset your password. Please use the following security token to reset it: \n\n**{token}**\n\nIf you did not request this, please ignore this email.",
                 'is_active' => true,
             ],
 
             // --- Billing & Invoices ---
             [
-                'event'     => 'invoice_created',
-                'channel'   => 'email',
-                'subject'   => 'New Invoice Available: {invoice_id}',
-                'body'      => "Hello {name},\n\nA new invoice ({invoice_id}) has been generated for your account. The total amount due is {amount} {currency}. Please ensure payment is made by {due_date}.\n\nThank you!",
+                'event' => 'invoice_created',
+                'channel' => 'email',
+                'subject' => 'New Invoice Available: {invoice_id}',
+                'body' => "Hello {name},\n\nA new invoice ({invoice_id}) has been generated for your account. The total amount due is {amount} {currency}. Please ensure payment is made by {due_date}.\n\nThank you!",
                 'is_active' => true,
             ],
             [
-                'event'     => 'invoice_paid',
-                'channel'   => 'email',
-                'subject'   => 'Payment Confirmation: Invoice {invoice_id}',
-                'body'      => "Hello {name},\n\nThank you! We have successfully received your payment of {amount} {currency} for invoice {invoice_id}.",
+                'event' => 'invoice_paid',
+                'channel' => 'email',
+                'subject' => 'Payment Confirmation: Invoice {invoice_id}',
+                'body' => "Hello {name},\n\nThank you! We have successfully received your payment of {amount} {currency} for invoice {invoice_id}.",
                 'is_active' => true,
             ],
 
             // --- HR & Employee Management ---
             [
-                'event'     => 'leave_approved',
-                'channel'   => 'email',
-                'subject'   => 'Leave Request Approved',
-                'body'      => "Hello {name},\n\nYour leave request from {start_date} to {end_date} has been officially approved by {approver_name}.",
+                'event' => 'leave_approved',
+                'channel' => 'email',
+                'subject' => 'Leave Request Approved',
+                'body' => "Hello {name},\n\nYour leave request from {start_date} to {end_date} has been officially approved by {approver_name}.",
                 'is_active' => true,
             ],
             [
-                'event'     => 'leave_rejected',
-                'channel'   => 'email',
-                'subject'   => 'Leave Request Update',
-                'body'      => "Hello {name},\n\nYour recent leave request has been reviewed but unfortunately could not be approved at this time.\nReason: {reason}",
+                'event' => 'leave_rejected',
+                'channel' => 'email',
+                'subject' => 'Leave Request Update',
+                'body' => "Hello {name},\n\nYour recent leave request has been reviewed but unfortunately could not be approved at this time.\nReason: {reason}",
                 'is_active' => true,
             ],
             [
-                'event'     => 'payslip_generated',
-                'channel'   => 'email',
-                'subject'   => 'Your New Payslip is Available',
-                'body'      => "Hello {name},\n\nYour payslip for the period {period_start} to {period_end} has been generated. Your net pay is {net_amount} {currency}. You can view the full breakdown in your employee portal.",
+                'event' => 'payslip_generated',
+                'channel' => 'email',
+                'subject' => 'Your New Payslip is Available',
+                'body' => "Hello {name},\n\nYour payslip for the period {period_start} to {period_end} has been generated. Your net pay is {net_amount} {currency}. You can view the full breakdown in your employee portal.",
                 'is_active' => true,
             ],
             [
-                'event'     => 'interview_scheduled',
-                'channel'   => 'email',
-                'subject'   => 'Interview Scheduled: {job_title}',
-                'body'      => "Hello {name},\n\nWe would like to invite you for an interview for the {job_title} position on {scheduled_at}. The interview will be conducted via {mode}.\n\nLooking forward to speaking with you!",
+                'event' => 'interview_scheduled',
+                'channel' => 'email',
+                'subject' => 'Interview Scheduled: {job_title}',
+                'body' => "Hello {name},\n\nWe would like to invite you for an interview for the {job_title} position on {scheduled_at}. The interview will be conducted via {mode}.\n\nLooking forward to speaking with you!",
                 'is_active' => true,
             ]
         ];
@@ -455,13 +546,13 @@ class TenantBootstrapSeeder extends Seeder
         foreach ($templates as $template) {
             DB::table('notification_templates')->updateOrInsert(
                 [
-                    'event'   => $template['event'],
+                    'event' => $template['event'],
                     'channel' => $template['channel'],
                 ],
                 [
-                    'subject'    => $template['subject'],
-                    'body'       => $template['body'],
-                    'is_active'  => $template['is_active'],
+                    'subject' => $template['subject'],
+                    'body' => $template['body'],
+                    'is_active' => $template['is_active'],
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]

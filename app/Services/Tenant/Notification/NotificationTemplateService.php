@@ -61,4 +61,66 @@ class NotificationTemplateService
     {
         $template->delete();
     }
+
+    /**
+     * Get the dictionary of available variables for each notification event.
+     * This feeds the frontend UI so users know what placeholders they can use.
+     *
+     * @return array
+     */
+    public function getAvailableVariables(): array
+    {
+        return [
+            'customer_registered' => [
+                'name' => 'Customer Full Name',
+                'store_name' => 'Name of the Store',
+            ],
+            'staff_registered' => [
+                'name' => 'Staff Full Name',
+                'store_name' => 'Name of the Store',
+                'email' => 'Staff Login Email',
+                'password' => 'Generated Login Password',
+            ],
+            'password_reset' => [
+                'name' => 'User Full Name',
+                'token' => 'Secure Password Reset Token',
+            ],
+            'invoice_created' => [
+                'name' => 'Customer Name',
+                'invoice_id' => 'Unique Invoice Number',
+                'amount' => 'Total Amount Due',
+                'currency' => 'Currency Code (e.g., USD)',
+                'due_date' => 'Date the payment is due',
+            ],
+            'invoice_paid' => [
+                'name' => 'Customer Name',
+                'invoice_id' => 'Unique Invoice Number',
+                'amount' => 'Total Amount Paid',
+                'currency' => 'Currency Code',
+            ],
+            'leave_approved' => [
+                'name' => 'Employee Name',
+                'start_date' => 'Leave Start Date',
+                'end_date' => 'Leave End Date',
+                'approver_name' => 'Name of the Manager/HR who approved',
+            ],
+            'leave_rejected' => [
+                'name' => 'Employee Name',
+                'reason' => 'Reason for rejection',
+            ],
+            'payslip_generated' => [
+                'name' => 'Employee Name',
+                'period_start' => 'Start of the pay period',
+                'period_end' => 'End of the pay period',
+                'net_amount' => 'Total net pay received',
+                'currency' => 'Currency Code',
+            ],
+            'interview_scheduled' => [
+                'name' => 'Applicant Name',
+                'job_title' => 'Title of the Job',
+                'scheduled_at' => 'Date and Time of Interview',
+                'mode' => 'Interview Mode (e.g., Video, Onsite)',
+            ],
+        ];
+    }
 }

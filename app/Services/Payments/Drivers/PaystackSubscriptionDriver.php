@@ -3,6 +3,7 @@
 namespace App\Services\Payments\Drivers;
 
 use App\Contracts\Payments\SubscriptionGatewayInterface;
+use App\Traits\ResolvesTenantPaymentConfig;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\RequestException;
@@ -15,6 +16,8 @@ use RuntimeException;
  */
 class PaystackSubscriptionDriver implements SubscriptionGatewayInterface
 {
+    use ResolvesTenantPaymentConfig;
+
     protected string $secret;
 
     protected string $baseUrl;
@@ -24,7 +27,8 @@ class PaystackSubscriptionDriver implements SubscriptionGatewayInterface
      */
     public function __construct()
     {
-        $this->secret = (string) config('services.paystack.secret');
+        $credentials = $this->putEnv('paystack');
+        $this->secret = $credentials['secret_key'] ?? '';
         $this->baseUrl = rtrim((string) config('services.paystack.url', 'https://api.paystack.co'), '/');
     }
 

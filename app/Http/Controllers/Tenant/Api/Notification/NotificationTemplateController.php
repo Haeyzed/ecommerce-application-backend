@@ -110,4 +110,19 @@ class NotificationTemplateController extends Controller
 
         return ApiResponse::success(null, 'Notification template deleted successfully');
     }
+
+    /**
+     * Get the available placeholder variables for notification templates.
+     *
+     * @return JsonResponse
+     */
+    public function variables(): JsonResponse
+    {
+        $variables = $this->templateService->getAvailableVariables();
+
+        return ApiResponse::success(
+            $variables,
+            'Available notification template variables retrieved successfully'
+        );
+    }
 }

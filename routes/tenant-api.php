@@ -18,6 +18,7 @@ use App\Http\Controllers\Tenant\Api\HR\PayrollController;
 use App\Http\Controllers\Tenant\Api\HR\PerformanceController;
 use App\Http\Controllers\Tenant\Api\HR\PositionController;
 use App\Http\Controllers\Tenant\Api\HR\TrainingController;
+use App\Http\Controllers\Tenant\Api\MailSettingController;
 use App\Http\Controllers\Tenant\Api\Notification\NotificationPreferenceController;
 use App\Http\Controllers\Tenant\Api\Notification\NotificationTemplateController;
 use App\Http\Controllers\Tenant\Api\SettingController;
@@ -40,9 +41,6 @@ Route::middleware([
 
     // --- Settings ---
     Route::get('/settings', [SettingController::class, 'show'])->name('settings.show');
-    Route::put('/settings', [SettingController::class, 'update'])
-        ->middleware('auth:sanctum')
-        ->name('settings.update');
 
     // --- Cart Module ---
     Route::prefix('cart')->name('cart.')->group(function () {
@@ -95,6 +93,16 @@ Route::middleware([
 
     // --- Authenticated Features (Shared Staff & Customer) ---
     Route::middleware('auth:sanctum')->group(function () {
+
+        // General Store Settings Update
+        Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
+
+        // Mail Settings
+        Route::prefix('settings/mail')->name('settings.mail.')->group(function () {
+            Route::get('/', [MailSettingController::class, 'show'])->name('show');
+            Route::put('/', [MailSettingController::class, 'update'])->name('update');
+        });
+
         // Notification Preferences
         Route::prefix('notifications/preferences')->name('notifications.preferences.')->group(function () {
             Route::get('/', [NotificationPreferenceController::class, 'index'])->name('index');
@@ -192,6 +200,7 @@ Route::middleware([
 
         // Notification Templates (Admin/HR Only)
         Route::prefix('notifications/templates')->name('notifications.templates.')->group(function () {
+            Route::get('/variables', [NotificationTemplateController::class, 'variables'])->name('variables');
             Route::get('/', [NotificationTemplateController::class, 'index'])->name('index');
             Route::get('/{id}', [NotificationTemplateController::class, 'show'])->name('show');
             Route::post('/', [NotificationTemplateController::class, 'store'])->name('store');
