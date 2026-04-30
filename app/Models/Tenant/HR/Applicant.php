@@ -4,6 +4,7 @@ namespace App\Models\Tenant\HR;
 
 use App\Traits\Auditable;
 use App\Traits\HasTenantMedia;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -65,5 +66,25 @@ class Applicant extends Model implements AuditableContract, HasMedia
     public function interviews(): HasMany
     {
         return $this->hasMany(Interview::class);
+    }
+
+    /**
+     * Scope a query to apply a dynamic array of filters.
+     */
+    public function scopeFilter(Builder $query, array $filters): void
+    {
+        $query->when($filters['search'] ?? null, function (Builder $query, string $search) {
+            $query->where(function (Builder $query) use ($search) {
+                $query->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        })
+            ->when($filters['job_posting_id'] ?? null, function (Builder $query, int $jobPostingId) {
+                $query->where('job_posting_id', $jobPostingId);
+            })
+            ->when($filters['status'] ?? null, function (Builder $query, string $status) {
+                $query->where('status', $status);
+            });
     }
 }

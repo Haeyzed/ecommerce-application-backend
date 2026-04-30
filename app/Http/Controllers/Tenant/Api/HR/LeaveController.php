@@ -24,9 +24,6 @@ class LeaveController extends Controller
 
     /**
      * List all leave requests.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -42,9 +39,6 @@ class LeaveController extends Controller
 
     /**
      * Submit a new leave request.
-     *
-     * @param StoreLeaveRequest $request
-     * @return JsonResponse
      */
     public function store(StoreLeaveRequest $request): JsonResponse
     {
@@ -62,9 +56,7 @@ class LeaveController extends Controller
     /**
      * Approve a leave request.
      *
-     * @param Request $request
-     * @param int $id The ID of the leave request.
-     * @return JsonResponse
+     * @param  int  $id  The ID of the leave request.
      */
     public function approve(Request $request, int $id): JsonResponse
     {
@@ -84,15 +76,13 @@ class LeaveController extends Controller
     /**
      * Reject a leave request.
      *
-     * @param Request $request
-     * @param int $id The ID of the leave request.
-     * @return JsonResponse
+     * @param  int  $id  The ID of the leave request.
      */
     public function reject(Request $request, int $id): JsonResponse
     {
         $request->validate([
             'approver_employee_id' => 'required|integer|exists:employees,id',
-            'reason' => 'nullable|string'
+            'reason' => 'nullable|string',
         ]);
 
         $leave = LeaveRequestModel::query()->findOrFail($id);

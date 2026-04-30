@@ -20,8 +20,6 @@ class CustomerController extends Controller
 {
     /**
      * Create a new CustomerController instance.
-     *
-     * @param CustomerService $customerService
      */
     public function __construct(
         private readonly CustomerService $customerService
@@ -29,9 +27,6 @@ class CustomerController extends Controller
 
     /**
      * List all customers.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -49,9 +44,6 @@ class CustomerController extends Controller
 
     /**
      * Get specific customer details.
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function show(int $id): JsonResponse
     {
@@ -66,8 +58,6 @@ class CustomerController extends Controller
     /**
      * Create a new customer manually.
      *
-     * @param StoreCustomerRequest $request
-     * @return JsonResponse
      * @throws Throwable
      */
     public function store(StoreCustomerRequest $request): JsonResponse
@@ -85,9 +75,6 @@ class CustomerController extends Controller
     /**
      * Update an existing customer.
      *
-     * @param UpdateCustomerRequest $request
-     * @param int $id
-     * @return JsonResponse
      * @throws Throwable
      */
     public function update(UpdateCustomerRequest $request, int $id): JsonResponse
@@ -104,9 +91,6 @@ class CustomerController extends Controller
 
     /**
      * Delete a customer.
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function destroy(int $id): JsonResponse
     {

@@ -16,8 +16,6 @@ class CategoryController extends Controller
 {
     /**
      * Create a new CategoryController instance.
-     *
-     * @param CategoryService $categoryService
      */
     public function __construct(
         private readonly CategoryService $categoryService
@@ -25,8 +23,6 @@ class CategoryController extends Controller
 
     /**
      * List all categories.
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
@@ -40,9 +36,6 @@ class CategoryController extends Controller
 
     /**
      * Create a new category.
-     *
-     * @param StoreCategoryRequest $request
-     * @return JsonResponse
      */
     public function store(StoreCategoryRequest $request): JsonResponse
     {

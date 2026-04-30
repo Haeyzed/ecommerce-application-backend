@@ -15,7 +15,6 @@ class ResetPasswordNotification extends ResetPassword
      * Build the frontend password reset URL.
      *
      * @param  mixed  $notifiable
-     * @return string
      */
     protected function resetUrl($notifiable): string
     {

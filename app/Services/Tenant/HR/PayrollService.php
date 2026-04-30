@@ -16,9 +16,8 @@ class PayrollService
     /**
      * Retrieve a paginated, filtered list of payslips.
      *
-     * @param array $filters Query filters (e.g., employee_id, status).
-     * @param int $perPage Items per page.
-     * @return LengthAwarePaginator
+     * @param  array  $filters  Query filters (e.g., employee_id, status).
+     * @param  int  $perPage  Items per page.
      */
     public function getPaginatedPayroll(array $filters = [], int $perPage = 20): LengthAwarePaginator
     {
@@ -33,43 +32,40 @@ class PayrollService
     /**
      * Generate a new payslip for an employee.
      *
-     * @param Employee $employee The employee receiving the payslip.
-     * @param CarbonInterface $start The start date of the pay period.
-     * @param CarbonInterface $end The end date of the pay period.
-     * @param array $deductions A breakdown array of applied deductions.
-     * @return Payslip
+     * @param  Employee  $employee  The employee receiving the payslip.
+     * @param  CarbonInterface  $start  The start date of the pay period.
+     * @param  CarbonInterface  $end  The end date of the pay period.
+     * @param  array  $deductions  A breakdown array of applied deductions.
      */
     public function generate(Employee $employee, CarbonInterface $start, CarbonInterface $end, array $deductions = []): Payslip
     {
-        $gross   = (int) $employee->salary_cents;
-        $taxPct  = (float) env('PAYROLL_TAX_PERCENT', 10);
-        $tax     = (int) round($gross * $taxPct / 100);
-        $deduct  = (int) array_sum(array_column($deductions, 'amount_cents'));
-        $net     = max(0, $gross - $tax - $deduct);
+        $gross = (int) $employee->salary_cents;
+        $taxPct = (float) env('PAYROLL_TAX_PERCENT', 10);
+        $tax = (int) round($gross * $taxPct / 100);
+        $deduct = (int) array_sum(array_column($deductions, 'amount_cents'));
+        $net = max(0, $gross - $tax - $deduct);
 
         return Payslip::query()->create([
-            'employee_id'      => $employee->id,
-            'period_start'     => $start,
-            'period_end'       => $end,
-            'gross_cents'      => $gross,
-            'tax_cents'        => $tax,
+            'employee_id' => $employee->id,
+            'period_start' => $start,
+            'period_end' => $end,
+            'gross_cents' => $gross,
+            'tax_cents' => $tax,
             'deductions_cents' => $deduct,
-            'net_cents'        => $net,
-            'currency'         => $employee->currency ?? 'USD',
-            'breakdown'        => ['deductions' => $deductions, 'tax_percent' => $taxPct],
-            'status'           => 'draft',
+            'net_cents' => $net,
+            'currency' => $employee->currency ?? 'USD',
+            'breakdown' => ['deductions' => $deductions, 'tax_percent' => $taxPct],
+            'status' => 'draft',
         ]);
     }
 
     /**
      * Mark a draft payslip as paid.
-     *
-     * @param Payslip $payslip
-     * @return Payslip
      */
     public function markPaid(Payslip $payslip): Payslip
     {
         $payslip->update(['status' => 'paid', 'paid_at' => now()]);
+
         return $payslip->fresh();
     }
 }

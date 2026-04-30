@@ -19,8 +19,6 @@ class AddressController extends Controller
 {
     /**
      * Create a new AddressController instance.
-     *
-     * @param AddressService $addressService
      */
     public function __construct(
         private readonly AddressService $addressService
@@ -28,9 +26,6 @@ class AddressController extends Controller
 
     /**
      * List customer addresses.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -45,8 +40,6 @@ class AddressController extends Controller
     /**
      * Create a new address.
      *
-     * @param StoreAddressRequest $request
-     * @return JsonResponse
      * @throws Throwable
      */
     public function store(StoreAddressRequest $request): JsonResponse
@@ -66,9 +59,6 @@ class AddressController extends Controller
 
     /**
      * Delete an address.
-     *
-     * @param Address $address
-     * @return JsonResponse
      */
     public function destroy(Address $address): JsonResponse
     {

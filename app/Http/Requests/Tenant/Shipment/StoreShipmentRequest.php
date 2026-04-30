@@ -18,7 +18,7 @@ class StoreShipmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'carrier'         => ['required', 'string'],
+            'carrier' => ['required', 'string'],
             'tracking_number' => ['nullable', 'string'],
         ];
     }

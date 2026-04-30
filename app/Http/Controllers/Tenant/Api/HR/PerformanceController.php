@@ -24,9 +24,6 @@ class PerformanceController extends Controller
 
     /**
      * List all performance reviews.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function reviews(Request $request): JsonResponse
     {
@@ -42,9 +39,6 @@ class PerformanceController extends Controller
 
     /**
      * Record a new performance review.
-     *
-     * @param StorePerformanceReviewRequest $request
-     * @return JsonResponse
      */
     public function storeReview(StorePerformanceReviewRequest $request): JsonResponse
     {
@@ -60,9 +54,6 @@ class PerformanceController extends Controller
 
     /**
      * List all employee goals.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function goals(Request $request): JsonResponse
     {
@@ -78,9 +69,6 @@ class PerformanceController extends Controller
 
     /**
      * Create a new employee goal.
-     *
-     * @param StoreGoalRequest $request
-     * @return JsonResponse
      */
     public function storeGoal(StoreGoalRequest $request): JsonResponse
     {

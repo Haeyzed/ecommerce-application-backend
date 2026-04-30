@@ -17,8 +17,6 @@ class WishlistController extends Controller
 {
     /**
      * Create a new WishlistController instance.
-     *
-     * @param WishlistService $wishlistService
      */
     public function __construct(
         private readonly WishlistService $wishlistService
@@ -26,9 +24,6 @@ class WishlistController extends Controller
 
     /**
      * List customer wishlist items.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -42,9 +37,6 @@ class WishlistController extends Controller
 
     /**
      * Toggle a product in the wishlist.
-     *
-     * @param ToggleWishlistRequest $request
-     * @return JsonResponse
      */
     public function toggle(ToggleWishlistRequest $request): JsonResponse
     {

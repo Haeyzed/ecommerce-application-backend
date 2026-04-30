@@ -18,7 +18,6 @@ class VerifyEmailNotification extends VerifyEmail
      * Build the verification URL.
      *
      * @param  mixed  $notifiable
-     * @return string
      */
     protected function verificationUrl($notifiable): string
     {
@@ -39,6 +38,6 @@ class VerifyEmailNotification extends VerifyEmail
         // 2. Wrap it in your Next.js frontend URL
         $frontendUrl = rtrim(config('app.frontend_url'), '/');
 
-        return "{$frontendUrl}/verify-email?verify_url=" . urlencode($apiUrl);
+        return "{$frontendUrl}/verify-email?verify_url=".urlencode($apiUrl);
     }
 }

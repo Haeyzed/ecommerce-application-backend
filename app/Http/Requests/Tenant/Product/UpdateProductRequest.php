@@ -24,14 +24,14 @@ class UpdateProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'         => ['sometimes', 'string', 'max:160'],
-            'description'  => ['sometimes', 'nullable', 'string'],
-            'price_cents'  => ['sometimes', 'integer', 'min:0'],
-            'currency'     => ['sometimes', 'nullable', 'string', 'size:3'],
-            'stock'        => ['sometimes', 'nullable', 'integer', 'min:0'],
-            'category_id'  => ['sometimes', 'nullable', 'integer', 'exists:categories,id'],
-            'image_url'    => ['sometimes', 'nullable', 'url'],
-            'is_active'    => ['sometimes', 'boolean'],
+            'name' => ['sometimes', 'string', 'max:160'],
+            'description' => ['sometimes', 'nullable', 'string'],
+            'price_cents' => ['sometimes', 'integer', 'min:0'],
+            'currency' => ['sometimes', 'nullable', 'string', 'size:3'],
+            'stock' => ['sometimes', 'nullable', 'integer', 'min:0'],
+            'category_id' => ['sometimes', 'nullable', 'integer', 'exists:categories,id'],
+            'image_url' => ['sometimes', 'nullable', 'url'],
+            'is_active' => ['sometimes', 'boolean'],
         ];
     }
 }

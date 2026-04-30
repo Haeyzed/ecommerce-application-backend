@@ -21,13 +21,13 @@ class StoreTenantRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'        => ['required', 'string', 'max:120'],
-            'subdomain'   => [
+            'name' => ['required', 'string', 'max:120'],
+            'subdomain' => [
                 'required', 'string', 'alpha_dash', 'min:2', 'max:40',
-                Rule::notIn(['www', 'api', 'admin', 'app', 'mail'])
+                Rule::notIn(['www', 'api', 'admin', 'app', 'mail']),
             ],
             'owner_email' => ['required', 'email'],
-            'plan_id'     => ['nullable', 'integer', 'exists:plans,id'],
+            'plan_id' => ['nullable', 'integer', 'exists:plans,id'],
         ];
     }
 }

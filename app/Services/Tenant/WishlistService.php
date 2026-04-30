@@ -13,9 +13,6 @@ class WishlistService
 {
     /**
      * Retrieve the active wishlist for a specific customer.
-     *
-     * @param int $customerId
-     * @return Collection
      */
     public function getCustomerWishlist(int $customerId): Collection
     {
@@ -29,9 +26,7 @@ class WishlistService
      * Toggle a product on a customer's wishlist.
      * Removes the product if it exists; adds it if it does not.
      *
-     * @param int $customerId
-     * @param array $data Validated wishlist toggle data.
-     * @return array
+     * @param  array  $data  Validated wishlist toggle data.
      */
     public function toggleWishlistItem(int $customerId, array $data): array
     {
@@ -42,12 +37,13 @@ class WishlistService
 
         if ($existing) {
             $existing->delete();
+
             return ['wishlisted' => false];
         }
 
         Wishlist::query()->create([
             'customer_id' => $customerId,
-            'product_id'  => $data['product_id'],
+            'product_id' => $data['product_id'],
         ]);
 
         return ['wishlisted' => true];

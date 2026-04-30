@@ -3,6 +3,7 @@
 namespace App\Models\Tenant\CMS;
 
 use App\Traits\Auditable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
@@ -22,11 +23,11 @@ use Spatie\Sluggable\SlugOptions;
  * @property Carbon|null $created_at Timestamp of when the category was created.
  * @property Carbon|null $updated_at Timestamp of when the category was last updated.
  *
- * @package App\Models\Tenant
+ * @method static Builder filter(array $filters)
  */
 class BlogCategory extends Model implements AuditableContract
 {
-    use HasSlug, Auditable;
+    use Auditable, HasSlug;
 
     /**
      * The attributes that are mass assignable.
@@ -41,8 +42,6 @@ class BlogCategory extends Model implements AuditableContract
 
     /**
      * Get the options for generating the slug.
-     *
-     * @return SlugOptions
      */
     public function getSlugOptions(): SlugOptions
     {
@@ -53,11 +52,19 @@ class BlogCategory extends Model implements AuditableContract
 
     /**
      * Get the posts belonging to this category.
-     *
-     * @return HasMany
      */
     public function posts(): HasMany
     {
         return $this->hasMany(BlogPost::class);
+    }
+
+    /**
+     * Scope a query to apply dynamic filters.
+     */
+    public function scopeFilter(Builder $query, array $filters): void
+    {
+        $query->when($filters['search'] ?? null, function (Builder $query, $search) {
+            $query->where('name', 'like', "%{$search}%");
+        });
     }
 }

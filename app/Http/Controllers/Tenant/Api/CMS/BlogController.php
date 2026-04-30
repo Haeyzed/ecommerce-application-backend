@@ -31,14 +31,22 @@ class BlogController extends Controller
 
     /**
      * List all blog posts (Admin/Public combined filters).
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
         $perPage = $request->integer('per_page', 20);
-        $posts = $this->blogService->getPaginatedPosts($request->all(), $perPage);
+
+        $filters = [
+            'search' => $request->string('search'),
+            'category_id' => $request->integer('category_id'),
+            'tag' => $request->string('tag'),
+        ];
+
+        if ($request->has('is_published')) {
+            $filters['is_published'] = $request->boolean('is_published');
+        }
+
+        $posts = $this->blogService->getPaginatedPosts($filters, $perPage);
 
         return ApiResponse::success(
             data: BlogPostResource::collection($posts),
@@ -49,9 +57,6 @@ class BlogController extends Controller
 
     /**
      * Show a specific blog post by slug.
-     *
-     * @param string $slug
-     * @return JsonResponse
      */
     public function show(string $slug): JsonResponse
     {
@@ -67,15 +72,14 @@ class BlogController extends Controller
     /**
      * Create a new blog post.
      *
-     * @param StoreBlogPostRequest $request
-     * @return JsonResponse
+     * @requestMediaType multipart/form-data
      */
     public function store(StoreBlogPostRequest $request): JsonResponse
     {
-        $data = $request->validated();
-        $data['author_id'] = $request->user('staff')?->id;
+        $postData = $request->validated();
+        $postData['author_id'] = $request->user('staff')?->id;
 
-        $post = $this->blogService->createPost($data);
+        $post = $this->blogService->createPost($postData);
 
         return ApiResponse::success(
             new BlogPostResource($post),
@@ -87,10 +91,6 @@ class BlogController extends Controller
 
     /**
      * Update an existing blog post.
-     *
-     * @param UpdateBlogPostRequest $request
-     * @param int $id
-     * @return JsonResponse
      */
     public function update(UpdateBlogPostRequest $request, int $id): JsonResponse
     {
@@ -105,9 +105,6 @@ class BlogController extends Controller
 
     /**
      * Delete a blog post.
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function destroy(int $id): JsonResponse
     {
@@ -119,25 +116,27 @@ class BlogController extends Controller
 
     /**
      * List all comments for a specific blog post.
-     *
-     * @param Request $request
-     * @param string $slug
-     * @return JsonResponse
      */
     public function getComments(Request $request, string $slug): JsonResponse
     {
         $post = $this->blogService->getPostBySlug($slug);
 
-        // Default to only showing approved comments (safe for public view).
-        // Passing ?is_approved=all or ?is_approved=0 will override this (useful for staff panels).
-        $isApproved = true;
+        $filters = [
+            'search' => $request->string('search'),
+            'is_approved' => true, // Default to true to keep public views safe
+        ];
 
         if ($request->has('is_approved')) {
-            $queryParam = $request->query('is_approved');
-            $isApproved = $queryParam === 'all' ? null : filter_var($queryParam, FILTER_VALIDATE_BOOLEAN);
+            $status = $request->string('is_approved')->value();
+
+            if ($status === 'all') {
+                unset($filters['is_approved']);
+            } else {
+                $filters['is_approved'] = $request->boolean('is_approved');
+            }
         }
 
-        $comments = $this->blogService->getCommentsByPost($post->id, $isApproved);
+        $comments = $this->blogService->getCommentsByPost($post->id, $filters);
 
         return ApiResponse::success(
             BlogCommentResource::collection($comments),
@@ -147,15 +146,16 @@ class BlogController extends Controller
 
     /**
      * Post a comment on a blog post.
-     *
-     * @param StoreBlogCommentRequest $request
-     * @param string $slug
-     * @return JsonResponse
      */
     public function publicComment(StoreBlogCommentRequest $request, string $slug): JsonResponse
     {
         $post = $this->blogService->getPostBySlug($slug);
-        $comment = $this->blogService->addComment($post, $request->validated(), $request->user('customer')?->id);
+
+        $comment = $this->blogService->addComment(
+            $post,
+            $request->validated(),
+            $request->user('customer')?->id
+        );
 
         return ApiResponse::success(
             new BlogCommentResource($comment),
@@ -167,12 +167,14 @@ class BlogController extends Controller
 
     /**
      * List all blog categories.
-     *
-     * @return JsonResponse
      */
-    public function categoriesIndex(): JsonResponse
+    public function categoriesIndex(Request $request): JsonResponse
     {
-        $categories = $this->blogService->getCategories();
+        $filters = [
+            'search' => $request->string('search'),
+        ];
+
+        $categories = $this->blogService->getCategories($filters);
 
         return ApiResponse::success(
             BlogCategoryResource::collection($categories),
@@ -182,9 +184,6 @@ class BlogController extends Controller
 
     /**
      * Create a new blog category.
-     *
-     * @param StoreBlogCategoryRequest $request
-     * @return JsonResponse
      */
     public function categoriesStore(StoreBlogCategoryRequest $request): JsonResponse
     {
@@ -200,27 +199,20 @@ class BlogController extends Controller
 
     /**
      * Update a blog category.
-     *
-     * @param UpdateBlogCategoryRequest $request
-     * @param int $id
-     * @return JsonResponse
      */
     public function categoriesUpdate(UpdateBlogCategoryRequest $request, int $id): JsonResponse
     {
         $category = BlogCategory::query()->findOrFail($id);
-        $updated = $this->blogService->updateCategory($category, $request->validated());
+        $updatedCategory = $this->blogService->updateCategory($category, $request->validated());
 
         return ApiResponse::success(
-            new BlogCategoryResource($updated),
+            new BlogCategoryResource($updatedCategory),
             'Category updated successfully'
         );
     }
 
     /**
      * Delete a blog category.
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function categoriesDestroy(int $id): JsonResponse
     {
@@ -232,27 +224,20 @@ class BlogController extends Controller
 
     /**
      * Approve or update a comment (Moderation).
-     *
-     * @param Request $request
-     * @param int $id
-     * @return JsonResponse
      */
     public function updateComment(Request $request, int $id): JsonResponse
     {
         $comment = BlogComment::query()->findOrFail($id);
-        $updated = $this->blogService->updateComment($comment, $request->only('is_approved', 'body'));
+        $updatedComment = $this->blogService->updateComment($comment, $request->only('is_approved', 'body'));
 
         return ApiResponse::success(
-            ['comment' => new BlogCommentResource($updated)],
+            new BlogCommentResource($updatedComment),
             'Comment updated successfully'
         );
     }
 
     /**
      * Delete a comment.
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function destroyComment(int $id): JsonResponse
     {

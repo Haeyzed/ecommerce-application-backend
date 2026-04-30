@@ -28,19 +28,19 @@ class UpdateCustomerRequest extends FormRequest
     {
         return [
             // User Auth Fields
-            'name'          => ['sometimes', 'string', 'max:255'],
-            'email'         => ['sometimes', 'email'],
-            'password'      => ['sometimes', 'nullable', 'string', 'min:8'],
+            'name' => ['sometimes', 'string', 'max:255'],
+            'email' => ['sometimes', 'email'],
+            'password' => ['sometimes', 'nullable', 'string', 'min:8'],
 
             // Customer Profile Fields
-            'phone'         => ['sometimes', 'nullable', 'string', 'max:50'],
-            'avatar_url'    => ['sometimes', 'nullable', 'url'],
+            'phone' => ['sometimes', 'nullable', 'string', 'max:50'],
+            'avatar_url' => ['sometimes', 'nullable', 'url'],
             'date_of_birth' => ['sometimes', 'nullable', 'date', 'before:today'],
-            'gender'        => ['sometimes', 'nullable', 'string', 'max:20'],
-            'currency'      => ['sometimes', 'nullable', 'string', 'size:3'],
-            'locale'        => ['sometimes', 'nullable', 'string', 'max:5'],
-            'notes'         => ['sometimes', 'nullable', 'string'],
-            'is_active'     => ['sometimes', 'boolean'],
+            'gender' => ['sometimes', 'nullable', 'string', 'max:20'],
+            'currency' => ['sometimes', 'nullable', 'string', 'size:3'],
+            'locale' => ['sometimes', 'nullable', 'string', 'max:5'],
+            'notes' => ['sometimes', 'nullable', 'string'],
+            'is_active' => ['sometimes', 'boolean'],
         ];
     }
 }

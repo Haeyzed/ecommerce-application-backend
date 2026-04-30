@@ -26,16 +26,16 @@ class StoreAddressRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type'        => ['required', 'in:shipping,billing'],
-            'name'        => ['required', 'string'],
-            'line1'       => ['required', 'string'],
-            'line2'       => ['nullable', 'string'],
-            'city'        => ['required', 'string'],
-            'state'       => ['nullable', 'string'],
+            'type' => ['required', 'in:shipping,billing'],
+            'name' => ['required', 'string'],
+            'line1' => ['required', 'string'],
+            'line2' => ['nullable', 'string'],
+            'city' => ['required', 'string'],
+            'state' => ['nullable', 'string'],
             'postal_code' => ['required', 'string'],
-            'country'     => ['required', 'string', 'size:2'],
-            'phone'       => ['nullable', 'string'],
-            'is_default'  => ['boolean'],
+            'country' => ['required', 'string', 'size:2'],
+            'phone' => ['nullable', 'string'],
+            'is_default' => ['boolean'],
         ];
     }
 }

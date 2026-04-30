@@ -23,9 +23,6 @@ class PositionController extends Controller
 
     /**
      * List all positions.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -41,9 +38,6 @@ class PositionController extends Controller
 
     /**
      * Create a new position.
-     *
-     * @param StorePositionRequest $request
-     * @return JsonResponse
      */
     public function store(StorePositionRequest $request): JsonResponse
     {
@@ -59,9 +53,6 @@ class PositionController extends Controller
 
     /**
      * Show a specific position.
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function show(int $id): JsonResponse
     {
@@ -75,10 +66,6 @@ class PositionController extends Controller
 
     /**
      * Update an existing position.
-     *
-     * @param StorePositionRequest $request
-     * @param int $id
-     * @return JsonResponse
      */
     public function update(StorePositionRequest $request, int $id): JsonResponse
     {
@@ -93,9 +80,6 @@ class PositionController extends Controller
 
     /**
      * Delete a position.
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function destroy(int $id): JsonResponse
     {

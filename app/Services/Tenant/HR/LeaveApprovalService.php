@@ -16,9 +16,8 @@ class LeaveApprovalService
     /**
      * Retrieve a paginated, filtered list of leave requests.
      *
-     * @param array $filters Query filters (e.g., employee_id, status).
-     * @param int $perPage Items per page.
-     * @return LengthAwarePaginator
+     * @param  array  $filters  Query filters (e.g., employee_id, status).
+     * @param  int  $perPage  Items per page.
      */
     public function listPaginated(array $filters = [], int $perPage = 20): LengthAwarePaginator
     {
@@ -33,39 +32,36 @@ class LeaveApprovalService
     /**
      * Submit a new leave request for an employee.
      *
-     * @param Employee $employee The employee requesting leave.
-     * @param array $data Validated leave request data.
-     * @return LeaveRequest
+     * @param  Employee  $employee  The employee requesting leave.
+     * @param  array  $data  Validated leave request data.
      */
     public function request(Employee $employee, array $data): LeaveRequest
     {
         $start = Carbon::parse($data['start_date']);
-        $end   = Carbon::parse($data['end_date']);
-        $days  = max(1, $end->diffInDays($start) + 1);
+        $end = Carbon::parse($data['end_date']);
+        $days = max(1, $end->diffInDays($start) + 1);
 
         return LeaveRequest::query()->create([
             'employee_id' => $employee->id,
-            'type'        => $data['type'],
-            'start_date'  => $start,
-            'end_date'    => $end,
-            'days'        => $days,
-            'reason'      => $data['reason'] ?? null,
-            'status'      => 'pending',
+            'type' => $data['type'],
+            'start_date' => $start,
+            'end_date' => $end,
+            'days' => $days,
+            'reason' => $data['reason'] ?? null,
+            'status' => 'pending',
         ]);
     }
 
     /**
      * Approve a pending leave request.
      *
-     * @param LeaveRequest $req
-     * @param Employee $approver The employee approving the request.
-     * @return LeaveRequest
+     * @param  Employee  $approver  The employee approving the request.
      */
     public function approve(LeaveRequest $req, Employee $approver): LeaveRequest
     {
         $req->update([
             'status' => 'approved',
-            'approved_by_employee_id' => $approver->id
+            'approved_by_employee_id' => $approver->id,
         ]);
 
         return $req->fresh();
@@ -74,17 +70,15 @@ class LeaveApprovalService
     /**
      * Reject a pending leave request.
      *
-     * @param LeaveRequest $req
-     * @param Employee $approver The employee rejecting the request.
-     * @param string|null $reason Optional rejection reason.
-     * @return LeaveRequest
+     * @param  Employee  $approver  The employee rejecting the request.
+     * @param  string|null  $reason  Optional rejection reason.
      */
     public function reject(LeaveRequest $req, Employee $approver, ?string $reason = null): LeaveRequest
     {
         $req->update([
             'status' => 'rejected',
             'approved_by_employee_id' => $approver->id,
-            'reason' => $reason ?? $req->reason
+            'reason' => $reason ?? $req->reason,
         ]);
 
         return $req->fresh();

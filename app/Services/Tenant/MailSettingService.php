@@ -12,26 +12,23 @@ class MailSettingService
 {
     /**
      * Retrieve the current mail settings or create defaults.
-     *
-     * @return MailSetting
      */
     public function getCurrentSettings(): MailSetting
     {
         return MailSetting::query()->firstOrCreate([], [
-            'mailer'       => 'smtp',
-            'host'         => '127.0.0.1',
-            'port'         => 1025,
-            'encryption'   => 'tls',
+            'mailer' => 'smtp',
+            'host' => '127.0.0.1',
+            'port' => 1025,
+            'encryption' => 'tls',
             'from_address' => 'noreply@example.com',
-            'from_name'    => function_exists('tenant') && tenant() ? tenant('name') ?? 'Store' : 'Store',
+            'from_name' => function_exists('tenant') && tenant() ? tenant('name') ?? 'Store' : 'Store',
         ]);
     }
 
     /**
      * Update the tenant mail settings.
      *
-     * @param array $data Validated mail settings data.
-     * @return MailSetting
+     * @param  array  $data  Validated mail settings data.
      */
     public function updateSettings(array $data): MailSetting
     {

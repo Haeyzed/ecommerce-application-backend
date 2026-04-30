@@ -24,14 +24,20 @@ class PageController extends Controller
 
     /**
      * List all pages (Admin/Staff view).
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
         $perPage = $request->integer('per_page', 20);
-        $pages = $this->pageService->getPaginatedPages($request->all(), $perPage);
+
+        $filters = [
+            'search' => $request->string('search'),
+        ];
+
+        if ($request->has('is_published')) {
+            $filters['is_published'] = $request->boolean('is_published');
+        }
+
+        $pages = $this->pageService->getPaginatedPages($filters, $perPage);
 
         return ApiResponse::success(
             data: PageResource::collection($pages),
@@ -42,9 +48,6 @@ class PageController extends Controller
 
     /**
      * Show a specific page (Staff access via ID).
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function show(int $id): JsonResponse
     {
@@ -58,9 +61,6 @@ class PageController extends Controller
 
     /**
      * Show a specific published page by slug (Public access).
-     *
-     * @param string $slug
-     * @return JsonResponse
      */
     public function showPublic(string $slug): JsonResponse
     {
@@ -74,9 +74,6 @@ class PageController extends Controller
 
     /**
      * Create a new page.
-     *
-     * @param StorePageRequest $request
-     * @return JsonResponse
      */
     public function store(StorePageRequest $request): JsonResponse
     {
@@ -92,10 +89,6 @@ class PageController extends Controller
 
     /**
      * Update an existing page.
-     *
-     * @param UpdatePageRequest $request
-     * @param int $id
-     * @return JsonResponse
      */
     public function update(UpdatePageRequest $request, int $id): JsonResponse
     {
@@ -110,9 +103,6 @@ class PageController extends Controller
 
     /**
      * Delete a page.
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function destroy(int $id): JsonResponse
     {
@@ -124,9 +114,6 @@ class PageController extends Controller
 
     /**
      * Force publish a page.
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function publish(int $id): JsonResponse
     {

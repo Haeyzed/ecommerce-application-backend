@@ -37,8 +37,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * The guard name used by Spatie permissions.
-     *
-     * @var string
      */
     protected string $guard_name = 'sanctum';
 

@@ -23,9 +23,6 @@ class JobPostingController extends Controller
 
     /**
      * List all job postings.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -41,9 +38,6 @@ class JobPostingController extends Controller
 
     /**
      * Create a new job posting.
-     *
-     * @param StoreJobPostingRequest $request
-     * @return JsonResponse
      */
     public function store(StoreJobPostingRequest $request): JsonResponse
     {
@@ -59,9 +53,6 @@ class JobPostingController extends Controller
 
     /**
      * Show a specific job posting.
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function show(int $id): JsonResponse
     {
@@ -75,10 +66,6 @@ class JobPostingController extends Controller
 
     /**
      * Update an existing job posting.
-     *
-     * @param StoreJobPostingRequest $request
-     * @param int $id
-     * @return JsonResponse
      */
     public function update(StoreJobPostingRequest $request, int $id): JsonResponse
     {
@@ -93,9 +80,6 @@ class JobPostingController extends Controller
 
     /**
      * Delete a job posting.
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function destroy(int $id): JsonResponse
     {

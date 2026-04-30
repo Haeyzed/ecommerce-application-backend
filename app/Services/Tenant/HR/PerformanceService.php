@@ -15,9 +15,8 @@ class PerformanceService
     /**
      * Retrieve a paginated list of performance reviews.
      *
-     * @param array $filters Query filters (e.g., employee_id).
-     * @param int $perPage Items per page.
-     * @return LengthAwarePaginator
+     * @param  array  $filters  Query filters (e.g., employee_id).
+     * @param  int  $perPage  Items per page.
      */
     public function getPaginatedReviews(array $filters = [], int $perPage = 20): LengthAwarePaginator
     {
@@ -31,8 +30,7 @@ class PerformanceService
     /**
      * Create a new performance review.
      *
-     * @param array $data Validated review data.
-     * @return PerformanceReview
+     * @param  array  $data  Validated review data.
      */
     public function createReview(array $data): PerformanceReview
     {
@@ -42,9 +40,8 @@ class PerformanceService
     /**
      * Retrieve a paginated list of employee goals.
      *
-     * @param array $filters Query filters (e.g., employee_id, status).
-     * @param int $perPage Items per page.
-     * @return LengthAwarePaginator
+     * @param  array  $filters  Query filters (e.g., employee_id, status).
+     * @param  int  $perPage  Items per page.
      */
     public function getPaginatedGoals(array $filters = [], int $perPage = 20): LengthAwarePaginator
     {
@@ -58,8 +55,7 @@ class PerformanceService
     /**
      * Create a new employee goal.
      *
-     * @param array $data Validated goal data.
-     * @return Goal
+     * @param  array  $data  Validated goal data.
      */
     public function createGoal(array $data): Goal
     {

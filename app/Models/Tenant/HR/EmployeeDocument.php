@@ -4,6 +4,7 @@ namespace App\Models\Tenant\HR;
 
 use App\Traits\Auditable;
 use App\Traits\HasTenantMedia;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
@@ -55,7 +56,22 @@ class EmployeeDocument extends Model implements AuditableContract, HasMedia
     }
 
     /**
+     * Scope a query to filter employee documents.
+     *
+     * @param  Builder  $query
+     * @return Builder
+     */
+    public function scopeFilter($query, array $filters)
+    {
+        return $query
+            ->when($filters['employee_id'] ?? null, fn ($q, $v) => $q->where('employee_id', $v))
+            ->when($filters['expiring_within_days'] ?? null, fn ($q, $v) => $q->whereNotNull('expires_at')->whereDate('expires_at', '<=', now()->addDays((int) $v)));
+    }
+
+    /**
      * Get the employee this document belongs to.
+     *
+     * @return BelongsTo<Employee, EmployeeDocument>
      */
     public function employee(): BelongsTo
     {

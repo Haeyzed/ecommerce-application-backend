@@ -28,22 +28,14 @@ class EmployeeService
     /**
      * Retrieve a paginated, filtered list of employees.
      *
-     * @param array $filters Query filters (e.g., search, department_id, is_active).
-     * @param int $perPage Items per page.
-     * @return LengthAwarePaginator
+     * @param  array  $filters  Query filters (e.g., search, department_id, is_active).
+     * @param  int  $perPage  Items per page.
      */
     public function getPaginatedEmployees(array $filters = [], int $perPage = 20): LengthAwarePaginator
     {
         return Employee::query()
             ->with(['department:id,name', 'position:id,title'])
-            ->when($filters['department_id'] ?? null, fn ($q, $v) => $q->where('department_id', $v))
-            ->when($filters['search'] ?? null, fn ($q, $v) => $q->where(fn ($qq) => $qq
-                ->where('first_name', 'like', "%{$v}%")
-                ->orWhere('last_name', 'like', "%{$v}%")
-                ->orWhere('email', 'like', "%{$v}%")
-                ->orWhere('employee_code', 'like', "%{$v}%")
-            ))
-            ->when(isset($filters['is_active']), fn ($q) => $q->where('is_active', (bool) $filters['is_active']))
+            ->filter($filters)
             ->orderByDesc('id')
             ->paginate($perPage);
     }
@@ -51,31 +43,31 @@ class EmployeeService
     /**
      * Create a new employee record and automatically generate their User and Staff accounts.
      *
-     * @param array $data Validated employee data.
-     * @return Employee
+     * @param  array  $data  Validated employee data.
+     *
      * @throws Throwable
      */
     public function createEmployee(array $data): Employee
     {
         return DB::transaction(function () use ($data) {
-            $data['employee_code'] = $data['employee_code'] ?? 'EMP-' . strtoupper(Str::random(6));
+            $data['employee_code'] = $data['employee_code'] ?? 'EMP-'.strtoupper(Str::random(6));
 
             if (empty($data['staff_id'])) {
 
                 $rawPassword = $data['password'] ?? Str::random(8);
 
                 $user = User::query()->create([
-                    'name'      => trim(($data['first_name'] ?? '') . ' ' . ($data['last_name'] ?? '')),
-                    'email'     => $data['email'],
-                    'password'  => Hash::make($rawPassword),
+                    'name' => trim(($data['first_name'] ?? '').' '.($data['last_name'] ?? '')),
+                    'email' => $data['email'],
+                    'password' => Hash::make($rawPassword),
                     'is_active' => $data['is_active'] ?? true,
                 ]);
 
                 $staff = Staff::query()->create([
-                    'user_id'   => $user->id,
-                    'phone'     => $data['phone'] ?? null,
-                    'currency'  => $data['currency'] ?? 'USD',
-                    'locale'    => 'en',
+                    'user_id' => $user->id,
+                    'phone' => $data['phone'] ?? null,
+                    'currency' => $data['currency'] ?? 'USD',
+                    'locale' => 'en',
                     'is_active' => $data['is_active'] ?? true,
                 ]);
 
@@ -88,10 +80,10 @@ class EmployeeService
                 $user->notify(new DynamicTemplateNotification(
                     event: 'staff_registered',
                     templateData: [
-                        'name'       => $user->name,
+                        'name' => $user->name,
                         'store_name' => $storeName,
-                        'email'      => $user->email,
-                        'password'   => $rawPassword,
+                        'email' => $user->email,
+                        'password' => $rawPassword,
                     ]
                 ));
             }
@@ -105,22 +97,18 @@ class EmployeeService
     /**
      * Update an existing employee record.
      *
-     * @param Employee $employee
-     * @param array $data Validated update data.
-     * @return Employee
+     * @param  array  $data  Validated update data.
      */
     public function updateEmployee(Employee $employee, array $data): Employee
     {
         unset($data['password']); // Do not allow password updates via HR route directly
         $employee->update($data);
+
         return $employee->fresh();
     }
 
     /**
      * Delete an employee record.
-     *
-     * @param Employee $employee
-     * @return void
      */
     public function deleteEmployee(Employee $employee): void
     {
@@ -129,17 +117,12 @@ class EmployeeService
 
     /**
      * Terminate an employee.
-     *
-     * @param Employee $employee
-     * @param DateTimeInterface $when
-     * @param string|null $reason
-     * @return Employee
      */
     public function terminateEmployee(Employee $employee, DateTimeInterface $when, ?string $reason = null): Employee
     {
         $employee->update([
-            'terminated_at'      => $when,
-            'is_active'          => false,
+            'terminated_at' => $when,
+            'is_active' => false,
             'termination_reason' => $reason,
         ]);
 

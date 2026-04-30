@@ -15,8 +15,6 @@ class PaymentService
 {
     /**
      * Create a new PaymentService instance.
-     *
-     * @param OrderService $orderService
      */
     public function __construct(
         private readonly OrderService $orderService
@@ -25,9 +23,8 @@ class PaymentService
     /**
      * Record a new payment against an order.
      *
-     * @param Order $order
-     * @param array $data Validated payment data.
-     * @return Payment
+     * @param  array  $data  Validated payment data.
+     *
      * @throws Throwable
      */
     public function recordPayment(Order $order, array $data): Payment
@@ -36,14 +33,14 @@ class PaymentService
             $status = $data['status'] ?? 'pending';
 
             $payment = Payment::query()->create([
-                'order_id'     => $order->id,
-                'provider'     => $data['provider'],
+                'order_id' => $order->id,
+                'provider' => $data['provider'],
                 'provider_ref' => $data['provider_ref'] ?? null,
-                'amount'       => $data['amount'] ?? $order->total,
-                'currency'     => $data['currency'] ?? $order->currency,
-                'status'       => $status,
-                'paid_at'      => $status === 'succeeded' ? now() : null,
-                'meta'         => $data['meta'] ?? null,
+                'amount' => $data['amount'] ?? $order->total,
+                'currency' => $data['currency'] ?? $order->currency,
+                'status' => $status,
+                'paid_at' => $status === 'succeeded' ? now() : null,
+                'meta' => $data['meta'] ?? null,
             ]);
 
             if ($payment->status === 'succeeded') {
@@ -56,17 +53,12 @@ class PaymentService
 
     /**
      * Handle incoming provider webhooks to update payment status.
-     *
-     * @param string $providerRef
-     * @param string $status
-     * @param array $meta
-     * @return Payment|null
      */
     public function handleProviderWebhook(string $providerRef, string $status, array $meta = []): ?Payment
     {
         $payment = Payment::query()->where('provider_ref', $providerRef)->first();
 
-        if (!$payment) {
+        if (! $payment) {
             return null;
         }
 

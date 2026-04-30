@@ -20,11 +20,7 @@ class ApiResponse
     /**
      * Build a successful API response.
      *
-     * @param mixed $data
-     * @param string $message
-     * @param array<string, mixed>|null $meta
-     * @param int $code
-     * @return JsonResponse
+     * @param  array<string, mixed>|null  $meta
      */
     public static function success(
         mixed $data = null,
@@ -43,11 +39,6 @@ class ApiResponse
 
     /**
      * Build an error API response.
-     *
-     * @param string $message
-     * @param mixed $errors
-     * @param int $code
-     * @return JsonResponse
      */
     public static function error(
         string $message = 'Error',
@@ -65,11 +56,6 @@ class ApiResponse
 
     /**
      * Build a failed API response (typically validation/business rule failures).
-     *
-     * @param string $message
-     * @param mixed $errors
-     * @param int $code
-     * @return JsonResponse
      */
     public static function fail(
         string $message = 'Validation failed',

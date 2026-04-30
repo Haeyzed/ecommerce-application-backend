@@ -10,6 +10,7 @@ use App\Http\Requests\Central\Auth\RegisterRequest;
 use App\Http\Requests\Central\Auth\ResetPasswordRequest;
 use App\Http\Resources\Central\UserResource;
 use App\Services\Central\AuthService;
+use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -200,7 +201,7 @@ class AuthController extends Controller
 
             return redirect()->away($base.'/auth/callback#'.$fragment);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Redirect back to frontend login page with an error parameter
             return redirect()->away(config('app.frontend_url').'/login?error=social_auth_failed');
         }

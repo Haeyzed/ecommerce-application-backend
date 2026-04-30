@@ -19,8 +19,6 @@ class PaymentController extends Controller
 {
     /**
      * Create a new PaymentController instance.
-     *
-     * @param PaymentService $paymentService
      */
     public function __construct(
         private readonly PaymentService $paymentService
@@ -29,9 +27,6 @@ class PaymentController extends Controller
     /**
      * Record a new payment.
      *
-     * @param StorePaymentRequest $request
-     * @param Order $order
-     * @return JsonResponse
      * @throws Throwable
      */
     public function store(StorePaymentRequest $request, Order $order): JsonResponse
@@ -48,9 +43,6 @@ class PaymentController extends Controller
 
     /**
      * Provider webhook endpoint (e.g. Stripe). Tenant-scoped via host.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function webhook(Request $request): JsonResponse
     {

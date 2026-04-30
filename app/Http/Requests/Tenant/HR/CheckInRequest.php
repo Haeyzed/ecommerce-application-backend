@@ -2,14 +2,13 @@
 
 namespace App\Http\Requests\Tenant\HR;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CheckInRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -19,21 +18,25 @@ class CheckInRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
             /**
              * The ID of the employee checking in.
+             *
              * @var int $employee_id
+             *
              * @example 42
              */
             'employee_id' => ['required', 'integer', 'exists:employees,id'],
 
             /**
              * The explicit timestamp for the check-in event.
+             *
              * @var string|null $at
+             *
              * @example "2026-04-25 09:00:00"
              */
             'at' => ['nullable', 'date'],

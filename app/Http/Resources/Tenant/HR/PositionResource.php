@@ -10,7 +10,6 @@ class PositionResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
@@ -18,35 +17,45 @@ class PositionResource extends JsonResource
         return [
             /**
              * The unique identifier for the position.
+             *
              * @var int $id
+             *
              * @example 10
              */
-            'id'               => $this->id,
+            'id' => $this->id,
 
             /**
              * The ID of the department this position belongs to.
+             *
              * @var int $department_id
+             *
              * @example 2
              */
-            'department_id'    => $this->department_id,
+            'department_id' => $this->department_id,
 
             /**
              * The job title for the position.
+             *
              * @var string $title
+             *
              * @example "Senior Frontend Developer"
              */
-            'title'            => $this->title,
+            'title' => $this->title,
 
             /**
              * The minimum expected salary boundary in minor units (cents).
+             *
              * @var int|null $min_salary_cents
+             *
              * @example 7000000
              */
             'min_salary_cents' => $this->min_salary_cents,
 
             /**
              * The maximum expected salary boundary in minor units (cents).
+             *
              * @var int|null $max_salary_cents
+             *
              * @example 12000000
              */
             'max_salary_cents' => $this->max_salary_cents,

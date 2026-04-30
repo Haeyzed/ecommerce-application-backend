@@ -25,9 +25,6 @@ class TrainingController extends Controller
 
     /**
      * List all training sessions.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -43,9 +40,6 @@ class TrainingController extends Controller
 
     /**
      * Show a specific training session.
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function show(int $id): JsonResponse
     {
@@ -59,9 +53,6 @@ class TrainingController extends Controller
 
     /**
      * Create a new training session.
-     *
-     * @param StoreTrainingRequest $request
-     * @return JsonResponse
      */
     public function store(StoreTrainingRequest $request): JsonResponse
     {
@@ -77,10 +68,6 @@ class TrainingController extends Controller
 
     /**
      * Update an existing training session.
-     *
-     * @param UpdateTrainingRequest $request
-     * @param int $id
-     * @return JsonResponse
      */
     public function update(UpdateTrainingRequest $request, int $id): JsonResponse
     {
@@ -96,9 +83,7 @@ class TrainingController extends Controller
     /**
      * Enroll an employee in a specific training session.
      *
-     * @param Request $request
-     * @param int $id The ID of the training session.
-     * @return JsonResponse
+     * @param  int  $id  The ID of the training session.
      */
     public function enroll(Request $request, int $id): JsonResponse
     {
@@ -115,9 +100,7 @@ class TrainingController extends Controller
     /**
      * Mark an employee's training as completed.
      *
-     * @param Request $request
-     * @param int $id The ID of the training session.
-     * @return JsonResponse
+     * @param  int  $id  The ID of the training session.
      */
     public function complete(Request $request, int $id): JsonResponse
     {
@@ -133,9 +116,6 @@ class TrainingController extends Controller
 
     /**
      * Delete a training session.
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function destroy(int $id): JsonResponse
     {

@@ -15,8 +15,6 @@ class StoreController extends Controller
 {
     /**
      * Create a new StoreController instance.
-     *
-     * @param StoreService $storeService
      */
     public function __construct(
         private readonly StoreService $storeService
@@ -24,8 +22,6 @@ class StoreController extends Controller
 
     /**
      * Returns metadata about the current tenant.
-     *
-     * @return JsonResponse
      */
     public function show(): JsonResponse
     {

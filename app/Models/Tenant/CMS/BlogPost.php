@@ -38,15 +38,15 @@ use Spatie\Sluggable\SlugOptions;
  * @property Carbon|null $created_at Timestamp of when the post was created.
  * @property Carbon|null $updated_at Timestamp of when the post was last updated.
  * @property Carbon|null $deleted_at Timestamp of soft deletion.
- *
  * @property-read BlogCategory|null $category The category this post belongs to.
  * @property-read Staff|null $author The user who wrote the post.
  *
- * @package App\Models\Tenant
+ * @method static Builder filter(array $filters)
+ * @method static Builder published()
  */
-class BlogPost extends Model implements HasMedia, AuditableContract
+class BlogPost extends Model implements AuditableContract, HasMedia
 {
-    use HasSlug, HasTenantMedia, Auditable, SoftDeletes;
+    use Auditable, HasSlug, HasTenantMedia, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -82,17 +82,15 @@ class BlogPost extends Model implements HasMedia, AuditableContract
     protected function casts(): array
     {
         return [
-            'tags'         => 'array',
+            'tags' => 'array',
             'is_published' => 'bool',
             'published_at' => 'datetime',
-            'views'        => 'int',
+            'views' => 'int',
         ];
     }
 
     /**
      * Get the options for generating the slug.
-     *
-     * @return SlugOptions
      */
     public function getSlugOptions(): SlugOptions
     {
@@ -103,8 +101,6 @@ class BlogPost extends Model implements HasMedia, AuditableContract
 
     /**
      * Get the category that the post belongs to.
-     *
-     * @return BelongsTo
      */
     public function category(): BelongsTo
     {
@@ -113,8 +109,6 @@ class BlogPost extends Model implements HasMedia, AuditableContract
 
     /**
      * Get the staff user who authored the post.
-     *
-     * @return BelongsTo
      */
     public function staff(): BelongsTo
     {
@@ -123,8 +117,6 @@ class BlogPost extends Model implements HasMedia, AuditableContract
 
     /**
      * Get the comments associated with this post.
-     *
-     * @return HasMany
      */
     public function comments(): HasMany
     {
@@ -133,12 +125,28 @@ class BlogPost extends Model implements HasMedia, AuditableContract
 
     /**
      * Scope a query to only include published posts.
-     *
-     * @param Builder $q
-     * @return void
      */
-    public function scopePublished(Builder $q): void
+    public function scopePublished(Builder $query): void
     {
-        $q->where('is_published', true);
+        $query->where('is_published', true);
+    }
+
+    /**
+     * Scope a query to apply a dynamic array of filters.
+     */
+    public function scopeFilter(Builder $query, array $filters): void
+    {
+        $query->when($filters['search'] ?? null, function (Builder $query, string $search) {
+            $query->where('title', 'like', "%{$search}%");
+        })
+            ->when($filters['category_id'] ?? null, function (Builder $query, mixed $categoryId) {
+                $query->where('blog_category_id', $categoryId);
+            })
+            ->when($filters['tag'] ?? null, function (Builder $query, mixed $tag) {
+                $query->whereJsonContains('tags', $tag);
+            })
+            ->when(isset($filters['is_published']), function (Builder $query) use ($filters) {
+                $query->where('is_published', $filters['is_published']);
+            });
     }
 }

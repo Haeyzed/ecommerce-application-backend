@@ -52,7 +52,7 @@ class AppServiceProvider extends ServiceProvider
             })
             ->withDocumentTransformers(function (OpenApi $openApi) {
                 $centralApiServer = rtrim(
-                    (string) config('scramble.central_api_server', config('app.url') . '/api'),
+                    (string) config('scramble.central_api_server', config('app.url').'/api'),
                     '/'
                 );
 

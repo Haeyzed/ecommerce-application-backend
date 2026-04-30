@@ -19,8 +19,6 @@ class ShipmentController extends Controller
 {
     /**
      * Create a new ShipmentController instance.
-     *
-     * @param ShipmentService $shipmentService
      */
     public function __construct(
         private readonly ShipmentService $shipmentService
@@ -29,9 +27,6 @@ class ShipmentController extends Controller
     /**
      * Dispatch a shipment for an order.
      *
-     * @param StoreShipmentRequest $request
-     * @param Order $order
-     * @return JsonResponse
      * @throws Throwable
      */
     public function store(StoreShipmentRequest $request, Order $order): JsonResponse
@@ -49,8 +44,6 @@ class ShipmentController extends Controller
     /**
      * Mark a shipment as delivered.
      *
-     * @param Shipment $shipment
-     * @return JsonResponse
      * @throws Throwable
      */
     public function deliver(Shipment $shipment): JsonResponse

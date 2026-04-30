@@ -18,8 +18,6 @@ class InventoryController extends Controller
 {
     /**
      * Create a new InventoryController instance.
-     *
-     * @param ProductService $productService
      */
     public function __construct(
         private readonly ProductService $productService
@@ -28,9 +26,6 @@ class InventoryController extends Controller
     /**
      * Adjust product stock levels manually.
      *
-     * @param AdjustInventoryRequest $request
-     * @param Product $product
-     * @return JsonResponse
      * @throws Throwable
      */
     public function adjust(AdjustInventoryRequest $request, Product $product): JsonResponse
@@ -50,9 +45,6 @@ class InventoryController extends Controller
 
     /**
      * Retrieve inventory movements for a product.
-     *
-     * @param Product $product
-     * @return JsonResponse
      */
     public function movements(Product $product): JsonResponse
     {

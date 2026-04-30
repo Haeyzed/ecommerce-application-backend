@@ -10,16 +10,14 @@ class StoreService
 {
     /**
      * Retrieve metadata about the current tenant.
-     *
-     * @return array
      */
     public function getCurrentTenantDetails(): array
     {
         $tenant = tenant();
 
         return [
-            'id'      => $tenant->id,
-            'name'    => $tenant->name,
+            'id' => $tenant->id,
+            'name' => $tenant->name,
             'domains' => $tenant->domains->pluck('domain'),
         ];
     }

@@ -18,8 +18,6 @@ class PlanController extends Controller
 {
     /**
      * Create a new PlanController instance.
-     *
-     * @param PlanService $planService
      */
     public function __construct(
         private readonly PlanService $planService
@@ -28,8 +26,6 @@ class PlanController extends Controller
     /**
      * List all plans.
      * Retrieves all available subscription plans ordered by price.
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
@@ -44,9 +40,6 @@ class PlanController extends Controller
     /**
      * Create a new plan.
      * Adds a new subscription tier to the platform.
-     *
-     * @param StorePlanRequest $request
-     * @return JsonResponse
      */
     public function store(StorePlanRequest $request): JsonResponse
     {
@@ -63,9 +56,6 @@ class PlanController extends Controller
     /**
      * Get plan details.
      * Retrieves a specific subscription plan.
-     *
-     * @param Plan $plan
-     * @return JsonResponse
      */
     public function show(Plan $plan): JsonResponse
     {
@@ -80,10 +70,6 @@ class PlanController extends Controller
     /**
      * Update a plan.
      * Modifies the features or pricing of an existing plan.
-     *
-     * @param UpdatePlanRequest $request
-     * @param Plan $plan
-     * @return JsonResponse
      */
     public function update(UpdatePlanRequest $request, Plan $plan): JsonResponse
     {
@@ -98,9 +84,6 @@ class PlanController extends Controller
     /**
      * Delete a plan.
      * Removes a subscription plan from the platform.
-     *
-     * @param Plan $plan
-     * @return JsonResponse
      */
     public function destroy(Plan $plan): JsonResponse
     {

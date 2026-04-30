@@ -20,9 +20,8 @@ class CustomerService
     /**
      * Retrieve a paginated, filtered list of customers.
      *
-     * @param array $filters Query filters (e.g., search)
-     * @param int $perPage Items per page
-     * @return LengthAwarePaginator
+     * @param  array  $filters  Query filters (e.g., search)
+     * @param  int  $perPage  Items per page
      */
     public function getPaginatedCustomers(array $filters = [], int $perPage = 20): LengthAwarePaginator
     {
@@ -40,9 +39,6 @@ class CustomerService
 
     /**
      * Retrieve a specific customer by their ID.
-     *
-     * @param int $id
-     * @return Customer
      */
     public function getCustomerById(int $id): Customer
     {
@@ -54,8 +50,8 @@ class CustomerService
     /**
      * Create a new customer profile and underlying user account.
      *
-     * @param array $data Validated customer data.
-     * @return Customer
+     * @param  array  $data  Validated customer data.
+     *
      * @throws Throwable
      */
     public function createCustomer(array $data): Customer
@@ -64,14 +60,14 @@ class CustomerService
             $user = User::query()->firstOrCreate(
                 ['email' => $data['email']],
                 [
-                    'name'     => $data['name'],
+                    'name' => $data['name'],
                     'password' => Hash::make($data['password']),
                 ]
             );
 
             $profileData = Arr::only($data, [
                 'phone', 'avatar_url', 'date_of_birth', 'gender',
-                'currency', 'locale', 'notes', 'is_active'
+                'currency', 'locale', 'notes', 'is_active',
             ]);
 
             $customer = Customer::query()->updateOrCreate(
@@ -86,9 +82,8 @@ class CustomerService
     /**
      * Update an existing customer's underlying user account and storefront profile details.
      *
-     * @param Customer $customer
-     * @param array $data Validated update data.
-     * @return Customer
+     * @param  array  $data  Validated update data.
+     *
      * @throws Throwable
      */
     public function updateCustomer(Customer $customer, array $data): Customer
@@ -102,7 +97,7 @@ class CustomerService
             if (isset($data['email'])) {
                 $user->email = $data['email'];
             }
-            if (!empty($data['password'])) {
+            if (! empty($data['password'])) {
                 $user->password = Hash::make($data['password']);
             }
 
@@ -112,10 +107,10 @@ class CustomerService
 
             $profileData = Arr::only($data, [
                 'phone', 'avatar_url', 'date_of_birth', 'gender',
-                'currency', 'locale', 'notes', 'is_active'
+                'currency', 'locale', 'notes', 'is_active',
             ]);
 
-            if (!empty($profileData)) {
+            if (! empty($profileData)) {
                 $customer->update($profileData);
             }
 
@@ -125,9 +120,6 @@ class CustomerService
 
     /**
      * Soft delete a customer profile.
-     *
-     * @param Customer $customer
-     * @return void
      */
     public function deleteCustomer(Customer $customer): void
     {

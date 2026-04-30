@@ -20,8 +20,8 @@ class AdjustInventoryRequest extends FormRequest
     {
         return [
             'qty_change' => ['required', 'integer'],
-            'reason'     => ['required', 'string'],
-            'note'       => ['nullable', 'string'],
+            'reason' => ['required', 'string'],
+            'note' => ['nullable', 'string'],
         ];
     }
 }

@@ -31,11 +31,12 @@ use Spatie\Sluggable\SlugOptions;
  * @property Carbon|null $updated_at Timestamp of when the page was last updated.
  * @property Carbon|null $deleted_at Timestamp of soft deletion.
  *
- * @package App\Models\Tenant
+ * @method static Builder filter(array $filters)
+ * @method static Builder published()
  */
-class Page extends Model implements HasMedia, AuditableContract
+class Page extends Model implements AuditableContract, HasMedia
 {
-    use HasSlug, HasTenantMedia, Auditable, SoftDeletes;
+    use Auditable, HasSlug, HasTenantMedia, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -61,7 +62,7 @@ class Page extends Model implements HasMedia, AuditableContract
     protected function casts(): array
     {
         return [
-            'blocks'       => 'array',
+            'blocks' => 'array',
             'is_published' => 'bool',
             'published_at' => 'datetime',
         ];
@@ -69,8 +70,6 @@ class Page extends Model implements HasMedia, AuditableContract
 
     /**
      * Get the options for generating the slug.
-     *
-     * @return SlugOptions
      */
     public function getSlugOptions(): SlugOptions
     {
@@ -81,12 +80,22 @@ class Page extends Model implements HasMedia, AuditableContract
 
     /**
      * Scope a query to only include published pages.
-     *
-     * @param Builder $q
-     * @return void
      */
-    public function scopePublished(Builder $q): void
+    public function scopePublished(Builder $query): void
     {
-        $q->where('is_published', true);
+        $query->where('is_published', true);
+    }
+
+    /**
+     * Scope a query to apply a dynamic array of filters.
+     */
+    public function scopeFilter(Builder $query, array $filters): void
+    {
+        $query->when($filters['search'] ?? null, function (Builder $query, string $search) {
+            $query->where('title', 'like', "%{$search}%");
+        })
+            ->when(isset($filters['is_published']), function (Builder $query) use ($filters) {
+                $query->where('is_published', $filters['is_published']);
+            });
     }
 }

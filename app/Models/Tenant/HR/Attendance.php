@@ -3,6 +3,7 @@
 namespace App\Models\Tenant\HR;
 
 use App\Traits\Auditable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
@@ -65,5 +66,21 @@ class Attendance extends Model implements AuditableContract
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class);
+    }
+
+    /**
+     * Scope a query to apply a dynamic array of filters.
+     */
+    public function scopeFilter(Builder $query, array $filters): void
+    {
+        $query->when($filters['employee_id'] ?? null, function (Builder $query, int $employeeId) {
+            $query->where('employee_id', $employeeId);
+        })
+            ->when($filters['from'] ?? null, function (Builder $query, string $from) {
+                $query->whereDate('date', '>=', $from);
+            })
+            ->when($filters['to'] ?? null, function (Builder $query, string $to) {
+                $query->whereDate('date', '<=', $to);
+            });
     }
 }

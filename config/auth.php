@@ -35,9 +35,16 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-
         'tenant' => [
             'driver' => 'session',
+            'provider' => 'tenant_users',
+        ],
+        'staff' => [
+            'driver' => 'sanctum',
+            'provider' => 'tenant_users',
+        ],
+        'customer' => [
+            'driver' => 'sanctum',
             'provider' => 'tenant_users',
         ],
     ],

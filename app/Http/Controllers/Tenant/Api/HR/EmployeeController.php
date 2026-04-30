@@ -29,14 +29,21 @@ class EmployeeController extends Controller
 
     /**
      * List all employees.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
         $perPage = $request->integer('per_page', 20);
-        $employees = $this->employeeService->getPaginatedEmployees($request->all(), $perPage);
+
+        $filters = [
+            'search' => $request->string('search'),
+            'department_id' => $request->integer('department_id'),
+        ];
+
+        if ($request->has('is_active')) {
+            $filters['is_active'] = $request->boolean('is_active');
+        }
+
+        $employees = $this->employeeService->getPaginatedEmployees($filters, $perPage);
 
         return ApiResponse::success(
             data: EmployeeResource::collection($employees),
@@ -48,8 +55,6 @@ class EmployeeController extends Controller
     /**
      * Create a new employee.
      *
-     * @param StoreEmployeeRequest $request
-     * @return JsonResponse
      * @throws FileDoesNotExist
      * @throws FileIsTooBig|Throwable
      */
@@ -71,9 +76,6 @@ class EmployeeController extends Controller
 
     /**
      * Show a specific employee.
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function show(int $id): JsonResponse
     {
@@ -89,9 +91,6 @@ class EmployeeController extends Controller
      * Update an existing employee.
      * Note: Uses POST route in API to support multipart/form-data for avatar uploads.
      *
-     * @param UpdateEmployeeRequest $request
-     * @param int $id
-     * @return JsonResponse
      * @throws FileDoesNotExist
      * @throws FileIsTooBig
      */
@@ -114,9 +113,6 @@ class EmployeeController extends Controller
 
     /**
      * Delete an employee.
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function destroy(int $id): JsonResponse
     {
@@ -129,9 +125,6 @@ class EmployeeController extends Controller
     /**
      * Terminate an employee.
      *
-     * @param Request $request
-     * @param int $id
-     * @return JsonResponse
      * @throws DateMalformedStringException
      */
     public function terminate(Request $request, int $id): JsonResponse

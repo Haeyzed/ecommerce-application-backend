@@ -23,14 +23,18 @@ class ApplicantController extends Controller
 
     /**
      * List all applicants.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
         $perPage = $request->integer('per_page', 20);
-        $applicants = $this->recruitmentService->getPaginatedApplicants($request->all(), $perPage);
+
+        $filters = [
+            'search' => $request->string('search'),
+            'job_posting_id' => $request->integer('job_posting_id'),
+            'status' => $request->string('status'),
+        ];
+
+        $applicants = $this->recruitmentService->getPaginatedApplicants($filters, $perPage);
 
         return ApiResponse::success(
             data: ApplicantResource::collection($applicants),
@@ -41,9 +45,6 @@ class ApplicantController extends Controller
 
     /**
      * Submit a new application.
-     *
-     * @param StoreApplicantRequest $request
-     * @return JsonResponse
      */
     public function store(StoreApplicantRequest $request): JsonResponse
     {
@@ -65,10 +66,6 @@ class ApplicantController extends Controller
 
     /**
      * Move an applicant to a different stage in the recruitment process.
-     *
-     * @param Request $request
-     * @param int $id
-     * @return JsonResponse
      */
     public function move(Request $request, int $id): JsonResponse
     {

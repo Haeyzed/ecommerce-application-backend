@@ -25,9 +25,6 @@ class PayrollController extends Controller
 
     /**
      * List all payslips.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -43,9 +40,6 @@ class PayrollController extends Controller
 
     /**
      * Generate a new payslip.
-     *
-     * @param GeneratePayslipRequest $request
-     * @return JsonResponse
      */
     public function generate(GeneratePayslipRequest $request): JsonResponse
     {
@@ -68,9 +62,6 @@ class PayrollController extends Controller
 
     /**
      * Mark a payslip as paid.
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function markPaid(int $id): JsonResponse
     {

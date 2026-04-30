@@ -17,8 +17,6 @@ class MailSettingController extends Controller
 {
     /**
      * Initialize the controller with the MailSettingService.
-     *
-     * @param MailSettingService $mailSettingService
      */
     public function __construct(
         private readonly MailSettingService $mailSettingService
@@ -26,8 +24,6 @@ class MailSettingController extends Controller
 
     /**
      * Retrieve the current mail settings.
-     *
-     * @return JsonResponse
      */
     public function show(): JsonResponse
     {
@@ -41,9 +37,6 @@ class MailSettingController extends Controller
 
     /**
      * Update the mail settings.
-     *
-     * @param UpdateMailSettingRequest $request
-     * @return JsonResponse
      */
     public function update(UpdateMailSettingRequest $request): JsonResponse
     {

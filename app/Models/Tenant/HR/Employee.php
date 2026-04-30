@@ -5,6 +5,7 @@ namespace App\Models\Tenant\HR;
 use App\Models\Tenant\Staff;
 use App\Traits\Auditable;
 use App\Traits\HasTenantMedia;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -89,46 +90,94 @@ class Employee extends Model implements AuditableContract, HasMedia
         ];
     }
 
+    /**
+     * Scope a query to apply a dynamic array of filters.
+     */
+    public function scopeFilter(Builder $query, array $filters): void
+    {
+        $query->when($filters['search'] ?? null, function (Builder $query, string $search) {
+            $query->where(function (Builder $query) use ($search) {
+                $query->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('employee_code', 'like', "%{$search}%");
+            });
+        })
+            ->when($filters['department_id'] ?? null, function (Builder $query, int $departmentId) {
+                $query->where('department_id', $departmentId);
+            })
+            ->when(isset($filters['is_active']), function (Builder $query) use ($filters) {
+                $query->where('is_active', (bool) $filters['is_active']);
+            });
+    }
+
+    /**
+     * Get the staff user account tied to this employee.
+     */
     public function staff(): BelongsTo
     {
         return $this->belongsTo(Staff::class, 'staff_id');
     }
 
+    /**
+     * Get the department this employee belongs to.
+     */
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);
     }
 
+    /**
+     * Get the position held by this employee.
+     */
     public function position(): BelongsTo
     {
         return $this->belongsTo(Position::class);
     }
 
+    /**
+     * Get the attendance records for this employee.
+     */
     public function attendances(): HasMany
     {
         return $this->hasMany(Attendance::class);
     }
 
+    /**
+     * Get the leave requests made by this employee.
+     */
     public function leaveRequests(): HasMany
     {
         return $this->hasMany(LeaveRequest::class);
     }
 
+    /**
+     * Get the payslips issued to this employee.
+     */
     public function payslips(): HasMany
     {
         return $this->hasMany(Payslip::class);
     }
 
+    /**
+     * Get the performance reviews for this employee.
+     */
     public function reviews(): HasMany
     {
         return $this->hasMany(PerformanceReview::class);
     }
 
+    /**
+     * Get the goals assigned to this employee.
+     */
     public function goals(): HasMany
     {
         return $this->hasMany(Goal::class);
     }
 
+    /**
+     * Get the training courses this employee is enrolled in.
+     */
     public function trainings(): BelongsToMany
     {
         return $this->belongsToMany(Training::class, 'employee_training')
@@ -136,6 +185,9 @@ class Employee extends Model implements AuditableContract, HasMedia
             ->withTimestamps();
     }
 
+    /**
+     * Get the documents attached to this employee.
+     */
     public function documents(): HasMany
     {
         return $this->hasMany(EmployeeDocument::class);

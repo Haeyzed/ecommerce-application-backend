@@ -20,10 +20,7 @@ use Illuminate\Support\Carbon;
  * @property string $line_total The total price for this line (qty * unit_price).
  * @property Carbon|null $created_at Timestamp of when the order item was created.
  * @property Carbon|null $updated_at Timestamp of when the order item was last updated.
- *
  * @property-read Product|null $product The original product associated with this item.
- *
- * @package App\Models\Tenant
  */
 class OrderItem extends Model
 {
@@ -51,14 +48,12 @@ class OrderItem extends Model
         return [
             'unit_price' => 'decimal:2',
             'line_total' => 'decimal:2',
-            'qty'        => 'integer',
+            'qty' => 'integer',
         ];
     }
 
     /**
      * Get the product associated with this order item.
-     *
-     * @return BelongsTo
      */
     public function product(): BelongsTo
     {

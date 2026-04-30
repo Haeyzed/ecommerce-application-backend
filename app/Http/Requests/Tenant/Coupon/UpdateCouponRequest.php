@@ -20,10 +20,10 @@ class UpdateCouponRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'value'     => ['sometimes', 'numeric', 'min:0'],
+            'value' => ['sometimes', 'numeric', 'min:0'],
             'is_active' => ['sometimes', 'boolean'],
-            'ends_at'   => ['sometimes', 'nullable', 'date'],
-            'max_uses'  => ['sometimes', 'nullable', 'integer', 'min:1'],
+            'ends_at' => ['sometimes', 'nullable', 'date'],
+            'max_uses' => ['sometimes', 'nullable', 'integer', 'min:1'],
         ];
     }
 }

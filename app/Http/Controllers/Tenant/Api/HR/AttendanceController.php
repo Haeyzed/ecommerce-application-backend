@@ -27,14 +27,18 @@ class AttendanceController extends Controller
 
     /**
      * List all attendance records.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
         $perPage = $request->integer('per_page', 30);
-        $attendances = $this->attendanceService->getPaginatedAttendances($request->all(), $perPage);
+
+        $filters = [
+            'employee_id' => $request->integer('employee_id'),
+            'from' => $request->string('from'),
+            'to' => $request->string('to'),
+        ];
+
+        $attendances = $this->attendanceService->getPaginatedAttendances($filters, $perPage);
 
         return ApiResponse::success(
             data: AttendanceResource::collection($attendances),
@@ -46,14 +50,12 @@ class AttendanceController extends Controller
     /**
      * Record an employee check-in.
      *
-     * @param CheckInRequest $request
-     * @return JsonResponse
      * @throws DateMalformedStringException
      */
     public function checkIn(CheckInRequest $request): JsonResponse
     {
         $employee = Employee::query()->findOrFail($request->integer('employee_id'));
-        $timestamp = $request->input('at') ? new DateTimeImmutable($request->input('at')) : new DateTimeImmutable();
+        $timestamp = $request->string('at')->value() ? new DateTimeImmutable($request->string('at')) : new DateTimeImmutable;
 
         $attendance = $this->attendanceService->checkInEmployee($employee, $timestamp);
 
@@ -68,14 +70,12 @@ class AttendanceController extends Controller
     /**
      * Record an employee check-out.
      *
-     * @param CheckInRequest $request
-     * @return JsonResponse
      * @throws DateMalformedStringException
      */
     public function checkOut(CheckInRequest $request): JsonResponse
     {
         $employee = Employee::query()->findOrFail($request->integer('employee_id'));
-        $timestamp = $request->input('at') ? new DateTimeImmutable($request->input('at')) : new DateTimeImmutable();
+        $timestamp = $request->string('at')->value() ? new DateTimeImmutable($request->string('at')) : new DateTimeImmutable;
 
         $attendance = $this->attendanceService->checkOutEmployee($employee, $timestamp);
 

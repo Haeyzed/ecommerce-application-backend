@@ -55,16 +55,16 @@ class TenantService
             ]);
 
             // Notify the owner user of the new tenant, if the user exists
-            if (!empty($data['owner_email'])) {
+            if (! empty($data['owner_email'])) {
                 $user = User::query()->where('email', $data['owner_email'])->first();
                 if ($user) {
                     $user->notify(new DynamicTemplateNotification(
                         event: 'tenant_registered',
                         templateData: [
                             'tenant_name' => $tenant->name,
-                            'domain'      => $tenantDomain,
-                            'email'       => $data['owner_email'],
-                            'password'    => $rawPassword,
+                            'domain' => $tenantDomain,
+                            'email' => $data['owner_email'],
+                            'password' => $rawPassword,
                         ]
                     ));
                 } else {
@@ -74,9 +74,9 @@ class TenantService
                             event: 'tenant_registered',
                             templateData: [
                                 'tenant_name' => $tenant->name,
-                                'domain'      => $tenantDomain,
-                                'email'       => $data['owner_email'],
-                                'password'    => $rawPassword,
+                                'domain' => $tenantDomain,
+                                'email' => $data['owner_email'],
+                                'password' => $rawPassword,
                             ]
                         ));
                 }

@@ -23,15 +23,15 @@ class CustomerAuthService
     /**
      * Register a new storefront customer.
      *
-     * @param array $data Validated registration data.
+     * @param  array  $data  Validated registration data.
      * @return array{user: User, profile: Customer, token: string}
      */
     public function register(array $data): array
     {
         $user = User::query()->create([
-            'name'      => $data['name'],
-            'email'     => $data['email'],
-            'password'  => Hash::make($data['password']),
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
             'is_active' => true,
         ]);
 
@@ -44,7 +44,7 @@ class CustomerAuthService
         $user->notify(new DynamicTemplateNotification(
             event: 'customer_registered',
             templateData: [
-                'name'       => $user->name,
+                'name' => $user->name,
                 'store_name' => config('app.name', 'Our Store'), // Or get tenant name
             ]
         ));
@@ -52,17 +52,17 @@ class CustomerAuthService
         $token = $user->createToken('customer')->plainTextToken;
 
         return [
-            'user'    => $user,
+            'user' => $user,
             'profile' => $customer,
-            'token'   => $token,
+            'token' => $token,
         ];
     }
 
     /**
      * Authenticate an existing customer.
      *
-     * @param array $credentials
      * @return array{user: User, profile: Customer, token: string}
+     *
      * @throws ValidationException
      */
     public function login(array $credentials): array
@@ -84,17 +84,15 @@ class CustomerAuthService
         $token = $user->createToken('customer')->plainTextToken;
 
         return [
-            'user'    => $user,
+            'user' => $user,
             'profile' => $user->customer,
-            'token'   => $token,
+            'token' => $token,
         ];
     }
 
     /**
      * Send a password reset link to the customer.
      *
-     * @param array $data
-     * @return string
      * @throws ValidationException
      */
     public function sendPasswordResetLink(array $data): string
@@ -113,8 +111,6 @@ class CustomerAuthService
     /**
      * Reset the customer's password.
      *
-     * @param array $data
-     * @return string
      * @throws ValidationException
      */
     public function resetPassword(array $data): string
@@ -137,9 +133,6 @@ class CustomerAuthService
     /**
      * Verify the customer's email address using the signed URL parameters.
      *
-     * @param string $id
-     * @param string $hash
-     * @return string
      * @throws AuthorizationException
      */
     public function verifyEmail(string $id, string $hash): string
@@ -162,9 +155,6 @@ class CustomerAuthService
 
     /**
      * Resend the email verification notification.
-     *
-     * @param User $user
-     * @return void
      */
     public function resendVerificationEmail(User $user): void
     {
@@ -178,8 +168,6 @@ class CustomerAuthService
     /**
      * Handle socialite user login or registration for a storefront customer.
      *
-     * @param string $provider
-     * @param SocialiteUser $socialUser
      * @return array{user: User, profile: Customer, token: string}
      */
     public function handleSocialLogin(string $provider, SocialiteUser $socialUser): array
@@ -187,18 +175,18 @@ class CustomerAuthService
         $user = User::query()->firstOrCreate(
             ['email' => $socialUser->getEmail()],
             [
-                'name'              => $socialUser->getName() ?? $socialUser->getNickname() ?? 'Customer',
-                'provider'          => $provider,
-                'provider_id'       => $socialUser->getId(),
-                'password'          => null,
+                'name' => $socialUser->getName() ?? $socialUser->getNickname() ?? 'Customer',
+                'provider' => $provider,
+                'provider_id' => $socialUser->getId(),
+                'password' => null,
                 'email_verified_at' => now(),
-                'is_active'         => true,
+                'is_active' => true,
             ]
         );
 
         if ($user->provider !== $provider) {
             $user->update([
-                'provider'    => $provider,
+                'provider' => $provider,
                 'provider_id' => $socialUser->getId(),
             ]);
         }
@@ -210,9 +198,9 @@ class CustomerAuthService
         $token = $user->createToken('customer')->plainTextToken;
 
         return [
-            'user'    => $user,
+            'user' => $user,
             'profile' => $customer,
-            'token'   => $token,
+            'token' => $token,
         ];
     }
 }

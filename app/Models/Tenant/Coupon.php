@@ -23,10 +23,9 @@ use Illuminate\Support\Carbon;
  * @property bool $is_active Indicates if the coupon is active.
  * @property Carbon|null $created_at Timestamp of when the coupon was created.
  * @property Carbon|null $updated_at Timestamp of when the coupon was last updated.
+ *
  * @method int increment(string $column, float|int $amount = 1, array $extra = [])
  * @method int decrement(string $column, float|int $amount = 1, array $extra = [])
- *
- * @package App\Models\Tenant
  */
 class Coupon extends Model
 {
@@ -66,18 +65,27 @@ class Coupon extends Model
     /**
      * Check if the coupon is redeemable based on subtotal and current time.
      *
-     * @param float $subtotal The subtotal of the cart or order.
-     * @param DateTimeInterface|null $now The current time (defaults to now).
-     * @return bool
+     * @param  float  $subtotal  The subtotal of the cart or order.
+     * @param  DateTimeInterface|null  $now  The current time (defaults to now).
      */
-    public function isRedeemable(float $subtotal, DateTimeInterface $now = null): bool
+    public function isRedeemable(float $subtotal, ?DateTimeInterface $now = null): bool
     {
         $now ??= now();
-        if (!$this->is_active) return false;
-        if ($this->starts_at && $now < $this->starts_at) return false;
-        if ($this->ends_at && $now > $this->ends_at) return false;
-        if ($this->max_uses !== null && $this->used_count >= $this->max_uses) return false;
-        if ($this->min_subtotal !== null && $subtotal < (float) $this->min_subtotal) return false;
+        if (! $this->is_active) {
+            return false;
+        }
+        if ($this->starts_at && $now < $this->starts_at) {
+            return false;
+        }
+        if ($this->ends_at && $now > $this->ends_at) {
+            return false;
+        }
+        if ($this->max_uses !== null && $this->used_count >= $this->max_uses) {
+            return false;
+        }
+        if ($this->min_subtotal !== null && $subtotal < (float) $this->min_subtotal) {
+            return false;
+        }
 
         return true;
     }
@@ -85,8 +93,7 @@ class Coupon extends Model
     /**
      * Calculate the discount amount for a given subtotal.
      *
-     * @param float $subtotal The subtotal to calculate the discount against.
-     * @return float
+     * @param  float  $subtotal  The subtotal to calculate the discount against.
      */
     public function discountFor(float $subtotal): float
     {

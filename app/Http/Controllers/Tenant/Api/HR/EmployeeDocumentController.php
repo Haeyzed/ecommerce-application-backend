@@ -25,14 +25,18 @@ class EmployeeDocumentController extends Controller
 
     /**
      * List all employee documents.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
-        $perPage = $request->integer('per_page', 20);
-        $documents = $this->documentService->getPaginatedDocuments($request->all(), $perPage);
+        $filters = [
+            'employee_id' => $request->integer('employee_id'),
+            'expiring_within_days' => $request->integer('expiring_within_days'),
+        ];
+
+        $documents = $this->documentService->getPaginatedDocuments(
+            array_filter($filters),
+            $request->integer('per_page', 20)
+        );
 
         return ApiResponse::success(
             data: EmployeeDocumentResource::collection($documents),
@@ -44,8 +48,6 @@ class EmployeeDocumentController extends Controller
     /**
      * Store a new employee document.
      *
-     * @param StoreEmployeeDocumentRequest $request
-     * @return JsonResponse
      * @throws FileDoesNotExist
      * @throws FileIsTooBig
      */
@@ -64,9 +66,6 @@ class EmployeeDocumentController extends Controller
 
     /**
      * Delete an employee document.
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function destroy(int $id): JsonResponse
     {

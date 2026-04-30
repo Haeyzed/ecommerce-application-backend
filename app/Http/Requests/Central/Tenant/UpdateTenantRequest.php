@@ -18,7 +18,7 @@ class UpdateTenantRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'    => ['sometimes', 'string', 'max:120'],
+            'name' => ['sometimes', 'string', 'max:120'],
             'plan_id' => ['sometimes', 'nullable', 'integer', 'exists:plans,id'],
         ];
     }

@@ -14,9 +14,8 @@ class PositionService
     /**
      * Retrieve a paginated, filtered list of positions.
      *
-     * @param array $filters Query filters (e.g., department_id).
-     * @param int $perPage Items per page.
-     * @return LengthAwarePaginator
+     * @param  array  $filters  Query filters (e.g., department_id).
+     * @param  int  $perPage  Items per page.
      */
     public function getPaginatedPositions(array $filters = [], int $perPage = 20): LengthAwarePaginator
     {
@@ -30,8 +29,7 @@ class PositionService
     /**
      * Create a new position.
      *
-     * @param array $data Validated position data.
-     * @return Position
+     * @param  array  $data  Validated position data.
      */
     public function createPosition(array $data): Position
     {
@@ -41,21 +39,17 @@ class PositionService
     /**
      * Update an existing position.
      *
-     * @param Position $position
-     * @param array $data Validated update data.
-     * @return Position
+     * @param  array  $data  Validated update data.
      */
     public function updatePosition(Position $position, array $data): Position
     {
         $position->update($data);
+
         return $position->fresh();
     }
 
     /**
      * Delete a position.
-     *
-     * @param Position $position
-     * @return void
      */
     public function deletePosition(Position $position): void
     {

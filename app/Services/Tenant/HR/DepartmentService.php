@@ -14,15 +14,14 @@ class DepartmentService
     /**
      * Retrieve a paginated, filtered list of departments.
      *
-     * @param array $filters Query filters (e.g., search)
-     * @param int $perPage Items per page
-     * @return LengthAwarePaginator
+     * @param  array  $filters  Query filters (e.g., search)
+     * @param  int  $perPage  Items per page
      */
     public function getPaginatedDepartments(array $filters = [], int $perPage = 20): LengthAwarePaginator
     {
         return Department::query()
+            ->filter($filters)
             ->withCount('employees')
-            ->when($filters['search'] ?? null, fn ($q, $v) => $q->where('name', 'like', "%{$v}%"))
             ->orderBy('name')
             ->paginate($perPage);
     }
@@ -30,8 +29,7 @@ class DepartmentService
     /**
      * Create a new department.
      *
-     * @param array $data Validated department data.
-     * @return Department
+     * @param  array  $data  Validated department data.
      */
     public function createDepartment(array $data): Department
     {
@@ -41,21 +39,17 @@ class DepartmentService
     /**
      * Update an existing department.
      *
-     * @param Department $department
-     * @param array $data Validated update data.
-     * @return Department
+     * @param  array  $data  Validated update data.
      */
     public function updateDepartment(Department $department, array $data): Department
     {
         $department->update($data);
+
         return $department->fresh();
     }
 
     /**
      * Delete a department.
-     *
-     * @param Department $department
-     * @return void
      */
     public function deleteDepartment(Department $department): void
     {

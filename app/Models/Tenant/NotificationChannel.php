@@ -3,6 +3,7 @@
 namespace App\Models\Tenant;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * Class NotificationChannel
@@ -14,8 +15,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $label The human-readable label for the channel.
  * @property bool $is_active Indicates if the channel is globally active.
  * @property array|null $config JSON configuration settings for the channel.
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  */
 class NotificationChannel extends Model
 {
@@ -39,7 +40,7 @@ class NotificationChannel extends Model
     protected function casts(): array
     {
         return [
-            'config'    => 'array',
+            'config' => 'array',
             'is_active' => 'bool',
         ];
     }

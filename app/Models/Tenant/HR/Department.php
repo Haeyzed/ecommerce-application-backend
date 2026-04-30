@@ -3,6 +3,7 @@
 namespace App\Models\Tenant\HR;
 
 use App\Traits\Auditable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -55,5 +56,22 @@ class Department extends Model implements AuditableContract
     public function manager(): BelongsTo
     {
         return $this->belongsTo(Employee::class, 'manager_employee_id');
+    }
+
+    /**
+     * Scope a query to apply a dynamic array of filters.
+     */
+    public function scopeFilter(Builder $query, array $filters): void
+    {
+        $query->when($filters['search'] ?? null, function (Builder $query, string $search) {
+            $query->where('name', 'like', "%{$search}%")
+                ->orWhere('code', 'like', "%{$search}%");
+        })
+            ->when($filters['parent_id'] ?? null, function (Builder $query, int $parentId) {
+                $query->where('parent_id', $parentId);
+            })
+            ->when($filters['manager_employee_id'] ?? null, function (Builder $query, int $managerId) {
+                $query->where('manager_employee_id', $managerId);
+            });
     }
 }

@@ -28,19 +28,19 @@ class StoreCustomerRequest extends FormRequest
     {
         return [
             // User Auth Fields
-            'name'          => ['required', 'string', 'max:255'],
-            'email'         => ['required', 'email'],
-            'password'      => ['required', 'string', 'min:8'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string', 'min:8'],
 
             // Customer Profile Fields
-            'phone'         => ['nullable', 'string', 'max:50'],
-            'avatar_url'    => ['nullable', 'url'],
+            'phone' => ['nullable', 'string', 'max:50'],
+            'avatar_url' => ['nullable', 'url'],
             'date_of_birth' => ['nullable', 'date', 'before:today'],
-            'gender'        => ['nullable', 'string', 'max:20'],
-            'currency'      => ['nullable', 'string', 'size:3'],
-            'locale'        => ['nullable', 'string', 'max:5'],
-            'notes'         => ['nullable', 'string'],
-            'is_active'     => ['boolean'],
+            'gender' => ['nullable', 'string', 'max:20'],
+            'currency' => ['nullable', 'string', 'size:3'],
+            'locale' => ['nullable', 'string', 'max:5'],
+            'notes' => ['nullable', 'string'],
+            'is_active' => ['boolean'],
         ];
     }
 }

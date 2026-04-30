@@ -21,11 +21,11 @@ class StorePaymentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'provider'     => ['required', 'string'],
+            'provider' => ['required', 'string'],
             'provider_ref' => ['nullable', 'string'],
-            'amount'       => ['nullable', 'numeric', 'min:0'],
-            'status'       => ['nullable', 'in:pending,succeeded,failed,refunded'],
-            'meta'         => ['nullable', 'array'],
+            'amount' => ['nullable', 'numeric', 'min:0'],
+            'status' => ['nullable', 'in:pending,succeeded,failed,refunded'],
+            'meta' => ['nullable', 'array'],
         ];
     }
 }

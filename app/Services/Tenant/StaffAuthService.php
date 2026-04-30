@@ -51,10 +51,10 @@ class StaffAuthService
         $user->notify(new DynamicTemplateNotification(
             event: 'staff_registered',
             templateData: [
-                'name'       => $user->name,
+                'name' => $user->name,
                 'store_name' => config('app.name', 'Our Store'), // Or get tenant name
-                'email'      => $user->email,
-                'password'   => $rawPassword,
+                'email' => $user->email,
+                'password' => $rawPassword,
             ]
         ));
 

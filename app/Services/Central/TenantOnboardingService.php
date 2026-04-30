@@ -122,15 +122,15 @@ class TenantOnboardingService
             }
 
             // Notify the owner of the new tenant
-            if (!empty($payload['owner_email'])) {
+            if (! empty($payload['owner_email'])) {
                 Notification::route('mail', $payload['owner_email'])
                     ->notify(new DynamicTemplateNotification(
                         event: 'tenant_registered',
                         templateData: [
                             'tenant_name' => $tenant->name,
-                            'domain'      => $tenantDomain,
-                            'email'       => $payload['owner_email'],
-                            'password'    => $rawPassword,
+                            'domain' => $tenantDomain,
+                            'email' => $payload['owner_email'],
+                            'password' => $rawPassword,
                         ]
                     ));
             }

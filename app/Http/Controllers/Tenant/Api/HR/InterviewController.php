@@ -23,9 +23,6 @@ class InterviewController extends Controller
 
     /**
      * Schedule an interview for an applicant.
-     *
-     * @param ScheduleInterviewRequest $request
-     * @return JsonResponse
      */
     public function schedule(ScheduleInterviewRequest $request): JsonResponse
     {

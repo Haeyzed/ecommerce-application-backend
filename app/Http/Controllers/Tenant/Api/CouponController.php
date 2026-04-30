@@ -19,8 +19,6 @@ class CouponController extends Controller
 {
     /**
      * Create a new CouponController instance.
-     *
-     * @param CouponService $couponService
      */
     public function __construct(
         private readonly CouponService $couponService
@@ -28,9 +26,6 @@ class CouponController extends Controller
 
     /**
      * List all coupons.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -44,9 +39,6 @@ class CouponController extends Controller
 
     /**
      * Create a new coupon.
-     *
-     * @param StoreCouponRequest $request
-     * @return JsonResponse
      */
     public function store(StoreCouponRequest $request): JsonResponse
     {
@@ -62,9 +54,6 @@ class CouponController extends Controller
 
     /**
      * Get coupon details.
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function show(int $id): JsonResponse
     {
@@ -78,10 +67,6 @@ class CouponController extends Controller
 
     /**
      * Update a coupon.
-     *
-     * @param UpdateCouponRequest $request
-     * @param Coupon $coupon
-     * @return JsonResponse
      */
     public function update(UpdateCouponRequest $request, Coupon $coupon): JsonResponse
     {
@@ -95,9 +80,6 @@ class CouponController extends Controller
 
     /**
      * Delete a coupon.
-     *
-     * @param Coupon $coupon
-     * @return JsonResponse
      */
     public function destroy(Coupon $coupon): JsonResponse
     {

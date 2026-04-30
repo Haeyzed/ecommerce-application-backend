@@ -9,6 +9,7 @@ use App\Http\Requests\Tenant\Customer\Auth\LoginRequest;
 use App\Http\Requests\Tenant\Customer\Auth\RegisterRequest;
 use App\Http\Requests\Tenant\Customer\Auth\ResetPasswordRequest;
 use App\Services\Tenant\CustomerAuthService;
+use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -183,7 +184,7 @@ class CustomerAuthController extends Controller
 
             return redirect()->away($base.'/auth/callback#'.$fragment);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return redirect()->away(config('app.storefront_url').'/login?error=social_auth_failed');
         }
     }

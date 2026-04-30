@@ -17,9 +17,7 @@ class RecruitmentService
     /**
      * Retrieve a paginated list of job postings.
      *
-     * @param array $filters Query filters (e.g., is_open).
-     * @param int $perPage
-     * @return LengthAwarePaginator
+     * @param  array  $filters  Query filters (e.g., is_open).
      */
     public function getPaginatedPostings(array $filters = [], int $perPage = 20): LengthAwarePaginator
     {
@@ -32,9 +30,6 @@ class RecruitmentService
 
     /**
      * Create a job posting.
-     *
-     * @param array $data
-     * @return JobPosting
      */
     public function createPosting(array $data): JobPosting
     {
@@ -43,22 +38,16 @@ class RecruitmentService
 
     /**
      * Update a job posting.
-     *
-     * @param JobPosting $posting
-     * @param array $data
-     * @return JobPosting
      */
     public function updatePosting(JobPosting $posting, array $data): JobPosting
     {
         $posting->update($data);
+
         return $posting->fresh();
     }
 
     /**
      * Delete a job posting.
-     *
-     * @param JobPosting $posting
-     * @return void
      */
     public function deletePosting(JobPosting $posting): void
     {
@@ -68,25 +57,19 @@ class RecruitmentService
     /**
      * Retrieve a paginated list of applicants.
      *
-     * @param array $filters Query filters (e.g., job_posting_id, status).
-     * @param int $perPage
-     * @return LengthAwarePaginator
+     * @param  array  $filters  Query filters (e.g., job_posting_id, status).
      */
     public function getPaginatedApplicants(array $filters = [], int $perPage = 20): LengthAwarePaginator
     {
         return Applicant::query()
             ->with('jobPosting:id,title')
-            ->when($filters['job_posting_id'] ?? null, fn ($q, $v) => $q->where('job_posting_id', $v))
-            ->when($filters['status'] ?? null, fn ($q, $v) => $q->where('status', $v))
+            ->filter($filters)
             ->orderByDesc('id')
             ->paginate($perPage);
     }
 
     /**
      * Create a new applicant.
-     *
-     * @param array $data
-     * @return Applicant
      */
     public function createApplicant(array $data): Applicant
     {
@@ -95,36 +78,30 @@ class RecruitmentService
 
     /**
      * Move an applicant to a different status.
-     *
-     * @param Applicant $applicant
-     * @param string $status
-     * @return Applicant
      */
     public function updateApplicantStatus(Applicant $applicant, string $status): Applicant
     {
         $applicant->update(['status' => $status]);
+
         return $applicant->fresh();
     }
 
     /**
      * Schedule an interview for an applicant.
      *
-     * @param Applicant $applicant
-     * @param Employee|null $interviewer
-     * @param array $data Validated interview data.
-     * @return Interview
+     * @param  array  $data  Validated interview data.
      */
     public function scheduleInterview(Applicant $applicant, ?Employee $interviewer, array $data): Interview
     {
         $applicant->update(['status' => 'interview']);
 
         return Interview::query()->create([
-            'applicant_id'            => $applicant->id,
+            'applicant_id' => $applicant->id,
             'interviewer_employee_id' => $interviewer?->id,
-            'scheduled_at'            => $data['scheduled_at'],
-            'mode'                    => $data['mode'] ?? 'onsite',
-            'status'                  => 'scheduled',
-            'notes'                   => $data['notes'] ?? null,
+            'scheduled_at' => $data['scheduled_at'],
+            'mode' => $data['mode'] ?? 'onsite',
+            'status' => 'scheduled',
+            'notes' => $data['notes'] ?? null,
         ]);
     }
 }

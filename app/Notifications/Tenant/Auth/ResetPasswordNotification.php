@@ -29,7 +29,6 @@ class ResetPasswordNotification extends ResetPassword
      * Build the mail representation of the notification using the DB template.
      *
      * @param  mixed  $notifiable
-     * @return MailMessage
      */
     public function toMail($notifiable): MailMessage
     {
@@ -43,16 +42,16 @@ class ResetPasswordNotification extends ResetPassword
             ->where('is_active', true)
             ->first();
 
-        if (!$template) {
+        if (! $template) {
             // Fallback to Laravel's default if template is deleted
             return parent::toMail($notifiable);
         }
 
         // 3. Prepare the data payload
         $data = [
-            'name'  => $notifiable->name ?? 'User',
+            'name' => $notifiable->name ?? 'User',
             'token' => $this->token, // For raw token entry
-            'link'  => $resetLink,   // In case you want to use a {link} variable later
+            'link' => $resetLink,   // In case you want to use a {link} variable later
         ];
 
         // 4. Parse variables
@@ -72,7 +71,7 @@ class ResetPasswordNotification extends ResetPassword
     {
         $replacements = [];
         foreach ($data as $key => $value) {
-            $replacements['{' . $key . '}'] = $value;
+            $replacements['{'.$key.'}'] = $value;
         }
 
         return strtr($text, $replacements);

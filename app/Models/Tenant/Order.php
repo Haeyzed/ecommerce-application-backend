@@ -30,11 +30,8 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $cancelled_at Timestamp of when the order was cancelled.
  * @property Carbon|null $created_at Timestamp of when the order was placed.
  * @property Carbon|null $updated_at Timestamp of when the order was last updated.
- *
  * @property-read Collection|OrderItem[] $items The line items belonging to this order.
  * @property-read Customer $customer The customer who placed the order.
- *
- * @package App\Models\Tenant
  */
 class Order extends Model
 {
@@ -69,21 +66,19 @@ class Order extends Model
     protected function casts(): array
     {
         return [
-            'subtotal'         => 'decimal:2',
-            'discount'         => 'decimal:2',
-            'tax'              => 'decimal:2',
-            'total'            => 'decimal:2',
+            'subtotal' => 'decimal:2',
+            'discount' => 'decimal:2',
+            'tax' => 'decimal:2',
+            'total' => 'decimal:2',
             'shipping_address' => 'array',
-            'billing_address'  => 'array',
-            'paid_at'          => 'datetime',
-            'cancelled_at'     => 'datetime',
+            'billing_address' => 'array',
+            'paid_at' => 'datetime',
+            'cancelled_at' => 'datetime',
         ];
     }
 
     /**
      * Get the items that belong to the order.
-     *
-     * @return HasMany
      */
     public function items(): HasMany
     {
@@ -92,8 +87,6 @@ class Order extends Model
 
     /**
      * Get the customer that placed the order.
-     *
-     * @return BelongsTo
      */
     public function customer(): BelongsTo
     {

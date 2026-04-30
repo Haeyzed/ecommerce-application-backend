@@ -19,8 +19,6 @@ class DomainController extends Controller
 {
     /**
      * Create a new DomainController instance.
-     *
-     * @param DomainService $domainService
      */
     public function __construct(
         private readonly DomainService $domainService
@@ -29,9 +27,6 @@ class DomainController extends Controller
     /**
      * List tenant domains.
      * Retrieves all domains attached to a specific tenant.
-     *
-     * @param Tenant $tenant
-     * @return JsonResponse
      */
     public function index(Tenant $tenant): JsonResponse
     {
@@ -46,10 +41,6 @@ class DomainController extends Controller
     /**
      * Add a custom domain.
      * Attaches a new custom domain to the tenant if their plan permits it.
-     *
-     * @param StoreDomainRequest $request
-     * @param Tenant $tenant
-     * @return JsonResponse
      */
     public function store(StoreDomainRequest $request, Tenant $tenant): JsonResponse
     {
@@ -70,10 +61,6 @@ class DomainController extends Controller
     /**
      * Remove a domain.
      * Deletes a specific domain from the tenant.
-     *
-     * @param Tenant $tenant
-     * @param string $domain
-     * @return JsonResponse
      */
     public function destroy(Tenant $tenant, string $domain): JsonResponse
     {

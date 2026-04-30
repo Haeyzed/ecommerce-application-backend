@@ -25,8 +25,6 @@ class SettingController extends Controller
 
     /**
      * Retrieve the current store settings.
-     *
-     * @return JsonResponse
      */
     public function show(): JsonResponse
     {
@@ -41,8 +39,6 @@ class SettingController extends Controller
     /**
      * Update the store settings (supports multipart/form-data for image uploads).
      *
-     * @param UpdateSettingRequest $request
-     * @return JsonResponse
      * @throws Throwable
      */
     public function update(UpdateSettingRequest $request): JsonResponse

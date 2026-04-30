@@ -24,14 +24,18 @@ class DepartmentController extends Controller
 
     /**
      * List all departments.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
         $perPage = $request->integer('per_page', 20);
-        $departments = $this->departmentService->getPaginatedDepartments($request->all(), $perPage);
+
+        $filters = [
+            'search' => $request->string('search'),
+            'parent_id' => $request->integer('parent_id'),
+            'manager_employee_id' => $request->integer('manager_employee_id'),
+        ];
+
+        $departments = $this->departmentService->getPaginatedDepartments($filters, $perPage);
 
         return ApiResponse::success(
             data: DepartmentResource::collection($departments),
@@ -42,9 +46,6 @@ class DepartmentController extends Controller
 
     /**
      * Create a new department.
-     *
-     * @param StoreDepartmentRequest $request
-     * @return JsonResponse
      */
     public function store(StoreDepartmentRequest $request): JsonResponse
     {
@@ -60,9 +61,6 @@ class DepartmentController extends Controller
 
     /**
      * Show a specific department.
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function show(int $id): JsonResponse
     {
@@ -76,10 +74,6 @@ class DepartmentController extends Controller
 
     /**
      * Update an existing department.
-     *
-     * @param UpdateDepartmentRequest $request
-     * @param int $id
-     * @return JsonResponse
      */
     public function update(UpdateDepartmentRequest $request, int $id): JsonResponse
     {
@@ -94,9 +88,6 @@ class DepartmentController extends Controller
 
     /**
      * Delete a department.
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function destroy(int $id): JsonResponse
     {

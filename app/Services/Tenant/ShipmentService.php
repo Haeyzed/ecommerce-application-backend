@@ -16,20 +16,19 @@ class ShipmentService
     /**
      * Create a shipment for an order.
      *
-     * @param Order $order
-     * @param array $data Validated shipment data.
-     * @return Shipment
+     * @param  array  $data  Validated shipment data.
+     *
      * @throws Throwable
      */
     public function shipOrder(Order $order, array $data): Shipment
     {
         return DB::transaction(function () use ($order, $data) {
             $shipment = Shipment::query()->create([
-                'order_id'        => $order->id,
-                'carrier'         => $data['carrier'] ?? null,
+                'order_id' => $order->id,
+                'carrier' => $data['carrier'] ?? null,
                 'tracking_number' => $data['tracking_number'] ?? null,
-                'status'          => 'shipped',
-                'shipped_at'      => now(),
+                'status' => 'shipped',
+                'shipped_at' => now(),
             ]);
 
             $order->update(['status' => 'shipped']);
@@ -41,15 +40,13 @@ class ShipmentService
     /**
      * Mark a shipment as delivered.
      *
-     * @param Shipment $shipment
-     * @return Shipment
      * @throws Throwable
      */
     public function markShipmentDelivered(Shipment $shipment): Shipment
     {
         return DB::transaction(function () use ($shipment) {
             $shipment->update([
-                'status'       => 'delivered',
+                'status' => 'delivered',
                 'delivered_at' => now(),
             ]);
 

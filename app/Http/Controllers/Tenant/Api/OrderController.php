@@ -18,8 +18,6 @@ class OrderController extends Controller
 {
     /**
      * Create a new OrderController instance.
-     *
-     * @param OrderService $orderService
      */
     public function __construct(
         private readonly OrderService $orderService
@@ -27,9 +25,6 @@ class OrderController extends Controller
 
     /**
      * List customer orders.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -43,10 +38,6 @@ class OrderController extends Controller
 
     /**
      * Get order details.
-     *
-     * @param Request $request
-     * @param int $id
-     * @return JsonResponse
      */
     public function show(Request $request, int $id): JsonResponse
     {
@@ -61,8 +52,6 @@ class OrderController extends Controller
     /**
      * Submit a new order.
      *
-     * @param StoreOrderRequest $request
-     * @return JsonResponse
      * @throws Throwable
      */
     public function store(StoreOrderRequest $request): JsonResponse

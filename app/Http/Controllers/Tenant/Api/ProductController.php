@@ -19,8 +19,6 @@ class ProductController extends Controller
 {
     /**
      * Create a new ProductController instance.
-     *
-     * @param ProductService $productService
      */
     public function __construct(
         private readonly ProductService $productService
@@ -28,16 +26,13 @@ class ProductController extends Controller
 
     /**
      * List all active products.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
         $filters = [
-            'is_active'     => true,
+            'is_active' => true,
             'category_slug' => $request->query('category'),
-            'search'        => $request->query('q'),
+            'search' => $request->query('q'),
         ];
 
         $products = $this->productService->getPaginatedProducts($filters);
@@ -50,9 +45,6 @@ class ProductController extends Controller
 
     /**
      * Get product details.
-     *
-     * @param string $slug
-     * @return JsonResponse
      */
     public function show(string $slug): JsonResponse
     {
@@ -66,9 +58,6 @@ class ProductController extends Controller
 
     /**
      * Create a new product.
-     *
-     * @param StoreProductRequest $request
-     * @return JsonResponse
      */
     public function store(StoreProductRequest $request): JsonResponse
     {
@@ -84,10 +73,6 @@ class ProductController extends Controller
 
     /**
      * Update a product.
-     *
-     * @param UpdateProductRequest $request
-     * @param int $id
-     * @return JsonResponse
      */
     public function update(UpdateProductRequest $request, int $id): JsonResponse
     {
@@ -102,9 +87,6 @@ class ProductController extends Controller
 
     /**
      * Delete a product.
-     *
-     * @param int $id
-     * @return JsonResponse
      */
     public function destroy(int $id): JsonResponse
     {

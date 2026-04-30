@@ -2,6 +2,7 @@
 
 namespace App\Models\Tenant;
 
+use Eloquent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Carbon;
@@ -19,8 +20,7 @@ use Illuminate\Support\Carbon;
  * @property bool $enabled Indicates whether notifications for this event and channel are enabled.
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- *
- * @property-read Model|\Eloquent $notifiable The entity this preference belongs to.
+ * @property-read Model|Eloquent $notifiable The entity this preference belongs to.
  */
 class NotificationPreference extends Model
 {
@@ -51,8 +51,6 @@ class NotificationPreference extends Model
 
     /**
      * Get the entity that this preference belongs to.
-     *
-     * @return MorphTo
      */
     public function notifiable(): MorphTo
     {

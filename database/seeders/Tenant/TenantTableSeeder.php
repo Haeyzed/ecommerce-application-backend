@@ -30,23 +30,23 @@ class TenantTableSeeder extends Seeder
         $matrix = config('roles.tenant');
         $guards = config('roles.guards', ['web']);
 
-        if (!is_array($matrix)) {
+        if (! is_array($matrix)) {
             throw new InvalidArgumentException('The config value [roles.tenant] must be an array. Check config/roles.php.');
         }
 
-        if (!is_array($guards) || $guards === []) {
+        if (! is_array($guards) || $guards === []) {
             throw new InvalidArgumentException('The config value [roles.guards] must be a non-empty array. Check config/roles.php.');
         }
 
         $allPerms = collect($matrix)
             ->flatten()
             ->unique()
-            ->reject(fn($permission) => $permission === '*');
+            ->reject(fn ($permission) => $permission === '*');
 
         $expanded = $allPerms
-            ->flatMap(fn($permission) => str_ends_with($permission, '.*')
+            ->flatMap(fn ($permission) => str_ends_with($permission, '.*')
                 ? collect(['view', 'create', 'update', 'delete'])
-                    ->map(fn($action) => str_replace('*', $action, $permission))
+                    ->map(fn ($action) => str_replace('*', $action, $permission))
                 : [$permission])
             ->unique()
             ->values();
@@ -60,7 +60,7 @@ class TenantTableSeeder extends Seeder
             }
 
             foreach ($matrix as $roleName => $permissions) {
-                if (!is_array($permissions)) {
+                if (! is_array($permissions)) {
                     throw new InvalidArgumentException("Permissions for tenant role [{$roleName}] must be an array.");
                 }
 
@@ -80,9 +80,9 @@ class TenantTableSeeder extends Seeder
                 }
 
                 $needed = collect($permissions)
-                    ->flatMap(fn($permission) => str_ends_with($permission, '.*')
+                    ->flatMap(fn ($permission) => str_ends_with($permission, '.*')
                         ? collect(['view', 'create', 'update', 'delete'])
-                            ->map(fn($action) => str_replace('*', $action, $permission))
+                            ->map(fn ($action) => str_replace('*', $action, $permission))
                         : [$permission])
                     ->unique()
                     ->values();
@@ -118,82 +118,108 @@ class TenantTableSeeder extends Seeder
                 ]),
                 'payment_providers' => json_encode([
                     'stripe' => [
-                        'enabled'   => false,
+                        'enabled' => false,
                         'test_mode' => true,
-                        'test'      => [
-                            'public_key'     => 'pk_test_stripe_...',
-                            'secret_key'     => 'sk_test_stripe_...',
+                        'test' => [
+                            'public_key' => 'pk_test_stripe_...',
+                            'secret_key' => 'sk_test_stripe_...',
                             'webhook_secret' => 'whsec_test_stripe_...',
                         ],
-                        'live'      => [
-                            'public_key'     => 'pk_live_stripe_...',
-                            'secret_key'     => 'sk_live_stripe_...',
+                        'live' => [
+                            'public_key' => 'pk_live_stripe_...',
+                            'secret_key' => 'sk_live_stripe_...',
                             'webhook_secret' => 'whsec_live_stripe_...',
-                        ]
+                        ],
                     ],
                     'paypal' => [
-                        'enabled'   => false,
+                        'enabled' => false,
                         'test_mode' => true,
-                        'test'      => [
+                        'test' => [
                             'client_id' => 'client_test_paypal_...',
-                            'secret'    => 'secret_test_paypal_...',
+                            'secret' => 'secret_test_paypal_...',
                         ],
-                        'live'      => [
+                        'live' => [
                             'client_id' => 'client_live_paypal_...',
-                            'secret'    => 'secret_live_paypal_...',
-                        ]
+                            'secret' => 'secret_live_paypal_...',
+                        ],
                     ],
                     'paystack' => [
-                        'enabled'   => false,
+                        'enabled' => false,
                         'test_mode' => true,
-                        'test'      => [
+                        'test' => [
                             'public_key' => 'pk_test_paystack_...',
                             'secret_key' => 'sk_test_paystack_...',
                         ],
-                        'live'      => [
+                        'live' => [
                             'public_key' => 'pk_live_paystack_...',
                             'secret_key' => 'sk_live_paystack_...',
-                        ]
+                        ],
                     ],
                     'flutterwave' => [
-                        'enabled'   => false,
+                        'enabled' => false,
                         'test_mode' => true,
-                        'test'      => [
-                            'public_key'     => 'flwpubk_test_...',
-                            'secret_key'     => 'flwsec_test_...',
+                        'test' => [
+                            'public_key' => 'flwpubk_test_...',
+                            'secret_key' => 'flwsec_test_...',
                             'encryption_key' => 'flw_enc_test_...',
                         ],
-                        'live'      => [
-                            'public_key'     => 'flwpubk_live_...',
-                            'secret_key'     => 'flwsec_live_...',
+                        'live' => [
+                            'public_key' => 'flwpubk_live_...',
+                            'secret_key' => 'flwsec_live_...',
                             'encryption_key' => 'flw_enc_live_...',
-                        ]
+                        ],
                     ],
                     'razorpay' => [
-                        'enabled'   => false,
+                        'enabled' => false,
                         'test_mode' => true,
-                        'test'      => [
-                            'key_id'     => 'rzp_test_...',
+                        'test' => [
+                            'key_id' => 'rzp_test_...',
                             'key_secret' => 'rzp_test_secret_...',
                         ],
-                        'live'      => [
-                            'key_id'     => 'rzp_live_...',
+                        'live' => [
+                            'key_id' => 'rzp_live_...',
                             'key_secret' => 'rzp_live_secret_...',
-                        ]
+                        ],
                     ],
                     'square' => [
-                        'enabled'   => false,
+                        'enabled' => false,
                         'test_mode' => true,
-                        'test'      => [
+                        'test' => [
                             'application_id' => 'sandbox-sq0idb_...',
-                            'access_token'   => 'sandbox-sq0atb_...',
-                            'location_id'    => 'sandbox_location_...',
+                            'access_token' => 'sandbox-sq0atb_...',
+                            'location_id' => 'sandbox_location_...',
                         ],
-                        'live'      => [
+                        'live' => [
                             'application_id' => 'sq0idp_...',
-                            'access_token'   => 'sq0atp_...',
-                            'location_id'    => 'live_location_...',
-                        ]
+                            'access_token' => 'sq0atp_...',
+                            'location_id' => 'live_location_...',
+                        ],
+                    ],
+                ]),
+                'storage_provider' => 'public',
+                'storage_settings' => json_encode([
+                    'public' => [
+                        'enabled' => true,
+                    ],
+                    's3' => [
+                        'enabled' => false,
+                        'key' => 'your-aws-access-key-id',
+                        'secret' => 'your-aws-secret-access-key',
+                        'region' => 'us-east-1',
+                        'bucket' => 'your-aws-bucket',
+                        'url' => null,
+                        'endpoint' => null,
+                        'use_path_style_endpoint' => false,
+                    ],
+                    'digitalocean' => [
+                        'enabled' => false,
+                        'key' => 'your-do-access-key-id',
+                        'secret' => 'your-do-secret-access-key',
+                        'region' => 'nyc3',
+                        'bucket' => 'your-do-bucket',
+                        'url' => null,
+                        'endpoint' => 'https://nyc3.digitaloceanspaces.com',
+                        'use_path_style_endpoint' => false,
                     ],
                 ]),
                 'contact_email' => null,
@@ -210,16 +236,16 @@ class TenantTableSeeder extends Seeder
         DB::table('mail_settings')->updateOrInsert(
             ['id' => 1],
             [
-                'mailer'       => 'smtp',
-                'host'         => '127.0.0.1',
-                'port'         => 1025,
-                'username'     => null,
-                'password'     => null,
-                'encryption'   => 'tls',
+                'mailer' => 'smtp',
+                'host' => '127.0.0.1',
+                'port' => 1025,
+                'username' => null,
+                'password' => null,
+                'encryption' => 'tls',
                 'from_address' => 'noreply@yourstore.com',
-                'from_name'    => 'Default Store',
-                'created_at'   => now(),
-                'updated_at'   => now(),
+                'from_name' => 'Default Store',
+                'created_at' => now(),
+                'updated_at' => now(),
             ]
         );
     }
@@ -413,7 +439,7 @@ class TenantTableSeeder extends Seeder
         foreach ($departments as $departmentName => $departmentData) {
             $department = DB::table('departments')->where('name', $departmentName)->first();
 
-            if (!$department) {
+            if (! $department) {
                 $departmentId = DB::table('departments')->insertGetId([
                     'name' => $departmentName,
                     'code' => $departmentData['code'],
@@ -540,7 +566,7 @@ class TenantTableSeeder extends Seeder
                 'subject' => 'Interview Scheduled: {job_title}',
                 'body' => "Hello {name},\n\nWe would like to invite you for an interview for the {job_title} position on {scheduled_at}. The interview will be conducted via {mode}.\n\nLooking forward to speaking with you!",
                 'is_active' => true,
-            ]
+            ],
         ];
 
         foreach ($templates as $template) {

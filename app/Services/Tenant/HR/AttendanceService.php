@@ -17,27 +17,20 @@ class AttendanceService
     /**
      * Retrieve a paginated, filtered list of attendance records.
      *
-     * @param array $filters Query filters (e.g., employee_id, from, to)
-     * @param int $perPage Items per page
-     * @return LengthAwarePaginator
+     * @param  array  $filters  Query filters (e.g., employee_id, from, to)
+     * @param  int  $perPage  Items per page
      */
     public function getPaginatedAttendances(array $filters = [], int $perPage = 30): LengthAwarePaginator
     {
         return Attendance::query()
             ->with('employee:id,first_name,last_name,employee_code')
-            ->when($filters['employee_id'] ?? null, fn ($q, $v) => $q->where('employee_id', $v))
-            ->when($filters['from'] ?? null, fn ($q, $v) => $q->whereDate('date', '>=', $v))
-            ->when($filters['to'] ?? null, fn ($q, $v) => $q->whereDate('date', '<=', $v))
+            ->filter($filters)
             ->orderByDesc('date')
             ->paginate($perPage);
     }
 
     /**
      * Process an employee check-in.
-     *
-     * @param Employee $employee
-     * @param DateTimeInterface $at
-     * @return Attendance
      */
     public function checkInEmployee(Employee $employee, DateTimeInterface $at): Attendance
     {
@@ -51,10 +44,6 @@ class AttendanceService
 
     /**
      * Process an employee check-out.
-     *
-     * @param Employee $employee
-     * @param DateTimeInterface $at
-     * @return Attendance
      */
     public function checkOutEmployee(Employee $employee, DateTimeInterface $at): Attendance
     {
@@ -67,7 +56,7 @@ class AttendanceService
 
         $attendance->update([
             'check_out' => $at,
-            'minutes_worked' => $minutes
+            'minutes_worked' => $minutes,
         ]);
 
         return $attendance->fresh();

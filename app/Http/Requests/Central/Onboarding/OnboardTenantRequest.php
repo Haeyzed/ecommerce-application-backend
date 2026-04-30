@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Central\Onboarding;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -9,8 +10,6 @@ class OnboardTenantRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -32,21 +31,25 @@ class OnboardTenantRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
             /**
              * The name of the store/tenant.
+             *
              * @var string $name
+             *
              * @example "My Awesome Store"
              */
             'name' => ['required', 'string', 'max:255'],
 
             /**
              * The desired tenant subdomain.
+             *
              * @var string $subdomain
+             *
              * @example "my-awesome-store"
              */
             'subdomain' => [
@@ -74,56 +77,72 @@ class OnboardTenantRequest extends FormRequest
 
             /**
              * The name of the store owner.
+             *
              * @var string|null $owner_name
+             *
              * @example "Jane Doe"
              */
             'owner_name' => ['nullable', 'string', 'max:255'],
 
             /**
              * The email of the store owner.
+             *
              * @var string|null $owner_email
+             *
              * @example "jane.doe@example.com"
              */
             'owner_email' => ['nullable', 'email'],
 
             /**
              * The password for the store owner.
+             *
              * @var string|null $owner_password
+             *
              * @example "SecurePassword123!"
              */
             'owner_password' => ['nullable', 'string', 'min:8'],
 
             /**
              * The default currency code.
+             *
              * @var string|null $currency
+             *
              * @example "USD"
              */
             'currency' => ['nullable', 'string', 'size:3'],
 
             /**
              * The default timezone.
+             *
              * @var string|null $timezone
+             *
              * @example "America/New_York"
              */
             'timezone' => ['nullable', 'string'],
 
             /**
              * The default language code.
+             *
              * @var string|null $language
+             *
              * @example "en"
              */
             'language' => ['nullable', 'string', 'size:2'],
 
             /**
              * The ID of the subscription plan.
+             *
              * @var int|null $plan_id
+             *
              * @example 2
              */
             'plan_id' => ['nullable', 'integer', 'exists:plans,id'],
 
             /**
              * The number of trial days.
+             *
              * @var int|null $trial_days
+             *
              * @example 14
              */
             'trial_days' => ['nullable', 'integer', 'min:1', 'max:90'],

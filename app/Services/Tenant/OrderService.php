@@ -19,9 +19,6 @@ class OrderService
 {
     /**
      * Create a new OrderService instance.
-     *
-     * @param CartService $cartService
-     * @param CouponService $couponService
      */
     public function __construct(
         private readonly CartService $cartService,
@@ -30,9 +27,6 @@ class OrderService
 
     /**
      * Retrieve a paginated list of orders for a specific customer.
-     *
-     * @param int $customerId
-     * @return LengthAwarePaginator
      */
     public function getPaginatedCustomerOrders(int $customerId): LengthAwarePaginator
     {
@@ -45,10 +39,6 @@ class OrderService
 
     /**
      * Retrieve a specific order by its ID and the customer's ID.
-     *
-     * @param int $customerId
-     * @param int $orderId
-     * @return Order
      */
     public function getCustomerOrderById(int $customerId, int $orderId): Order
     {
@@ -61,9 +51,8 @@ class OrderService
     /**
      * Create a new order directly from an array of items (direct checkout).
      *
-     * @param int $customerId
-     * @param array $data Validated order data.
-     * @return Order
+     * @param  array  $data  Validated order data.
+     *
      * @throws Throwable
      */
     public function createOrder(int $customerId, array $data): Order
@@ -83,19 +72,19 @@ class OrderService
                 $total += $p->price_cents * $line['quantity'];
 
                 $rows[] = [
-                    'product_id'       => $p->id,
-                    'name'             => $p->name,
+                    'product_id' => $p->id,
+                    'name' => $p->name,
                     'unit_price_cents' => $p->price_cents,
-                    'quantity'         => $line['quantity'],
+                    'quantity' => $line['quantity'],
                 ];
             }
 
             $order = Order::query()->create([
-                'number'           => 'ORD-' . strtoupper(Str::random(10)),
-                'customer_id'      => $customerId,
-                'status'           => 'pending',
-                'total_cents'      => $total,
-                'currency'         => 'USD',
+                'number' => 'ORD-'.strtoupper(Str::random(10)),
+                'customer_id' => $customerId,
+                'status' => 'pending',
+                'total_cents' => $total,
+                'currency' => 'USD',
                 'shipping_address' => $data['shipping_address'],
             ]);
 
@@ -108,9 +97,6 @@ class OrderService
     /**
      * Convert an active cart into a paid-pending order.
      *
-     * @param Cart $cart
-     * @param array $payload
-     * @return Order
      * @throws Throwable
      */
     public function checkoutCart(Cart $cart, array $payload): Order
@@ -123,24 +109,24 @@ class OrderService
             $totals = $this->cartService->getCartTotals($cart);
 
             $order = Order::query()->create([
-                'number'           => 'ORD-' . strtoupper(Str::random(10)),
-                'customer_id'      => $cart->customer_id,
-                'status'           => 'pending',
-                'subtotal'         => $totals['subtotal'],
-                'discount'         => $totals['discount'],
-                'tax'              => $totals['tax'],
-                'total'            => $totals['total'],
-                'currency'         => $cart->currency,
+                'number' => 'ORD-'.strtoupper(Str::random(10)),
+                'customer_id' => $cart->customer_id,
+                'status' => 'pending',
+                'subtotal' => $totals['subtotal'],
+                'discount' => $totals['discount'],
+                'tax' => $totals['tax'],
+                'total' => $totals['total'],
+                'currency' => $cart->currency,
                 'shipping_address' => $payload['shipping_address'] ?? null,
-                'billing_address'  => $payload['billing_address'] ?? $payload['shipping_address'] ?? null,
-                'notes'            => $payload['notes'] ?? null,
+                'billing_address' => $payload['billing_address'] ?? $payload['shipping_address'] ?? null,
+                'notes' => $payload['notes'] ?? null,
             ]);
 
             foreach ($cart->items as $item) {
                 OrderItem::query()->create([
-                    'order_id'   => $order->id,
+                    'order_id' => $order->id,
                     'product_id' => $item->product_id,
-                    'qty'        => $item->qty,
+                    'qty' => $item->qty,
                     'unit_price' => $item->unit_price,
                     'line_total' => $item->qty * $item->unit_price,
                 ]);
@@ -163,14 +149,11 @@ class OrderService
 
     /**
      * Mark an order as paid.
-     *
-     * @param Order $order
-     * @return Order
      */
     public function markOrderPaid(Order $order): Order
     {
         $order->update([
-            'status'  => 'paid',
+            'status' => 'paid',
             'paid_at' => now(),
         ]);
 
@@ -180,9 +163,6 @@ class OrderService
     /**
      * Cancel an order and restore stock levels.
      *
-     * @param Order $order
-     * @param string|null $reason
-     * @return Order
      * @throws Throwable
      */
     public function cancelOrder(Order $order, ?string $reason = null): Order
@@ -198,9 +178,9 @@ class OrderService
             }
 
             $order->update([
-                'status'              => 'cancelled',
+                'status' => 'cancelled',
                 'cancellation_reason' => $reason,
-                'cancelled_at'        => now(),
+                'cancelled_at' => now(),
             ]);
 
             return $order->fresh();

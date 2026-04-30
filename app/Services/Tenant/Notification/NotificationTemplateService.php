@@ -14,9 +14,8 @@ class NotificationTemplateService
     /**
      * Retrieve a paginated, filtered list of notification templates.
      *
-     * @param array $filters Query filters (e.g., event, channel).
-     * @param int $perPage Items per page.
-     * @return LengthAwarePaginator
+     * @param  array  $filters  Query filters (e.g., event, channel).
+     * @param  int  $perPage  Items per page.
      */
     public function getPaginatedTemplates(array $filters = [], int $perPage = 30): LengthAwarePaginator
     {
@@ -29,9 +28,6 @@ class NotificationTemplateService
 
     /**
      * Create a new notification template.
-     *
-     * @param array $data
-     * @return NotificationTemplate
      */
     public function createTemplate(array $data): NotificationTemplate
     {
@@ -40,22 +36,16 @@ class NotificationTemplateService
 
     /**
      * Update an existing notification template.
-     *
-     * @param NotificationTemplate $template
-     * @param array $data
-     * @return NotificationTemplate
      */
     public function updateTemplate(NotificationTemplate $template, array $data): NotificationTemplate
     {
         $template->update($data);
+
         return $template->fresh();
     }
 
     /**
      * Delete a notification template.
-     *
-     * @param NotificationTemplate $template
-     * @return void
      */
     public function deleteTemplate(NotificationTemplate $template): void
     {
@@ -65,8 +55,6 @@ class NotificationTemplateService
     /**
      * Get the dictionary of available variables for each notification event.
      * This feeds the frontend UI so users know what placeholders they can use.
-     *
-     * @return array
      */
     public function getAvailableVariables(): array
     {

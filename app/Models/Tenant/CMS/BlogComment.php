@@ -3,6 +3,7 @@
 namespace App\Models\Tenant\CMS;
 
 use App\Models\Tenant\Customer;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
@@ -21,11 +22,10 @@ use Illuminate\Support\Carbon;
  * @property bool $is_approved Whether the comment has been moderated and approved.
  * @property Carbon|null $created_at Timestamp of when the comment was created.
  * @property Carbon|null $updated_at Timestamp of when the comment was last updated.
- *
  * @property-read BlogPost $post The post this comment belongs to.
  * @property-read Customer|null $customer The customer who made the comment.
  *
- * @package App\Models\Tenant
+ * @method static Builder filter(array $filters)
  */
 class BlogComment extends Model
 {
@@ -57,8 +57,6 @@ class BlogComment extends Model
 
     /**
      * Get the post that this comment belongs to.
-     *
-     * @return BelongsTo
      */
     public function post(): BelongsTo
     {
@@ -67,11 +65,25 @@ class BlogComment extends Model
 
     /**
      * Get the customer that made this comment.
-     *
-     * @return BelongsTo
      */
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    /**
+     * Scope a query to apply dynamic filters.
+     */
+    public function scopeFilter(Builder $query, array $filters): void
+    {
+        $query->when($filters['search'] ?? null, function (Builder $query, $search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('body', 'like', "%{$search}%")
+                    ->orWhere('author_name', 'like', "%{$search}%");
+            });
+        })
+            ->when(isset($filters['is_approved']), function (Builder $query) use ($filters) {
+                $query->where('is_approved', $filters['is_approved']);
+            });
     }
 }

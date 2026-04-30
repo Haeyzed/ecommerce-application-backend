@@ -24,14 +24,14 @@ class StoreCouponRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'code'          => ['nullable', 'string', 'max:32'],
-            'type'          => ['required', 'in:percent,fixed'],
-            'value'         => ['required', 'numeric', 'min:0'],
-            'min_subtotal'  => ['nullable', 'numeric', 'min:0'],
-            'max_uses'      => ['nullable', 'integer', 'min:1'],
-            'starts_at'     => ['nullable', 'date'],
-            'ends_at'       => ['nullable', 'date', 'after_or_equal:starts_at'],
-            'is_active'     => ['boolean'],
+            'code' => ['nullable', 'string', 'max:32'],
+            'type' => ['required', 'in:percent,fixed'],
+            'value' => ['required', 'numeric', 'min:0'],
+            'min_subtotal' => ['nullable', 'numeric', 'min:0'],
+            'max_uses' => ['nullable', 'integer', 'min:1'],
+            'starts_at' => ['nullable', 'date'],
+            'ends_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
+            'is_active' => ['boolean'],
         ];
     }
 }

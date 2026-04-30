@@ -15,9 +15,8 @@ class TrainingService
     /**
      * Retrieve a paginated, filtered list of training sessions.
      *
-     * @param array $filters Query filters (e.g., is_mandatory).
-     * @param int $perPage Items per page.
-     * @return LengthAwarePaginator
+     * @param  array  $filters  Query filters (e.g., is_mandatory).
+     * @param  int  $perPage  Items per page.
      */
     public function getPaginatedTrainings(array $filters = [], int $perPage = 20): LengthAwarePaginator
     {
@@ -31,8 +30,7 @@ class TrainingService
     /**
      * Create a new training session.
      *
-     * @param array $data Validated training data.
-     * @return Training
+     * @param  array  $data  Validated training data.
      */
     public function createTraining(array $data): Training
     {
@@ -42,22 +40,17 @@ class TrainingService
     /**
      * Update an existing training session.
      *
-     * @param Training $training
-     * @param array $data Validated update data.
-     * @return Training
+     * @param  array  $data  Validated update data.
      */
     public function updateTraining(Training $training, array $data): Training
     {
         $training->update($data);
+
         return $training->fresh();
     }
 
     /**
      * Enroll an employee into a training session.
-     *
-     * @param Training $training
-     * @param Employee $employee
-     * @return void
      */
     public function enrollEmployee(Training $training, Employee $employee): void
     {
@@ -66,10 +59,6 @@ class TrainingService
 
     /**
      * Mark a training session as completed for an employee.
-     *
-     * @param Training $training
-     * @param Employee $employee
-     * @return void
      */
     public function completeTraining(Training $training, Employee $employee): void
     {
@@ -78,9 +67,6 @@ class TrainingService
 
     /**
      * Delete a training session.
-     *
-     * @param Training $training
-     * @return void
      */
     public function deleteTraining(Training $training): void
     {

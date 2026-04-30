@@ -18,8 +18,6 @@ class ReviewController extends Controller
 {
     /**
      * Create a new ReviewController instance.
-     *
-     * @param ReviewService $reviewService
      */
     public function __construct(
         private readonly ReviewService $reviewService
@@ -27,9 +25,6 @@ class ReviewController extends Controller
 
     /**
      * List approved product reviews.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -45,9 +40,6 @@ class ReviewController extends Controller
 
     /**
      * Submit a new product review.
-     *
-     * @param StoreReviewRequest $request
-     * @return JsonResponse
      */
     public function store(StoreReviewRequest $request): JsonResponse
     {
@@ -66,9 +58,6 @@ class ReviewController extends Controller
 
     /**
      * Approve a product review.
-     *
-     * @param Review $review
-     * @return JsonResponse
      */
     public function approve(Review $review): JsonResponse
     {

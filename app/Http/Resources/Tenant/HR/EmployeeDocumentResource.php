@@ -10,7 +10,6 @@ class EmployeeDocumentResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
@@ -18,45 +17,57 @@ class EmployeeDocumentResource extends JsonResource
         return [
             /**
              * The unique identifier for the employee document.
+             *
              * @var int $id
+             *
              * @example 15
              */
-            'id'          => $this->id,
+            'id' => $this->id,
 
             /**
              * The ID of the employee this document belongs to.
+             *
              * @var int $employee_id
+             *
              * @example 42
              */
             'employee_id' => $this->employee_id,
 
             /**
              * The title of the document.
+             *
              * @var string $title
+             *
              * @example "Signed Employment Contract"
              */
-            'title'       => $this->title,
+            'title' => $this->title,
 
             /**
              * The type of the document (contract, id, certificate, etc.).
+             *
              * @var string|null $type
+             *
              * @example "contract"
              */
-            'type'        => $this->type,
+            'type' => $this->type,
 
             /**
              * The expiration date of the document, if applicable.
+             *
              * @var string|null $expires_at
+             *
              * @example "2027-12-31"
              */
-            'expires_at'  => $this->expires_at,
+            'expires_at' => $this->expires_at,
 
             /**
              * Additional notes regarding the document.
+             *
              * @var string|null $notes
+             *
              * @example "Original stored in HR filing cabinet."
              */
-            'notes'       => $this->notes,
+            'notes' => $this->notes,
         ];
     }
 }

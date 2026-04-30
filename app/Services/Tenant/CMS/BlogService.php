@@ -17,26 +17,19 @@ class BlogService
     /**
      * Retrieve a paginated, filtered list of blog posts.
      *
-     * @param array $filters Query filters (e.g., category_id, search, is_published, tag)
-     * @param int $perPage Items per page
-     * @return LengthAwarePaginator
+     * @param  array  $filters  Query filters (e.g., category_id, search, is_published, tag)
+     * @param  int  $perPage  Items per page
      */
     public function getPaginatedPosts(array $filters = [], int $perPage = 20): LengthAwarePaginator
     {
         return BlogPost::query()
-            ->when($filters['search'] ?? null, fn($q, $v) => $q->where('title', 'like', "%{$v}%"))
-            ->when($filters['category_id'] ?? null, fn($q, $v) => $q->where('blog_category_id', $v))
-            ->when($filters['tag'] ?? null, fn($q, $v) => $q->whereJsonContains('tags', $v))
-            ->when(isset($filters['is_published']), fn($q) => $q->where('is_published', (bool)$filters['is_published']))
+            ->filter($filters)
             ->latest('published_at')
             ->paginate($perPage);
     }
 
     /**
      * Retrieve a specific published post by its slug.
-     *
-     * @param string $slug
-     * @return BlogPost
      */
     public function getPostBySlug(string $slug): BlogPost
     {
@@ -49,8 +42,7 @@ class BlogService
     /**
      * Create a new blog post.
      *
-     * @param array $data Validated post data.
-     * @return BlogPost
+     * @param  array  $data  Validated post data.
      */
     public function createPost(array $data): BlogPost
     {
@@ -60,21 +52,17 @@ class BlogService
     /**
      * Update an existing blog post.
      *
-     * @param BlogPost $post
-     * @param array $data Validated update data.
-     * @return BlogPost
+     * @param  array  $data  Validated update data.
      */
     public function updatePost(BlogPost $post, array $data): BlogPost
     {
         $post->update($data);
+
         return $post->fresh();
     }
 
     /**
      * Delete a blog post.
-     *
-     * @param BlogPost $post
-     * @return void
      */
     public function deletePost(BlogPost $post): void
     {
@@ -83,9 +71,6 @@ class BlogService
 
     /**
      * Increment the view counter for a post.
-     *
-     * @param BlogPost $post
-     * @return void
      */
     public function incrementViews(BlogPost $post): void
     {
@@ -93,13 +78,14 @@ class BlogService
     }
 
     /**
-     * Get all categories with post counts.
+     * Get all categories with post counts, optionally filtered.
      *
-     * @return Collection
+     * @param  array  $filters  Query filters (e.g., search)
      */
-    public function getCategories(): Collection
+    public function getCategories(array $filters = []): Collection
     {
         return BlogCategory::query()
+            ->filter($filters)
             ->withCount('posts')
             ->orderBy('name')
             ->get();
@@ -107,9 +93,6 @@ class BlogService
 
     /**
      * Create a new blog category.
-     *
-     * @param array $data
-     * @return BlogCategory
      */
     public function createCategory(array $data): BlogCategory
     {
@@ -118,22 +101,16 @@ class BlogService
 
     /**
      * Update an existing blog category.
-     *
-     * @param BlogCategory $category
-     * @param array $data
-     * @return BlogCategory
      */
     public function updateCategory(BlogCategory $category, array $data): BlogCategory
     {
         $category->update($data);
+
         return $category->refresh();
     }
 
     /**
      * Delete a blog category.
-     *
-     * @param BlogCategory $category
-     * @return void
      */
     public function deleteCategory(BlogCategory $category): void
     {
@@ -141,17 +118,15 @@ class BlogService
     }
 
     /**
-     * Retrieve all comments for a post, optionally filtered by approval status.
+     * Retrieve all comments for a post, optionally filtered.
      *
-     * @param int $postId
-     * @param bool|null $isApproved
-     * @return Collection
+     * @param  array  $filters  Query filters (e.g., is_approved, search)
      */
-    public function getCommentsByPost(int $postId, ?bool $isApproved = null): Collection
+    public function getCommentsByPost(int $postId, array $filters = []): Collection
     {
         return BlogComment::query()
             ->where('blog_post_id', $postId)
-            ->when(!is_null($isApproved), fn($q) => $q->where('is_approved', $isApproved))
+            ->filter($filters)
             ->latest()
             ->get();
     }
@@ -159,40 +134,31 @@ class BlogService
     /**
      * Add a comment to a specific post.
      *
-     * @param BlogPost $post
-     * @param array $data Validated comment data.
-     * @param int|null $customerId
-     * @return BlogComment
+     * @param  array  $data  Validated comment data.
      */
     public function addComment(BlogPost $post, array $data, ?int $customerId = null): BlogComment
     {
         return $post->comments()->create([
-            'customer_id'  => $customerId,
-            'author_name'  => $data['author_name']  ?? null,
+            'customer_id' => $customerId,
+            'author_name' => $data['author_name'] ?? null,
             'author_email' => $data['author_email'] ?? null,
-            'body'         => $data['body'],
-            'is_approved'  => false,
+            'body' => $data['body'],
+            'is_approved' => false,
         ]);
     }
 
     /**
      * Update a comment (e.g., moderation/approval).
-     *
-     * @param BlogComment $comment
-     * @param array $data
-     * @return BlogComment
      */
     public function updateComment(BlogComment $comment, array $data): BlogComment
     {
         $comment->update($data);
+
         return $comment->refresh();
     }
 
     /**
      * Delete a comment.
-     *
-     * @param BlogComment $comment
-     * @return void
      */
     public function deleteComment(BlogComment $comment): void
     {

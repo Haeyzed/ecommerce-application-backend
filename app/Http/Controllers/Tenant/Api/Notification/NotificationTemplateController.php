@@ -20,8 +20,6 @@ class NotificationTemplateController extends Controller
 {
     /**
      * Initialize the controller with the NotificationTemplateService.
-     *
-     * @param NotificationTemplateService $templateService
      */
     public function __construct(
         private readonly NotificationTemplateService $templateService
@@ -29,9 +27,6 @@ class NotificationTemplateController extends Controller
 
     /**
      * List all notification templates.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -48,8 +43,7 @@ class NotificationTemplateController extends Controller
     /**
      * Show a specific notification template.
      *
-     * @param int $id The ID of the notification template.
-     * @return JsonResponse
+     * @param  int  $id  The ID of the notification template.
      */
     public function show(int $id): JsonResponse
     {
@@ -63,9 +57,6 @@ class NotificationTemplateController extends Controller
 
     /**
      * Create a new notification template.
-     *
-     * @param StoreNotificationTemplateRequest $request
-     * @return JsonResponse
      */
     public function store(StoreNotificationTemplateRequest $request): JsonResponse
     {
@@ -82,9 +73,7 @@ class NotificationTemplateController extends Controller
     /**
      * Update an existing notification template.
      *
-     * @param UpdateNotificationTemplateRequest $request
-     * @param int $id The ID of the notification template.
-     * @return JsonResponse
+     * @param  int  $id  The ID of the notification template.
      */
     public function update(UpdateNotificationTemplateRequest $request, int $id): JsonResponse
     {
@@ -100,8 +89,7 @@ class NotificationTemplateController extends Controller
     /**
      * Delete a notification template.
      *
-     * @param int $id The ID of the notification template.
-     * @return JsonResponse
+     * @param  int  $id  The ID of the notification template.
      */
     public function destroy(int $id): JsonResponse
     {
@@ -113,8 +101,6 @@ class NotificationTemplateController extends Controller
 
     /**
      * Get the available placeholder variables for notification templates.
-     *
-     * @return JsonResponse
      */
     public function variables(): JsonResponse
     {

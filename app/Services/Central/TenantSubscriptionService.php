@@ -124,7 +124,7 @@ class TenantSubscriptionService
      */
     protected function notifyTenantSubscribed(Tenant $tenant, Plan $plan): void
     {
-        if (!empty($tenant->owner_email)) {
+        if (! empty($tenant->owner_email)) {
             $user = User::query()->where('email', $tenant->owner_email)->first();
             if ($user) {
                 $user->notify(new DynamicTemplateNotification(
@@ -152,7 +152,7 @@ class TenantSubscriptionService
      */
     protected function notifyTenantCanceled(Tenant $tenant, Plan $plan): void
     {
-        if (!empty($tenant->owner_email)) {
+        if (! empty($tenant->owner_email)) {
             $user = User::query()->where('email', $tenant->owner_email)->first();
             if ($user) {
                 $user->notify(new DynamicTemplateNotification(

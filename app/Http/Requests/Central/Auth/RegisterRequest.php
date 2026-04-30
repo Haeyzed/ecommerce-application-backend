@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Central\Auth;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
 
@@ -15,8 +16,6 @@ class RegisterRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -26,28 +25,34 @@ class RegisterRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
             /**
              * The full name of the user.
+             *
              * @var string $name
+             *
              * @example "Victor Ugwu"
              */
             'name' => ['required', 'string', 'min:2', 'max:50'],
 
             /**
              * The email address of the user.
+             *
              * @var string $email
+             *
              * @example "victor@example.com"
              */
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
 
             /**
              * The desired password (minimum 8 characters).
+             *
              * @var string $password
+             *
              * @example "SecretP@ssw0rd!"
              */
             'password' => ['required', 'confirmed', Password::min(8)],

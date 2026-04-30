@@ -19,8 +19,6 @@ class NotificationPreferenceController extends Controller
 {
     /**
      * Initialize the controller with the NotificationPreferenceService.
-     *
-     * @param NotificationPreferenceService $preferenceService
      */
     public function __construct(
         private readonly NotificationPreferenceService $preferenceService
@@ -28,15 +26,12 @@ class NotificationPreferenceController extends Controller
 
     /**
      * Get the authenticated user's notification preferences.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
         $notifiable = $request->user('customer') ?? $request->user('staff');
 
-        if (!$notifiable) {
+        if (! $notifiable) {
             return ApiResponse::error('Unauthorized', 401);
         }
 
@@ -51,15 +46,13 @@ class NotificationPreferenceController extends Controller
     /**
      * Update the authenticated user's notification preferences.
      *
-     * @param UpdateNotificationPreferencesRequest $request
-     * @return JsonResponse
      * @throws Throwable
      */
     public function update(UpdateNotificationPreferencesRequest $request): JsonResponse
     {
         $notifiable = $request->user('customer') ?? $request->user('staff');
 
-        if (!$notifiable) {
+        if (! $notifiable) {
             return ApiResponse::error('Unauthorized', 401);
         }
 
