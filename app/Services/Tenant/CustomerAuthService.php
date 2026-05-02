@@ -32,6 +32,7 @@ class CustomerAuthService
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'user_type' => 'customer',
             'is_active' => true,
         ]);
 
@@ -49,7 +50,7 @@ class CustomerAuthService
             ]
         ));
 
-        $token = $user->createToken('customer')->plainTextToken;
+        $token = $user->createToken('customer', ['customer:access'])->plainTextToken;
 
         return [
             'user' => $user,
@@ -67,7 +68,10 @@ class CustomerAuthService
      */
     public function login(array $credentials): array
     {
-        $user = User::query()->where('email', $credentials['email'])->first();
+        $user = User::query()
+            ->where('email', $credentials['email'])
+            ->where('user_type', 'customer')
+            ->first();
 
         if (! $user || ! Hash::check($credentials['password'], $user->password)) {
             throw ValidationException::withMessages([
@@ -81,7 +85,7 @@ class CustomerAuthService
             ]);
         }
 
-        $token = $user->createToken('customer')->plainTextToken;
+        $token = $user->createToken('customer', ['customer:access'])->plainTextToken;
 
         return [
             'user' => $user,
@@ -173,7 +177,10 @@ class CustomerAuthService
     public function handleSocialLogin(string $provider, SocialiteUser $socialUser): array
     {
         $user = User::query()->firstOrCreate(
-            ['email' => $socialUser->getEmail()],
+            [
+                'email' => $socialUser->getEmail(),
+                'user_type' => 'customer'
+            ],
             [
                 'name' => $socialUser->getName() ?? $socialUser->getNickname() ?? 'Customer',
                 'provider' => $provider,
@@ -195,7 +202,7 @@ class CustomerAuthService
             'user_id' => $user->id,
         ]);
 
-        $token = $user->createToken('customer')->plainTextToken;
+        $token = $user->createToken('customer', ['customer:access'])->plainTextToken;
 
         return [
             'user' => $user,

@@ -22,6 +22,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property int $id The unique identifier of the user.
  * @property string $name The full name of the user.
  * @property string $email The user's email address.
+ * @property string $user_type The type of user ('customer' or 'staff').
  * @property Carbon|null $email_verified_at Timestamp of when the email was verified.
  * @property string $password The hashed password of the user.
  * @property string|null $provider The OAuth provider used for registration (e.g., google, github).
@@ -49,6 +50,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'user_type',
         'is_active',
         'provider',
         'provider_id',

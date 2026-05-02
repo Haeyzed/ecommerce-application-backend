@@ -34,7 +34,8 @@ class StaffAuthService
         $user = User::query()->create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'password' => $data['password'],
+            'password' => $data['password'] ?? $rawPassword,
+            'user_type' => 'staff',
             'is_active' => true,
         ]);
 
@@ -58,7 +59,7 @@ class StaffAuthService
             ]
         ));
 
-        $token = $user->createToken('staff')->plainTextToken;
+        $token = $user->createToken('staff', ['staff:access'])->plainTextToken;
 
         return [
             'user' => $user,
@@ -80,6 +81,7 @@ class StaffAuthService
     {
         $user = User::query()
             ->where('email', $credentials['email'])
+            ->where('user_type', 'staff')
             ->whereHas('staff')
             ->first();
 
@@ -95,7 +97,7 @@ class StaffAuthService
             ]);
         }
 
-        $token = $user->createToken('staff')->plainTextToken;
+        $token = $user->createToken('staff', ['staff:access'])->plainTextToken;
 
         return [
             'user' => $user->load('staff'),

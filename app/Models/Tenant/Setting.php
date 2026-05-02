@@ -32,9 +32,9 @@ use Spatie\MediaLibrary\HasMedia;
  * @property Carbon|null $created_at Timestamp of when the settings were created.
  * @property Carbon|null $updated_at Timestamp of when the settings were last updated.
  */
-class Setting extends Model implements AuditableContract//, HasMedia
+class Setting extends Model implements AuditableContract, HasMedia
 {
-    use Auditable;//, HasTenantMedia;
+    use Auditable, HasTenantMedia;
 
     /**
      * The attributes that are mass assignable.

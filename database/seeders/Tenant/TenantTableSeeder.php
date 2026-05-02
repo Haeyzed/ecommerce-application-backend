@@ -28,7 +28,7 @@ class TenantTableSeeder extends Seeder
     private function seedRolesAndPermissions(): void
     {
         $matrix = config('roles.tenant');
-        $guards = config('roles.guards', ['web']);
+        $guards = config('roles.guards', ['web', 'sanctum']); // Added sanctum just in case
 
         if (! is_array($matrix)) {
             throw new InvalidArgumentException('The config value [roles.tenant] must be an array. Check config/roles.php.');
@@ -194,32 +194,6 @@ class TenantTableSeeder extends Seeder
                             'access_token' => 'sq0atp_...',
                             'location_id' => 'live_location_...',
                         ],
-                    ],
-                ]),
-                'storage_provider' => 'public',
-                'storage_settings' => json_encode([
-                    'public' => [
-                        'enabled' => true,
-                    ],
-                    's3' => [
-                        'enabled' => false,
-                        'key' => 'your-aws-access-key-id',
-                        'secret' => 'your-aws-secret-access-key',
-                        'region' => 'us-east-1',
-                        'bucket' => 'your-aws-bucket',
-                        'url' => null,
-                        'endpoint' => null,
-                        'use_path_style_endpoint' => false,
-                    ],
-                    'digitalocean' => [
-                        'enabled' => false,
-                        'key' => 'your-do-access-key-id',
-                        'secret' => 'your-do-secret-access-key',
-                        'region' => 'nyc3',
-                        'bucket' => 'your-do-bucket',
-                        'url' => null,
-                        'endpoint' => 'https://nyc3.digitaloceanspaces.com',
-                        'use_path_style_endpoint' => false,
                     ],
                 ]),
                 'contact_email' => null,

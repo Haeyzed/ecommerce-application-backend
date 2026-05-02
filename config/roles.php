@@ -20,6 +20,5 @@ return [
             'payroll.*', 'departments.*', 'positions.*',
         ],
         'staff'    => ['products.view', 'orders.view', 'orders.update', 'inventory.view'],
-        'customer' => ['storefront.*'],
     ],
 ];
