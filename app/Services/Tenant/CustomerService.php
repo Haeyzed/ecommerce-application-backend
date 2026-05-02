@@ -61,6 +61,7 @@ class CustomerService
                 ['email' => $data['email']],
                 [
                     'name' => $data['name'],
+                    'user_type' => 'customer',
                     'password' => Hash::make($data['password']),
                 ]
             );
