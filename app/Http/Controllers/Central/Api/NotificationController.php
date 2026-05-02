@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Central\Api;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Central\StoreNotificationTemplateRequest;
 use App\Http\Requests\Central\UpdateNotificationPreferencesRequest;
@@ -11,6 +12,7 @@ use App\Http\Resources\Central\NotificationTemplateResource;
 use App\Models\Central\NotificationTemplate;
 use App\Services\Central\NotificationPreferenceService;
 use App\Services\Central\NotificationTemplateService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
@@ -100,5 +102,17 @@ class NotificationController extends Controller
         $preferences = $this->preferenceService->getPreferencesFor($request->user());
 
         return NotificationPreferenceResource::collection($preferences);
+    }
+
+    /**
+     * List notification templates as dropdown options.
+     *
+     * Returns templates with value (id) and label (name – event).
+     */
+    public function dropdown(): JsonResponse
+    {
+        $options = $this->templateService->getDropdownOptions();
+
+        return ApiResponse::success($options, 'Notification template dropdown options retrieved successfully');
     }
 }

@@ -4,13 +4,12 @@ namespace Database\Seeders\Central;
 
 use App\Models\Central\Plan;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class CentralTableSeeder extends Seeder
 {
@@ -191,30 +190,30 @@ class CentralTableSeeder extends Seeder
                 ]),
                 'payment_providers' => json_encode([
                     'stripe' => [
-                        'enabled'   => false,
+                        'enabled' => false,
                         'test_mode' => true,
-                        'test'      => [
-                            'public_key'     => 'pk_test_stripe_...',
-                            'secret_key'     => 'sk_test_stripe_...',
+                        'test' => [
+                            'public_key' => 'pk_test_stripe_...',
+                            'secret_key' => 'sk_test_stripe_...',
                             'webhook_secret' => 'whsec_test_stripe_...',
                         ],
-                        'live'      => [
-                            'public_key'     => 'pk_live_stripe_...',
-                            'secret_key'     => 'sk_live_stripe_...',
+                        'live' => [
+                            'public_key' => 'pk_live_stripe_...',
+                            'secret_key' => 'sk_live_stripe_...',
                             'webhook_secret' => 'whsec_live_stripe_...',
-                        ]
+                        ],
                     ],
                     'paypal' => [
-                        'enabled'   => false,
+                        'enabled' => false,
                         'test_mode' => true,
-                        'test'      => [
+                        'test' => [
                             'client_id' => 'client_test_paypal_...',
-                            'secret'    => 'secret_test_paypal_...',
+                            'secret' => 'secret_test_paypal_...',
                         ],
-                        'live'      => [
+                        'live' => [
                             'client_id' => 'client_live_paypal_...',
-                            'secret'    => 'secret_live_paypal_...',
-                        ]
+                            'secret' => 'secret_live_paypal_...',
+                        ],
                     ],
                 ]),
                 'contact_email' => null,
@@ -263,7 +262,7 @@ class CentralTableSeeder extends Seeder
                 'seo_title' => 'Terms and Conditions',
                 'seo_description' => 'Read our terms and conditions.',
                 'is_published' => true,
-            ]
+            ],
         ];
 
         foreach ($pages as $page) {
@@ -302,7 +301,7 @@ class CentralTableSeeder extends Seeder
             [
                 'name' => 'Feature Updates',
                 'description' => 'Updates about new features.',
-            ]
+            ],
         ];
 
         foreach ($categories as $category) {
@@ -381,7 +380,7 @@ class CentralTableSeeder extends Seeder
                 'subject' => 'Password Reset Request',
                 'body' => "Hello {name},\n\nWe received a request to reset your password. Please use the following link to reset it: \n\n**{url}**\n\nIf you did not request this, please ignore this email.",
                 'is_active' => true,
-            ]
+            ],
         ];
 
         foreach ($templates as $template) {
@@ -393,6 +392,13 @@ class CentralTableSeeder extends Seeder
                 [
                     'subject' => $template['subject'],
                     'body' => $template['body'],
+                    'greeting' => $template['greeting'] ?? 'Hello,',
+                    'closing' => $template['closing'] ?? 'Best regards,',
+                    'sign_off' => $template['sign_off'] ?? config('app.name'),
+                    'logo_url' => $template['logo_url'] ?? null,
+                    'logo_alt' => $template['logo_alt'] ?? 'Logo',
+                    'header_bg_color' => $template['header_bg_color'] ?? '#1e2b2e',
+                    'accent_color' => $template['accent_color'] ?? '#73bc1c',
                     'is_active' => $template['is_active'],
                     'created_at' => now(),
                     'updated_at' => now(),

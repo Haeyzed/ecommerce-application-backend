@@ -6,6 +6,7 @@ use App\Models\Central\Tenant;
 use App\Models\Central\User;
 use App\Notifications\Central\DynamicTemplateNotification;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
@@ -114,5 +115,21 @@ class TenantService
     public function deleteTenant(Tenant $tenant): void
     {
         $tenant->delete();
+    }
+
+    /**
+     * Retrieve all tenants as dropdown options.
+     *
+     * @return SupportCollection<int, array{value: string, label: string}>
+     */
+    public function getDropdownOptions(): SupportCollection
+    {
+        return Tenant::query()
+            ->orderBy('id')
+            ->get(['id', 'name'])
+            ->map(fn (Tenant $tenant): array => [
+                'value' => $tenant->id,
+                'label' => $tenant->name ?? $tenant->id,
+            ]);
     }
 }

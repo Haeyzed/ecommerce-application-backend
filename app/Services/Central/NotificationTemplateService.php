@@ -4,6 +4,7 @@ namespace App\Services\Central;
 
 use App\Models\Central\NotificationTemplate;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection as SupportCollection;
 
 /**
  * Class NotificationTemplateService
@@ -83,5 +84,21 @@ class NotificationTemplateService
                 'url' => 'Password reset URL',
             ],
         ];
+    }
+
+    /**
+     * Retrieve notification templates as dropdown options.
+     *
+     * @return SupportCollection<int, array{value: int, label: string}>
+     */
+    public function getDropdownOptions(): SupportCollection
+    {
+        return NotificationTemplate::query()
+            ->orderBy('name')
+            ->get(['id', 'name', 'event'])
+            ->map(fn (NotificationTemplate $template): array => [
+                'value' => $template->id,
+                'label' => $template->name.' ('.$template->event.')',
+            ]);
     }
 }

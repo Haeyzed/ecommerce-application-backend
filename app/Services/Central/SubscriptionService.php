@@ -8,6 +8,7 @@ use App\Models\Central\Plan;
 use App\Models\Central\Subscription;
 use App\Models\Central\Tenant;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Str;
 
 /**
@@ -83,5 +84,19 @@ class SubscriptionService
             'status' => 'open',
             'issued_at' => now(),
         ]);
+    }
+
+    /**
+     * Retrieve subscription status enum values as dropdown options.
+     *
+     * @return SupportCollection<int, array{value: string, label: string}>
+     */
+    public function getStatusDropdownOptions(): SupportCollection
+    {
+        return collect(SubscriptionStatus::cases())
+            ->map(fn (SubscriptionStatus $status): array => [
+                'value' => $status->value,
+                'label' => ucwords(str_replace('_', ' ', $status->value)),
+            ]);
     }
 }

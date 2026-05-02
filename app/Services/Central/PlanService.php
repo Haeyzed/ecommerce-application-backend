@@ -4,6 +4,7 @@ namespace App\Services\Central;
 
 use App\Models\Central\Plan;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection as SupportCollection;
 
 /**
  * Class PlanService
@@ -13,8 +14,6 @@ class PlanService
 {
     /**
      * Retrieve all plans ordered by price.
-     *
-     * @return Collection
      */
     public function getAllPlans(): Collection
     {
@@ -24,8 +23,7 @@ class PlanService
     /**
      * Create a new subscription plan.
      *
-     * @param array $data Validated plan data.
-     * @return Plan
+     * @param  array  $data  Validated plan data.
      */
     public function createPlan(array $data): Plan
     {
@@ -34,9 +32,6 @@ class PlanService
 
     /**
      * Retrieve a specific plan.
-     *
-     * @param Plan $plan
-     * @return Plan
      */
     public function getPlanDetails(Plan $plan): Plan
     {
@@ -46,9 +41,7 @@ class PlanService
     /**
      * Update an existing subscription plan.
      *
-     * @param Plan $plan
-     * @param array $data Validated update data.
-     * @return Plan
+     * @param  array  $data  Validated update data.
      */
     public function updatePlan(Plan $plan, array $data): Plan
     {
@@ -59,12 +52,26 @@ class PlanService
 
     /**
      * Delete a subscription plan.
-     *
-     * @param Plan $plan
-     * @return void
      */
     public function deletePlan(Plan $plan): void
     {
         $plan->delete();
+    }
+
+    /**
+     * Retrieve active plans as dropdown options.
+     *
+     * @return SupportCollection<int, array{value: int, label: string}>
+     */
+    public function getDropdownOptions(): SupportCollection
+    {
+        return Plan::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name'])
+            ->map(fn (Plan $plan): array => [
+                'value' => $plan->id,
+                'label' => $plan->name,
+            ]);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Central\Api;
 
+use App\Enums\Central\RoleEnum;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Central\Subscription\StartTrialRequest;
@@ -98,5 +99,33 @@ class SubscriptionController extends Controller
             null,
             201
         );
+    }
+
+    /**
+     * List subscription statuses as dropdown options.
+     *
+     * Returns all possible subscription status enum values.
+     */
+    public function statusDropdown(): JsonResponse
+    {
+        $options = $this->subscriptionService->getStatusDropdownOptions();
+
+        return ApiResponse::success($options, 'Subscription status dropdown options retrieved successfully');
+    }
+
+    /**
+     * List roles as dropdown options.
+     *
+     * Returns all central platform roles.
+     */
+    public function roleDropdown(): JsonResponse
+    {
+        $options = collect(RoleEnum::cases())
+            ->map(fn (RoleEnum $role): array => [
+                'value' => $role->value,
+                'label' => ucwords(str_replace('-', ' ', $role->value)),
+            ]);
+
+        return ApiResponse::success($options, 'Role dropdown options retrieved successfully');
     }
 }

@@ -578,6 +578,13 @@ class TenantTableSeeder extends Seeder
                 [
                     'subject' => $template['subject'],
                     'body' => $template['body'],
+                    'greeting' => $template['greeting'] ?? 'Hello,',
+                    'closing' => $template['closing'] ?? 'Best regards,',
+                    'sign_off' => $template['sign_off'] ?? config('app.name'),
+                    'logo_url' => $template['logo_url'] ?? null,
+                    'logo_alt' => $template['logo_alt'] ?? 'Logo',
+                    'header_bg_color' => $template['header_bg_color'] ?? '#1e2b2e',
+                    'accent_color' => $template['accent_color'] ?? '#73bc1c',
                     'is_active' => $template['is_active'],
                     'created_at' => now(),
                     'updated_at' => now(),

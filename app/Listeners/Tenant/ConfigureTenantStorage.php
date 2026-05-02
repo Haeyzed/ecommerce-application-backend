@@ -4,6 +4,7 @@ namespace App\Listeners\Tenant;
 
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Stancl\Tenancy\Events\TenancyInitialized;
 
 class ConfigureTenantStorage
@@ -13,6 +14,10 @@ class ConfigureTenantStorage
      */
     public function handle(TenancyInitialized $event): void
     {
+        if (! Schema::hasTable('settings')) {
+            return;
+        }
+
         $settings = DB::table('settings')->where('id', 1)->first();
 
         if (! $settings || ! isset($settings->storage_provider)) {

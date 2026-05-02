@@ -90,4 +90,16 @@ class TenantController extends Controller
 
         return ApiResponse::success(null, 'Tenant deleted successfully');
     }
+
+    /**
+     * List tenants as dropdown options.
+     *
+     * Returns all tenants with value (id) and label (name).
+     */
+    public function dropdown(): JsonResponse
+    {
+        $options = $this->tenantService->getDropdownOptions();
+
+        return ApiResponse::success($options, 'Tenant dropdown options retrieved successfully');
+    }
 }

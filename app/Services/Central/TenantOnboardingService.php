@@ -12,7 +12,9 @@ use App\Notifications\Central\DynamicTemplateNotification;
 use Database\Seeders\Tenant\TenantTableSeeder;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -70,6 +72,13 @@ class TenantOnboardingService
             ]);
 
             /*
+             * Register the subdomain in the local hosts file (development only).
+             */
+            if (app()->environment('local')) {
+                $this->registerLocalDomain($tenantDomain);
+            }
+
+            /*
              * Boot tenant context and seed roles + owner inside the tenant DB.
              */
             $tenant->run(function () use ($payload, $subdomain, $rawPassword) {
@@ -96,15 +105,29 @@ class TenantOnboardingService
                     'notes' => 'Tenant owner profile created during onboarding.',
                 ]);
 
+                $settingsData = [
+                    'currency' => $payload['currency'] ?? 'USD',
+                    'timezone' => $payload['timezone'] ?? 'UTC',
+                    'language' => $payload['language'] ?? 'en',
+                    'name' => $payload['name'],
+                    'tagline' => $payload['tagline'] ?? null,
+                ];
+
+                if (! empty($payload['storage_provider'])) {
+                    $settingsData['storage_provider'] = $payload['storage_provider'];
+                }
+
+                if (! empty($payload['storage_settings'])) {
+                    $settingsData['storage_settings'] = json_encode($payload['storage_settings']);
+                }
+
+                if (! empty($payload['payment_providers'])) {
+                    $settingsData['payment_providers'] = json_encode($payload['payment_providers']);
+                }
+
                 Setting::query()->updateOrCreate(
                     ['id' => 1],
-                    [
-                        'currency' => $payload['currency'] ?? 'USD',
-                        'timezone' => $payload['timezone'] ?? 'UTC',
-                        'language' => $payload['language'] ?? 'en',
-                        'name' => $payload['name'],
-                        'tagline' => $payload['tagline'] ?? null,
-                    ]
+                    $settingsData
                 );
             });
 
@@ -137,5 +160,28 @@ class TenantOnboardingService
 
             return $tenant->fresh('domains');
         });
+    }
+
+    /**
+     * Add a subdomain entry to the Windows hosts file and flush DNS.
+     */
+    private function registerLocalDomain(string $domain): void
+    {
+        $hostsFile = 'C:\\Windows\\System32\\drivers\\etc\\hosts';
+        $entry = "127.0.0.1 {$domain}";
+
+        try {
+            $contents = file_get_contents($hostsFile);
+
+            if ($contents !== false && ! str_contains($contents, $entry)) {
+                file_put_contents($hostsFile, PHP_EOL.$entry, FILE_APPEND);
+
+                Process::run('ipconfig /flushdns');
+
+                Log::info("Local hosts entry added for [{$domain}] and DNS cache flushed.");
+            }
+        } catch (Throwable $e) {
+            Log::warning("Could not register local domain [{$domain}]: {$e->getMessage()}");
+        }
     }
 }

@@ -9,7 +9,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\HtmlString;
 
 /**
  * Class DynamicTemplateNotification
@@ -47,6 +46,10 @@ class DynamicTemplateNotification extends Notification implements ShouldQueue
 
     /**
      * Build the mail representation of the notification.
+     *
+     * Uses the custom `emails.notification` Blade view instead of Laravel's
+     * default markdown layout so the received email matches the exact design
+     * defined in the project's HTML template.
      */
     public function toMail(mixed $notifiable): MailMessage
     {
@@ -72,7 +75,17 @@ class DynamicTemplateNotification extends Notification implements ShouldQueue
 
         return (new MailMessage)
             ->subject($subject)
-            ->line(new HtmlString($formattedBody));
+            ->view('emails.notification', [
+                'body' => $formattedBody,
+                'subject' => $subject,
+                'greeting' => $template->greeting ?? $this->templateData['greeting'] ?? 'Hello,',
+                'closing' => $template->closing ?? $this->templateData['closing'] ?? 'Best regards,',
+                'signOff' => $template->sign_off ?? $this->templateData['sign_off'] ?? config('app.name'),
+                'logoUrl' => $template->logo_url ?? $this->templateData['logo_url'] ?? null,
+                'logoAlt' => $template->logo_alt ?? $this->templateData['logo_alt'] ?? 'Logo',
+                'headerBgColor' => $template->header_bg_color ?? $this->templateData['header_bg_color'] ?? '#1e2b2e',
+                'accentColor' => $template->accent_color ?? $this->templateData['accent_color'] ?? '#73bc1c',
+            ]);
     }
 
     /**

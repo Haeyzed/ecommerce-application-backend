@@ -17,9 +17,16 @@ return new class extends Migration
             $table->string('channel'); // matches notification_channels.key
             $table->string('subject')->nullable();
             $table->longText('body');
+            $table->string('greeting')->nullable();
+            $table->string('closing')->nullable();
+            $table->string('sign_off')->nullable();
+            $table->string('logo_url')->nullable();
+            $table->string('logo_alt')->nullable();
+            $table->string('header_bg_color')->nullable();
+            $table->string('accent_color')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-            $table->unique(['event','channel']);
+            $table->unique(['event', 'channel']);
         });
     }
 

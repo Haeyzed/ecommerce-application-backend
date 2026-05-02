@@ -4,11 +4,6 @@ namespace App\Http\Requests\Central\Subscription;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-/**
- * @property string $tenant_id The ID of the tenant.
- * @property int $plan_id The ID of the plan.
- * @property int|null $trial_days The number of trial days.
- */
 class StartTrialRequest extends FormRequest
 {
     public function authorize(): bool

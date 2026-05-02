@@ -91,4 +91,16 @@ class PlanController extends Controller
 
         return ApiResponse::success(null, 'Plan deleted successfully');
     }
+
+    /**
+     * List plans as dropdown options.
+     *
+     * Returns active plans with value (id) and label (name).
+     */
+    public function dropdown(): JsonResponse
+    {
+        $options = $this->planService->getDropdownOptions();
+
+        return ApiResponse::success($options, 'Plan dropdown options retrieved successfully');
+    }
 }

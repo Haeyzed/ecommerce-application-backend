@@ -17,7 +17,7 @@ use Illuminate\Http\Request;
 
 /**
  * Attendance Endpoints
- * * Handles employee check-ins, check-outs, and timesheet records.
+ * Handles employee check-ins, check-outs, and timesheet records.
  */
 class AttendanceController extends Controller
 {

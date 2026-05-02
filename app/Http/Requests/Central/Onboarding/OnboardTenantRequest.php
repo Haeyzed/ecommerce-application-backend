@@ -146,6 +146,84 @@ class OnboardTenantRequest extends FormRequest
              * @example 14
              */
             'trial_days' => ['nullable', 'integer', 'min:1', 'max:90'],
+
+            /**
+             * A short tagline for the store.
+             *
+             * @var string|null $tagline
+             *
+             * @example "Your trusted online store"
+             */
+            'tagline' => ['nullable', 'string', 'max:255'],
+
+            /**
+             * The active storage provider.
+             *
+             * @var string|null $storage_provider
+             *
+             * @example "public"
+             */
+            'storage_provider' => ['nullable', 'string', Rule::in(['public', 's3', 'digitalocean'])],
+
+            /**
+             * Storage provider configuration keyed by provider name.
+             *
+             * Structure follows the tenant settings seed format:
+             * ```
+             * {
+             *   "public":        { "enabled": true },
+             *   "s3":            { "enabled": false, "key": "…", "secret": "…", "region": "…", "bucket": "…", "url": null, "endpoint": null, "use_path_style_endpoint": false },
+             *   "digitalocean":  { "enabled": false, "key": "…", "secret": "…", "region": "…", "bucket": "…", "url": null, "endpoint": "…", "use_path_style_endpoint": false }
+             * }
+             * ```
+             *
+             * @var array|null $storage_settings
+             */
+            'storage_settings' => ['nullable', 'array'],
+            'storage_settings.public' => ['nullable', 'array'],
+            'storage_settings.public.enabled' => ['nullable', 'boolean'],
+            'storage_settings.s3' => ['nullable', 'array'],
+            'storage_settings.s3.enabled' => ['nullable', 'boolean'],
+            'storage_settings.s3.key' => ['nullable', 'string'],
+            'storage_settings.s3.secret' => ['nullable', 'string'],
+            'storage_settings.s3.region' => ['nullable', 'string'],
+            'storage_settings.s3.bucket' => ['nullable', 'string'],
+            'storage_settings.s3.url' => ['nullable', 'string'],
+            'storage_settings.s3.endpoint' => ['nullable', 'string'],
+            'storage_settings.s3.use_path_style_endpoint' => ['nullable', 'boolean'],
+            'storage_settings.digitalocean' => ['nullable', 'array'],
+            'storage_settings.digitalocean.enabled' => ['nullable', 'boolean'],
+            'storage_settings.digitalocean.key' => ['nullable', 'string'],
+            'storage_settings.digitalocean.secret' => ['nullable', 'string'],
+            'storage_settings.digitalocean.region' => ['nullable', 'string'],
+            'storage_settings.digitalocean.bucket' => ['nullable', 'string'],
+            'storage_settings.digitalocean.url' => ['nullable', 'string'],
+            'storage_settings.digitalocean.endpoint' => ['nullable', 'string'],
+            'storage_settings.digitalocean.use_path_style_endpoint' => ['nullable', 'boolean'],
+
+            /**
+             * Payment provider configuration keyed by provider name.
+             *
+             * Structure follows the tenant settings seed format:
+             * ```
+             * {
+             *   "stripe":      { "enabled": false, "test_mode": true, "test": { "public_key": "…", "secret_key": "…", "webhook_secret": "…" }, "live": { … } },
+             *   "paypal":      { "enabled": false, "test_mode": true, "test": { "client_id": "…", "secret": "…" }, "live": { … } },
+             *   "paystack":    { "enabled": false, "test_mode": true, "test": { "public_key": "…", "secret_key": "…" }, "live": { … } },
+             *   "flutterwave": { "enabled": false, "test_mode": true, "test": { "public_key": "…", "secret_key": "…", "encryption_key": "…" }, "live": { … } },
+             *   "razorpay":    { "enabled": false, "test_mode": true, "test": { "key_id": "…", "key_secret": "…" }, "live": { … } },
+             *   "square":      { "enabled": false, "test_mode": true, "test": { "application_id": "…", "access_token": "…", "location_id": "…" }, "live": { … } }
+             * }
+             * ```
+             *
+             * @var array|null $payment_providers
+             */
+            'payment_providers' => ['nullable', 'array'],
+            'payment_providers.*' => ['nullable', 'array'],
+            'payment_providers.*.enabled' => ['nullable', 'boolean'],
+            'payment_providers.*.test_mode' => ['nullable', 'boolean'],
+            'payment_providers.*.test' => ['nullable', 'array'],
+            'payment_providers.*.live' => ['nullable', 'array'],
         ];
     }
 }
