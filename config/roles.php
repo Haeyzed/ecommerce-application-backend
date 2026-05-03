@@ -19,6 +19,6 @@ return [
             'inventory.*', 'reports.view', 'employees.*', 'leaves.*',
             'payroll.*', 'departments.*', 'positions.*',
         ],
-        'staff'    => ['products.view', 'orders.view', 'orders.update', 'inventory.view'],
+        'admin'    => ['products.view', 'orders.view', 'orders.update', 'inventory.view'],
     ],
 ];

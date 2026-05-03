@@ -25,7 +25,7 @@ class UpdateEmployeeRequest extends FormRequest
     {
         return [
             /**
-             * The ID of the linked staff user account.
+             * The ID of the linked admin user account.
              *
              * @var int|null $staff_id
              *

@@ -482,10 +482,10 @@ class TenantTableSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'event' => 'staff_registered',
+                'event' => 'admin_registered',
                 'channel' => 'email',
                 'subject' => 'Welcome to the Team!',
-                'body' => "Hello {name},\n\nYour staff account at {store_name} has been set up by the administrator.\n\nPlease log in to the staff portal using the following credentials:\nEmail: {email}\nPassword: {password}\n\nFor security reasons, we recommend changing your password after your first login.\n\nWelcome aboard!",
+                'body' => "Hello {name},\n\nYour admin account at {store_name} has been set up by the administrator.\n\nPlease log in to the admin portal using the following credentials:\nEmail: {email}\nPassword: {password}\n\nFor security reasons, we recommend changing your password after your first login.\n\nWelcome aboard!",
                 'is_active' => true,
             ],
             [

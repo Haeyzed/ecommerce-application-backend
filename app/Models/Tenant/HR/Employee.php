@@ -18,7 +18,7 @@ use Spatie\MediaLibrary\HasMedia;
 /**
  * Class Employee
  *
- * Represents a staff member inside the tenant's HR system.
+ * Represents a admin member inside the tenant's HR system.
  *
  * @property int $id The unique identifier of the employee.
  * @property int|null $staff_id The linked Staff account ID (if they have login access).
@@ -37,7 +37,7 @@ use Spatie\MediaLibrary\HasMedia;
  * @property bool $is_active Indicates if the employee is currently active.
  * @property Carbon|null $created_at Timestamp of when the record was created.
  * @property Carbon|null $updated_at Timestamp of when the record was last updated.
- * @property-read Staff|null $staff The system user account tied to this employee.
+ * @property-read Staff|null $admin The system user account tied to this employee.
  * @property-read Department|null $department The department this employee belongs to.
  * @property-read Position|null $position The position held by this employee.
  * @property-read Collection|Attendance[] $attendances The attendance records of the employee.
@@ -112,7 +112,7 @@ class Employee extends Model implements AuditableContract, HasMedia
     }
 
     /**
-     * Get the staff user account tied to this employee.
+     * Get the admin user account tied to this employee.
      */
     public function staff(): BelongsTo
     {

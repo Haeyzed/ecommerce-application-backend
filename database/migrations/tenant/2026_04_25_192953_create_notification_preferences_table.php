@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('notification_preferences', function (Blueprint $table) {
             $table->id();
-            $table->morphs('notifiable'); // customer or staff
+            $table->morphs('notifiable'); // customer or admin
             $table->string('event');
             $table->string('channel');
             $table->boolean('enabled')->default(true);

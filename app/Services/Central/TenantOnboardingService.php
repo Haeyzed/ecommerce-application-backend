@@ -12,6 +12,7 @@ use App\Notifications\Central\DynamicTemplateNotification;
 use Database\Seeders\Tenant\TenantTableSeeder;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Process;
@@ -24,7 +25,7 @@ use Throwable;
  * Handles end-to-end tenant onboarding:
  * 1. Creates Tenant record.
  * 2. Attaches the default `<subdomain>.<central_domain>` domain.
- * 3. Inside the tenant connection: seeds roles, creates owner user, creates staff profile, writes settings.
+ * 3. Inside the tenant connection: seeds roles, creates owner user, creates admin profile, writes settings.
  * 4. Starts a trial subscription on the chosen plan.
  */
 class TenantOnboardingService
@@ -84,7 +85,8 @@ class TenantOnboardingService
                 $ownerUser = User::query()->create([
                     'name' => $payload['owner_name'] ?? 'Owner',
                     'email' => $payload['owner_email'] ?? "owner@{$subdomain}.local",
-                    'password' => $rawPassword,
+                    'password' => Hash::make($rawPassword),
+                    'user_type' => 'admin',
                     'is_active' => true,
                 ]);
 

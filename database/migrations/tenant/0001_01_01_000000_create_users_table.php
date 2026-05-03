@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email');
-            $table->string('user_type')->default('customer'); // 'customer' or 'staff'
+            $table->string('user_type')->default('customer'); // 'customer' or 'admin'
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
             $table->boolean('is_active')->default(true);
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            // Allow same email for customer and staff, but not two customers with same email
+            // Allow same email for customer and admin, but not two customers with same email
             $table->unique(['email', 'user_type']);
         });
 

@@ -19,7 +19,7 @@ class DynamicTemplateNotification extends Notification implements ShouldQueue
     use Queueable;
 
     /**
-     * @param  string  $event  The event name (e.g., 'staff_registered', 'leave_approved')
+     * @param  string  $event  The event name (e.g., 'admin_registered', 'leave_approved')
      * @param  array  $templateData  The key-value pairs to swap into the template
      */
     public function __construct(

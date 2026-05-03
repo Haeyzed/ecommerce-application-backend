@@ -73,7 +73,7 @@ Route::middleware([
     });
 
     // --- Staff Auth ---
-    Route::prefix('staff')->name('staff.')->group(function () {
+    Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/register', [StaffAuthController::class, 'register'])->name('register');
         Route::post('/login', [StaffAuthController::class, 'login'])->name('login');
         Route::post('/forgot-password', [StaffAuthController::class, 'forgotPassword'])->name('password.email');
@@ -82,7 +82,7 @@ Route::middleware([
             ->middleware(['signed', 'throttle:6,1'])
             ->name('verification.verify');
 
-        Route::middleware(['auth:sanctum', 'ability:staff:access'])->group(function () {
+        Route::middleware(['auth:sanctum', 'ability:admin:access'])->group(function () {
             Route::post('/logout', [StaffAuthController::class, 'logout'])->name('logout');
             Route::get('/me', [StaffAuthController::class, 'me'])->name('me');
             Route::post('/email/verification-notification', [StaffAuthController::class, 'resendVerification'])
@@ -93,19 +93,19 @@ Route::middleware([
 
     // --- Authenticated Features (Shared Staff & Customer) ---
     // Note: If you want shared routes, they need either no strict ability check OR an 'abilities' check
-    // that accepts both 'customer:access' and 'staff:access'.
+    // that accepts both 'customer:access' and 'admin:access'.
     Route::middleware(['auth:sanctum'])->group(function () {
 
         // General Store Settings Update
-        Route::post('/settings', [SettingController::class, 'update'])->name('settings.update')->middleware('ability:staff:access');
+        Route::post('/settings', [SettingController::class, 'update'])->name('settings.update')->middleware('ability:admin:access');
 
         // Mail Settings
-        Route::prefix('settings/mail')->name('settings.mail.')->middleware('ability:staff:access')->group(function () {
+        Route::prefix('settings/mail')->name('settings.mail.')->middleware('ability:admin:access')->group(function () {
             Route::get('/', [MailSettingController::class, 'show'])->name('show');
             Route::put('/', [MailSettingController::class, 'update'])->name('update');
         });
 
-        // Notification Preferences (Both staff and customer might have this)
+        // Notification Preferences (Both admin and customer might have this)
         Route::prefix('notifications/preferences')->name('notifications.preferences.')->group(function () {
             Route::get('/', [NotificationPreferenceController::class, 'index'])->name('index');
             Route::put('/', [NotificationPreferenceController::class, 'update'])->name('update');
@@ -113,7 +113,7 @@ Route::middleware([
     });
 
     // --- HR Module (Protected Staff) ---
-    Route::middleware(['auth:sanctum', 'ability:staff:access'])->prefix('hr')->name('hr.')->group(function () {
+    Route::middleware(['auth:sanctum', 'ability:admin:access'])->prefix('hr')->name('hr.')->group(function () {
 
         Route::prefix('departments')->name('departments.')->group(function () {
             Route::get('/', [DepartmentController::class, 'index'])->name('index');
@@ -215,7 +215,7 @@ Route::middleware([
     Route::prefix('pages')->name('pages.')->group(function () {
         Route::get('/public/{slug}', [PageController::class, 'showPublic'])->name('show.public');
 
-        Route::middleware(['auth:sanctum', 'ability:staff:access'])->group(function () {
+        Route::middleware(['auth:sanctum', 'ability:admin:access'])->group(function () {
             Route::get('/', [PageController::class, 'index'])->name('index');
             Route::get('/{id}', [PageController::class, 'show'])->name('show');
             Route::post('/', [PageController::class, 'store'])->name('store');
@@ -233,7 +233,7 @@ Route::middleware([
         Route::post('/posts/{slug}/comments', [BlogController::class, 'publicComment'])->name('posts.comments.public');
         Route::get('/categories', [BlogController::class, 'categoriesIndex'])->name('categories.index');
 
-        Route::middleware(['auth:sanctum', 'ability:staff:access'])->group(function () {
+        Route::middleware(['auth:sanctum', 'ability:admin:access'])->group(function () {
             Route::post('/posts', [BlogController::class, 'store'])->name('posts.store');
             Route::put('/posts/{id}', [BlogController::class, 'update'])->name('posts.update');
             Route::delete('/posts/{id}', [BlogController::class, 'destroy'])->name('posts.destroy');

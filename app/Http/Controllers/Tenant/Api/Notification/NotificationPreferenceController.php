@@ -13,7 +13,7 @@ use Throwable;
 
 /**
  * Notification Preference Endpoints
- * * Handles the management of user and staff notification opt-ins and opt-outs.
+ * * Handles the management of user and admin notification opt-ins and opt-outs.
  */
 class NotificationPreferenceController extends Controller
 {
@@ -29,7 +29,7 @@ class NotificationPreferenceController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $notifiable = $request->user('customer') ?? $request->user('staff');
+        $notifiable = $request->user('customer') ?? $request->user('admin');
 
         if (! $notifiable) {
             return ApiResponse::error('Unauthorized', 401);
@@ -50,7 +50,7 @@ class NotificationPreferenceController extends Controller
      */
     public function update(UpdateNotificationPreferencesRequest $request): JsonResponse
     {
-        $notifiable = $request->user('customer') ?? $request->user('staff');
+        $notifiable = $request->user('customer') ?? $request->user('admin');
 
         if (! $notifiable) {
             return ApiResponse::error('Unauthorized', 401);

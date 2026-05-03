@@ -11,7 +11,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | The default guard targets the central (SaaS) application. Tenant storefront
-    | and staff APIs authenticate via the `tenant` guard in tenant services.
+    | and admin APIs authenticate via the `tenant` guard in tenant services.
     |
     */
 
@@ -39,7 +39,7 @@ return [
             'driver' => 'session',
             'provider' => 'tenant_users',
         ],
-        'staff' => [
+        'admin' => [
             'driver' => 'sanctum',
             'provider' => 'tenant_users',
         ],

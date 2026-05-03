@@ -14,8 +14,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
- * Staff Auth Endpoints
- * * Handles registration, authentication, profile retrieval, and password resets for internal store staff.
+ * Admin Auth Endpoints
+ * * Handles registration, authentication, profile retrieval, and password resets for internal store admin.
  */
 class StaffAuthController extends Controller
 {
@@ -27,7 +27,7 @@ class StaffAuthController extends Controller
     ) {}
 
     /**
-     * Register a new staff member.
+     * Register a new admin member.
      */
     public function register(RegisterRequest $request): JsonResponse
     {
@@ -39,14 +39,14 @@ class StaffAuthController extends Controller
                 'profile' => $result['profile'],
                 'token' => $result['token'],
             ],
-            'Staff registered successfully',
+            'Admin registered successfully',
             null,
             201
         );
     }
 
     /**
-     * Authenticate an existing staff member.
+     * Authenticate an existing admin member.
      */
     public function login(LoginRequest $request): JsonResponse
     {
@@ -63,7 +63,7 @@ class StaffAuthController extends Controller
     }
 
     /**
-     * Get the currently authenticated staff profile.
+     * Get the currently authenticated admin profile.
      */
     public function me(Request $request): JsonResponse
     {
@@ -71,12 +71,12 @@ class StaffAuthController extends Controller
 
         return ApiResponse::success(
             ['user' => $user],
-            'Staff profile retrieved successfully'
+            'Admin profile retrieved successfully'
         );
     }
 
     /**
-     * Logout the staff member by revoking the current Sanctum token.
+     * Logout the admin member by revoking the current Sanctum token.
      */
     public function logout(Request $request): JsonResponse
     {

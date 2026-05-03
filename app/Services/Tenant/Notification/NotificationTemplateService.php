@@ -63,10 +63,10 @@ class NotificationTemplateService
                 'name' => 'Customer Full Name',
                 'store_name' => 'Name of the Store',
             ],
-            'staff_registered' => [
-                'name' => 'Staff Full Name',
+            'admin_registered' => [
+                'name' => 'Admin Full Name',
                 'store_name' => 'Name of the Store',
-                'email' => 'Staff Login Email',
+                'email' => 'Admin Login Email',
                 'password' => 'Generated Login Password',
             ],
             'password_reset' => [

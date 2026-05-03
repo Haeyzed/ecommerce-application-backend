@@ -16,12 +16,12 @@ use Illuminate\Validation\ValidationException;
 
 /**
  * Class StaffAuthService
- * * Handles staff authentication, profile management, and password resets via the base User model.
+ * * Handles admin authentication, profile management, and password resets via the base User model.
  */
 class StaffAuthService
 {
     /**
-     * Register a new staff member.
+     * Register a new admin member.
      * * Creates the underlying User, attaches a Staff profile, and issues a Sanctum token.
      *
      * @param  array  $data  Validated registration data.
@@ -35,7 +35,7 @@ class StaffAuthService
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => $data['password'] ?? $rawPassword,
-            'user_type' => 'staff',
+            'user_type' => 'admin',
             'is_active' => true,
         ]);
 
@@ -59,7 +59,7 @@ class StaffAuthService
             ]
         ));
 
-        $token = $user->createToken('staff', ['staff:access'])->plainTextToken;
+        $token = $user->createToken('admin', ['admin:access'])->plainTextToken;
 
         return [
             'user' => $user,
@@ -69,7 +69,7 @@ class StaffAuthService
     }
 
     /**
-     * Authenticate an existing staff member via Sanctum token.
+     * Authenticate an existing admin member via Sanctum token.
      * * Ensures they have a Staff profile.
      *
      * @param  array  $credentials  Validated login credentials.
@@ -81,7 +81,7 @@ class StaffAuthService
     {
         $user = User::query()
             ->where('email', $credentials['email'])
-            ->where('user_type', 'staff')
+            ->where('user_type', 'admin')
             ->whereHas('staff')
             ->first();
 
@@ -93,11 +93,11 @@ class StaffAuthService
 
         if (! $user->is_active || ! optional($user->staff)->is_active) {
             throw ValidationException::withMessages([
-                'email' => ['This staff account is inactive.'],
+                'email' => ['This admin account is inactive.'],
             ]);
         }
 
-        $token = $user->createToken('staff', ['staff:access'])->plainTextToken;
+        $token = $user->createToken('admin', ['admin:access'])->plainTextToken;
 
         return [
             'user' => $user->load('staff'),
@@ -115,7 +115,7 @@ class StaffAuthService
     }
 
     /**
-     * Send a password reset link to the given staff member.
+     * Send a password reset link to the given admin member.
      *
      * @param  array  $data  Array containing the user's email.
      * @return string The status translation string.
@@ -136,7 +136,7 @@ class StaffAuthService
     }
 
     /**
-     * Reset the staff member's password.
+     * Reset the admin member's password.
      *
      * @param  array  $data  Validated reset token, email, and new password.
      * @return string The status translation string.
@@ -163,7 +163,7 @@ class StaffAuthService
     }
 
     /**
-     * Verify the staff member's email address using the signed URL parameters.
+     * Verify the admin member's email address using the signed URL parameters.
      *
      * @param  string  $id  The user ID.
      * @param  string  $hash  The verification hash.

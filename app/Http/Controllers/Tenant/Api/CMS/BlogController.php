@@ -77,7 +77,7 @@ class BlogController extends Controller
     public function store(StoreBlogPostRequest $request): JsonResponse
     {
         $postData = $request->validated();
-        $postData['author_id'] = $request->user('staff')?->id;
+        $postData['author_id'] = $request->user('admin')?->id;
 
         $post = $this->blogService->createPost($postData);
 

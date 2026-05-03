@@ -25,7 +25,7 @@ class StoreEmployeeRequest extends FormRequest
     {
         return [
             /**
-             * The ID of the linked staff user account. If omitted, a new Staff & User will be generated.
+             * The ID of the linked admin user account. If omitted, a new Staff & User will be generated.
              *
              * @var int|null $staff_id
              *
@@ -34,7 +34,7 @@ class StoreEmployeeRequest extends FormRequest
             'staff_id' => ['nullable', 'integer', 'exists:staffs,id'],
 
             /**
-             * The optional password to set for the newly auto-generated staff account.
+             * The optional password to set for the newly auto-generated admin account.
              *
              * @var string|null $password
              *

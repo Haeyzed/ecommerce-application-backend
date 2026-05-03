@@ -23,7 +23,7 @@ use Spatie\Sluggable\SlugOptions;
  *
  * @property int $id The unique identifier of the post.
  * @property int|null $blog_category_id The foreign key for the category.
- * @property int|null $staff_id The foreign key for the staff author.
+ * @property int|null $staff_id The foreign key for the admin author.
  * @property string $title The title of the post.
  * @property string $slug The URL-friendly version of the post title.
  * @property string|null $excerpt A short summary of the post.
@@ -108,7 +108,7 @@ class BlogPost extends Model implements AuditableContract, HasMedia
     }
 
     /**
-     * Get the staff user who authored the post.
+     * Get the admin user who authored the post.
      */
     public function staff(): BelongsTo
     {

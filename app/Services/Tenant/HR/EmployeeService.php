@@ -17,7 +17,7 @@ use Throwable;
 
 /**
  * Class EmployeeService
- * * Handles business logic related to tenant HR employees, auto-provisioning staff users.
+ * * Handles business logic related to tenant HR employees, auto-provisioning admin users.
  */
 class EmployeeService
 {
@@ -60,6 +60,7 @@ class EmployeeService
                     'name' => trim(($data['first_name'] ?? '').' '.($data['last_name'] ?? '')),
                     'email' => $data['email'],
                     'password' => Hash::make($rawPassword),
+                    'user_type' => 'admin',
                     'is_active' => $data['is_active'] ?? true,
                 ]);
 
@@ -78,7 +79,7 @@ class EmployeeService
                 event(new Registered($user));
 
                 $user->notify(new DynamicTemplateNotification(
-                    event: 'staff_registered',
+                    event: 'admin_registered',
                     templateData: [
                         'name' => $user->name,
                         'store_name' => $storeName,
