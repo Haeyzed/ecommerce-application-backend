@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Tenant\Api;
+namespace App\Http\Controllers\Central\Api;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Tenant\Setting\UpdateSettingRequest;
-use App\Http\Resources\Tenant\SettingResource;
-use App\Services\Tenant\SettingService;
+use App\Http\Requests\Central\Setting\UpdateSettingRequest;
+use App\Http\Resources\Central\SettingResource;
+use App\Services\Central\SettingService;
 use Illuminate\Http\JsonResponse;
 use Throwable;
 
 /**
- * Setting Endpoints
- * * Handles the retrieval and updating of tenant storefront settings.
+ * Central Setting Endpoints
+ * Handles the retrieval and updating of central platform settings.
  */
 class SettingController extends Controller
 {
@@ -22,12 +22,12 @@ class SettingController extends Controller
     public function __construct(
         private readonly SettingService $settingService
     ) {
-        $this->middleware('permission:view tenant settings')->only(['show']);
-        $this->middleware('permission:update tenant settings')->only(['update']);
+        $this->middleware('permission:view central settings')->only(['show']);
+        $this->middleware('permission:update central settings')->only(['update']);
     }
 
     /**
-     * Retrieve the current store settings.
+     * Retrieve the current central platform settings.
      */
     public function show(): JsonResponse
     {
@@ -35,12 +35,12 @@ class SettingController extends Controller
 
         return ApiResponse::success(
             new SettingResource($setting),
-            'Settings retrieved successfully'
+            'Central settings retrieved successfully'
         );
     }
 
     /**
-     * Update the store settings (supports multipart/form-data for image uploads).
+     * Update the central platform settings (supports multipart/form-data for image uploads).
      *
      * @throws Throwable
      */
@@ -54,7 +54,7 @@ class SettingController extends Controller
 
         return ApiResponse::success(
             new SettingResource($setting),
-            'Settings updated successfully'
+            'Central settings updated successfully'
         );
     }
 }

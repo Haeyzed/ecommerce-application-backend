@@ -22,7 +22,12 @@ class TenantController extends Controller
      */
     public function __construct(
         private readonly TenantService $tenantService
-    ) {}
+    ) {
+        $this->middleware('permission:view tenants')->only(['index', 'show', 'dropdown']);
+        $this->middleware('permission:create tenants')->only(['store']);
+        $this->middleware('permission:update tenants')->only(['update']);
+        $this->middleware('permission:delete tenants')->only(['destroy']);
+    }
 
     /**
      * List all tenants.

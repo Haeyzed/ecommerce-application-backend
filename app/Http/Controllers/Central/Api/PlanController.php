@@ -21,7 +21,12 @@ class PlanController extends Controller
      */
     public function __construct(
         private readonly PlanService $planService
-    ) {}
+    ) {
+        $this->middleware('permission:view plans')->only(['index', 'show', 'dropdown']);
+        $this->middleware('permission:create plans')->only(['store']);
+        $this->middleware('permission:update plans')->only(['update']);
+        $this->middleware('permission:delete plans')->only(['destroy']);
+    }
 
     /**
      * List all plans.
@@ -32,7 +37,7 @@ class PlanController extends Controller
         $plans = $this->planService->getAllPlans();
 
         return ApiResponse::success(
-            ['plans' => $plans],
+            $plans,
             'Plans retrieved successfully'
         );
     }
@@ -46,7 +51,7 @@ class PlanController extends Controller
         $plan = $this->planService->createPlan($request->validated());
 
         return ApiResponse::success(
-            ['plan' => $plan],
+            $plan,
             'Plan created successfully',
             null,
             201
@@ -62,7 +67,7 @@ class PlanController extends Controller
         $planDetails = $this->planService->getPlanDetails($plan);
 
         return ApiResponse::success(
-            ['plan' => $planDetails],
+            $planDetails,
             'Plan retrieved successfully'
         );
     }
@@ -76,7 +81,7 @@ class PlanController extends Controller
         $updatedPlan = $this->planService->updatePlan($plan, $request->validated());
 
         return ApiResponse::success(
-            ['plan' => $updatedPlan],
+            $updatedPlan,
             'Plan updated successfully'
         );
     }

@@ -22,7 +22,11 @@ class AddressController extends Controller
      */
     public function __construct(
         private readonly AddressService $addressService
-    ) {}
+    ) {
+        $this->middleware('permission:view addresses')->only(['index']);
+        $this->middleware('permission:create addresses')->only(['store']);
+        $this->middleware('permission:delete addresses')->only(['destroy']);
+    }
 
     /**
      * List customer addresses.

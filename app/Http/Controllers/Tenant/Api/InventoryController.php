@@ -21,7 +21,10 @@ class InventoryController extends Controller
      */
     public function __construct(
         private readonly ProductService $productService
-    ) {}
+    ) {
+        $this->middleware('permission:manage product inventory')->only(['adjust']);
+        $this->middleware('permission:view inventory movements')->only(['movements']);
+    }
 
     /**
      * Adjust product stock levels manually.

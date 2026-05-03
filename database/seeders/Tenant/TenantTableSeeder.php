@@ -16,7 +16,7 @@ class TenantTableSeeder extends Seeder
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        $this->seedRolesAndPermissions();
+//        $this->seedRolesAndPermissions();
         $this->seedSettings();
         $this->seedMailSettings();
         $this->seedPages();

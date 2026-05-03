@@ -20,7 +20,10 @@ class WishlistController extends Controller
      */
     public function __construct(
         private readonly WishlistService $wishlistService
-    ) {}
+    ) {
+        $this->middleware('permission:view wishlists')->only(['index']);
+        $this->middleware('permission:manage wishlists')->only(['toggle']);
+    }
 
     /**
      * List customer wishlist items.

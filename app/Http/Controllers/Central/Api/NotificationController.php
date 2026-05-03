@@ -23,7 +23,15 @@ class NotificationController extends Controller
     public function __construct(
         private readonly NotificationTemplateService $templateService,
         private readonly NotificationPreferenceService $preferenceService
-    ) {}
+    ) {
+        $this->middleware('permission:view notification templates')->only(['index', 'showTemplate', 'getTemplateVariables', 'dropdown']);
+        $this->middleware('permission:create notification templates')->only(['store']);
+        $this->middleware('permission:update notification templates')->only(['update']);
+        $this->middleware('permission:delete notification templates')->only(['destroy']);
+
+        $this->middleware('permission:view notification preferences')->only(['getPreferences']);
+        $this->middleware('permission:update notification preferences')->only(['updatePreferences']);
+    }
 
     /**
      * Get all notification templates.

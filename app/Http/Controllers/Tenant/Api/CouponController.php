@@ -22,7 +22,12 @@ class CouponController extends Controller
      */
     public function __construct(
         private readonly CouponService $couponService
-    ) {}
+    ) {
+        $this->middleware('permission:view coupons')->only(['index', 'show']);
+        $this->middleware('permission:create coupons')->only(['store']);
+        $this->middleware('permission:update coupons')->only(['update']);
+        $this->middleware('permission:delete coupons')->only(['destroy']);
+    }
 
     /**
      * List all coupons.

@@ -23,7 +23,14 @@ class SubscriptionController extends Controller
      */
     public function __construct(
         private readonly SubscriptionService $subscriptionService
-    ) {}
+    ) {
+        $this->middleware('permission:view subscriptions')->only(['index', 'statusDropdown']);
+        $this->middleware('permission:create subscriptions')->only(['startTrial']);
+        $this->middleware('permission:activate subscriptions')->only(['activate']);
+        $this->middleware('permission:cancel subscriptions')->only(['cancel']);
+        $this->middleware('permission:invoice subscriptions')->only(['invoice']);
+        $this->middleware('permission:view central roles')->only(['roleDropdown']); // Assuming this is for viewing central roles
+    }
 
     /**
      * List all subscriptions.

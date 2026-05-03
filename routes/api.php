@@ -7,6 +7,7 @@ use App\Http\Controllers\Central\Api\InvoiceController;
 use App\Http\Controllers\Central\Api\NotificationController;
 use App\Http\Controllers\Central\Api\OnboardingController;
 use App\Http\Controllers\Central\Api\PlanController;
+use App\Http\Controllers\Central\Api\SettingController; // Import the Central SettingController
 use App\Http\Controllers\Central\Api\SubscriptionController;
 use App\Http\Controllers\Central\Api\TenantController;
 use Illuminate\Support\Facades\Route;
@@ -61,6 +62,10 @@ Route::prefix('central')->name('central.')->group(function (): void {
         Route::get('invoices/{id}', [InvoiceController::class, 'show'])->whereNumber('id')->name('invoices.show');
 
         Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
+
+        // Central Settings Routes
+        Route::get('/settings', [SettingController::class, 'show'])->name('settings.show');
+        Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
     });
 });
 

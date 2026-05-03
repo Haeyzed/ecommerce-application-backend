@@ -22,7 +22,9 @@ class DomainController extends Controller
      */
     public function __construct(
         private readonly DomainService $domainService
-    ) {}
+    ) {
+        $this->middleware('permission:manage tenant domains')->only(['index', 'store', 'destroy']);
+    }
 
     /**
      * List tenant domains.

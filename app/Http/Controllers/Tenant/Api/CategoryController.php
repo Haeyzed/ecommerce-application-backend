@@ -19,7 +19,10 @@ class CategoryController extends Controller
      */
     public function __construct(
         private readonly CategoryService $categoryService
-    ) {}
+    ) {
+        $this->middleware('permission:view categories')->only(['index']);
+        $this->middleware('permission:create categories')->only(['store']);
+    }
 
     /**
      * List all categories.

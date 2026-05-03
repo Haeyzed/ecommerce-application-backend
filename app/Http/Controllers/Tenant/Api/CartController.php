@@ -25,7 +25,9 @@ class CartController extends Controller
      */
     public function __construct(
         private readonly CartService $cartService
-    ) {}
+    ) {
+        $this->middleware('permission:manage cart')->except(['show']); // Apply to all methods except show
+    }
 
     /**
      * Resolve the active cart using headers or auth.
@@ -82,7 +84,7 @@ class CartController extends Controller
     /**
      * Update the quantity of a specific cart item.
      */
-    public function updateItem(UpdateItemRequest $request, int $itemId): JsonResponse
+    public function updateItem(int $itemId, UpdateItemRequest $request): JsonResponse
     {
         $cart = $this->resolveCart($request);
         $item = $cart->items()->findOrFail($itemId);

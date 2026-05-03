@@ -21,7 +21,7 @@ class CentralTableSeeder extends Seeder
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $this->seedPlans();
-        $this->seedRolesAndPermissions();
+//        $this->seedRolesAndPermissions();
         $this->seedSettings();
         $this->seedPages();
         $this->seedBlogCategories();

@@ -22,7 +22,10 @@ class ShipmentController extends Controller
      */
     public function __construct(
         private readonly ShipmentService $shipmentService
-    ) {}
+    ) {
+        $this->middleware('permission:create shipments')->only(['store']);
+        $this->middleware('permission:update shipments')->only(['deliver']); // Assuming 'deliver' is an update operation
+    }
 
     /**
      * Dispatch a shipment for an order.

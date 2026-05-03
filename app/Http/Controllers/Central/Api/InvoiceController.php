@@ -18,7 +18,9 @@ class InvoiceController extends Controller
      */
     public function __construct(
         private readonly InvoiceService $invoiceService
-    ) {}
+    ) {
+        $this->middleware('permission:view invoices')->only(['index', 'show']);
+    }
 
     /**
      * List all invoices.

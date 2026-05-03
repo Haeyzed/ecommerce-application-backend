@@ -19,7 +19,9 @@ class AuditLogController extends Controller
      */
     public function __construct(
         private readonly AuditLogService $auditLogService
-    ) {}
+    ) {
+        $this->middleware('permission:view audit logs')->only(['index']);
+    }
 
     /**
      * List all audit logs.

@@ -22,7 +22,12 @@ class ProductController extends Controller
      */
     public function __construct(
         private readonly ProductService $productService
-    ) {}
+    ) {
+        $this->middleware('permission:view products')->only(['index', 'show']);
+        $this->middleware('permission:create products')->only(['store']);
+        $this->middleware('permission:update products')->only(['update']);
+        $this->middleware('permission:delete products')->only(['destroy']);
+    }
 
     /**
      * List all active products.

@@ -21,7 +21,11 @@ class ReviewController extends Controller
      */
     public function __construct(
         private readonly ReviewService $reviewService
-    ) {}
+    ) {
+        $this->middleware('permission:view reviews')->only(['index']);
+        $this->middleware('permission:create reviews')->only(['store']);
+        $this->middleware('permission:manage reviews')->only(['approve']);
+    }
 
     /**
      * List approved product reviews.

@@ -21,7 +21,10 @@ class OrderController extends Controller
      */
     public function __construct(
         private readonly OrderService $orderService
-    ) {}
+    ) {
+        $this->middleware('permission:view orders')->only(['index', 'show']);
+        $this->middleware('permission:create orders')->only(['store']);
+    }
 
     /**
      * List customer orders.

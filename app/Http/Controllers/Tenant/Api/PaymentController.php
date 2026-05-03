@@ -22,7 +22,10 @@ class PaymentController extends Controller
      */
     public function __construct(
         private readonly PaymentService $paymentService
-    ) {}
+    ) {
+        $this->middleware('permission:process payments')->only(['store']);
+        // The webhook method is an external endpoint and should not be protected by internal permissions.
+    }
 
     /**
      * Record a new payment.
