@@ -28,6 +28,7 @@ Route::prefix('central')->name('central.')->group(function (): void {
     Route::get('/auth/{provider}/callback', [AuthController::class, 'handleProviderCallback'])->name('oauth.callback');
 
     Route::post('/onboarding', [OnboardingController::class, 'store'])->name('onboarding.store');
+    Route::get('/settings', [SettingController::class, 'show'])->name('settings.show');
 
     Route::middleware('auth:sanctum')->group(function (): void {
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

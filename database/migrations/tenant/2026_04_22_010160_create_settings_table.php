@@ -18,11 +18,11 @@ return new class extends Migration
             $table->string('currency', 8)->default('USD');
             $table->string('timezone', 64)->default('UTC');
             $table->string('language', 8)->default('en');
-            $table->string('logo_path')->nullable();
-            $table->string('favicon_path')->nullable();
+//            $table->string('logo_path')->nullable();
+//            $table->string('favicon_path')->nullable();
             $table->string('primary_color', 16)->nullable();
             $table->json('social')->nullable();
-            $table->json('payment_providers')->nullable();
+//            $table->json('payment_providers')->nullable();
             $table->string('contact_email')->nullable();
             $table->string('contact_phone')->nullable();
             $table->text('address')->nullable();

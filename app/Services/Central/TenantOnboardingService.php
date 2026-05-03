@@ -90,7 +90,7 @@ class TenantOnboardingService
                     'is_active' => true,
                 ]);
 
-                $ownerUser->assignRole(RoleEnum::OWNER->value);
+                $ownerUser->assignRole(RoleEnum::ADMIN->value);
 
                 Staff::query()->create([
                     'user_id' => $ownerUser->id,

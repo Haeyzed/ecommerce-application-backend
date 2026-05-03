@@ -6,7 +6,9 @@ enum RoleEnum: string
 {
     case OWNER = 'owner';
     case MANAGER = 'manager';
-    case STAFF = 'admin';
+    case STAFF = 'staff';
+
+    case ADMIN = 'admin';
     case CUSTOMER = 'customer';
 
     public static function values(): array

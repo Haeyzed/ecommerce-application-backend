@@ -179,8 +179,8 @@ class CentralTableSeeder extends Seeder
                 'currency' => 'USD',
                 'timezone' => 'UTC',
                 'language' => 'en',
-                'logo_path' => null,
-                'favicon_path' => null,
+//                'logo_path' => null,
+//                'favicon_path' => null,
                 'primary_color' => '#2563eb',
                 'social' => json_encode([
                     'facebook' => null,
@@ -188,34 +188,34 @@ class CentralTableSeeder extends Seeder
                     'twitter' => null,
                     'linkedin' => null,
                 ]),
-                'payment_providers' => json_encode([
-                    'stripe' => [
-                        'enabled' => false,
-                        'test_mode' => true,
-                        'test' => [
-                            'public_key' => 'pk_test_stripe_...',
-                            'secret_key' => 'sk_test_stripe_...',
-                            'webhook_secret' => 'whsec_test_stripe_...',
-                        ],
-                        'live' => [
-                            'public_key' => 'pk_live_stripe_...',
-                            'secret_key' => 'sk_live_stripe_...',
-                            'webhook_secret' => 'whsec_live_stripe_...',
-                        ],
-                    ],
-                    'paypal' => [
-                        'enabled' => false,
-                        'test_mode' => true,
-                        'test' => [
-                            'client_id' => 'client_test_paypal_...',
-                            'secret' => 'secret_test_paypal_...',
-                        ],
-                        'live' => [
-                            'client_id' => 'client_live_paypal_...',
-                            'secret' => 'secret_live_paypal_...',
-                        ],
-                    ],
-                ]),
+//                'payment_providers' => json_encode([
+//                    'stripe' => [
+//                        'enabled' => false,
+//                        'test_mode' => true,
+//                        'test' => [
+//                            'public_key' => 'pk_test_stripe_...',
+//                            'secret_key' => 'sk_test_stripe_...',
+//                            'webhook_secret' => 'whsec_test_stripe_...',
+//                        ],
+//                        'live' => [
+//                            'public_key' => 'pk_live_stripe_...',
+//                            'secret_key' => 'sk_live_stripe_...',
+//                            'webhook_secret' => 'whsec_live_stripe_...',
+//                        ],
+//                    ],
+//                    'paypal' => [
+//                        'enabled' => false,
+//                        'test_mode' => true,
+//                        'test' => [
+//                            'client_id' => 'client_test_paypal_...',
+//                            'secret' => 'secret_test_paypal_...',
+//                        ],
+//                        'live' => [
+//                            'client_id' => 'client_live_paypal_...',
+//                            'secret' => 'secret_live_paypal_...',
+//                        ],
+//                    ],
+//                ]),
                 'contact_email' => null,
                 'contact_phone' => null,
                 'address' => null,
